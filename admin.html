@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TobaKart | Admin Command Center</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js for Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif']
+                    },
+                    colors: {
+                        brand: { 50: '#f8fafc', 500: '#3b82f6', 600: '#2563eb', 900: '#0f172a' },
+                        accent: { dark: '#020617', red: '#ef4444' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #f1f5f9; color: #334155; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .admin-section { display: none; }
+        .admin-section.active { display: block; animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .table-container::-webkit-scrollbar { height: 6px; width: 6px; }
+        .table-container::-webkit-scrollbar-track { background: #f8fafc; }
+        .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+        .toast { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translateY(150%); opacity: 0; pointer-events: none; }
+        .toast.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+        
+        .loader { border: 3px solid #f1f5f9; border-top: 3px solid #0f172a; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="h-screen overflow-hidden flex selection:bg-brand-900 selection:text-white">
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-accent-dark text-white px-6 py-4 rounded-xl shadow-2xl z-[100] flex items-center space-x-3 text-sm font-semibold border border-white/10">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-green-400"></i>
+        <span id="toastMessage">Action successful</span>
+    </div>
+
+    <!-- 1. AUTHENTICATION VIEW -->
+    <div id="authView" class="fixed inset-0 z-50 bg-brand-50 flex items-center justify-center p-4">
+        <div class="bg-white p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] max-w-md w-full border border-gray-100">
+            <div class="text-center mb-10">
+                <div class="w-16 h-16 bg-accent-dark text-white rounded-2xl flex items-center justify-center text-2xl mx-auto mb-6 shadow-lg">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h1 class="font-display text-3xl font-extrabold text-accent-dark tracking-tight uppercase">Command Center</h1>
+                <p class="text-gray-500 text-sm mt-2 font-medium">TobaKart Admin Access</p>
+            </div>
+            <form id="loginForm" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Admin Email</label>
+                    <input type="email" id="loginEmail" required class="w-full bg-brand-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-accent-dark focus:bg-white outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Password</label>
+                    <input type="password" id="loginPassword" required class="w-full bg-brand-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-accent-dark focus:bg-white outline-none transition">
+                </div>
+                <button type="submit" id="btnLogin" class="w-full bg-accent-dark hover:bg-gray-800 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-sm shadow-lg transition flex justify-center items-center h-14">
+                    Authenticate
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. MAIN APPLICATION VIEW -->
+    <div id="appView" class="hidden flex w-full h-full relative">
+        
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="w-[280px] bg-accent-dark text-gray-300 flex flex-col transition-transform absolute z-40 h-full md:relative md:translate-x-0 -translate-x-full shadow-2xl md:shadow-none">
+            <div class="h-20 flex items-center justify-between px-6 border-b border-white/10 bg-accent-dark shrink-0">
+                <span class="font-display text-2xl font-bold text-white tracking-tighter">TOBAKART<span class="text-accent-red">.</span></span>
+                <button class="md:hidden text-gray-400 hover:text-white" onclick="toggleSidebar()"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <nav class="flex-1 overflow-y-auto py-6 space-y-2 px-4 hide-scrollbar">
+                <div class="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-3 mb-2">Operations</div>
+                <button onclick="navigate('dashboard')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white/10 text-white font-semibold transition text-sm" data-target="dashboard">
+                    <i class="fa-solid fa-chart-line w-5 text-center"></i> Dashboard
+                </button>
+                <button onclick="navigate('orders')" class="nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white font-semibold transition text-sm" data-target="orders">
+                    <div class="flex items-center gap-3"><i class="fa-solid fa-box-open w-5 text-center"></i> Orders</div>
+                    <span class="bg-brand-500 text-white text-[10px] px-2 py-0.5 rounded-md font-bold" id="badgePendingOrders">0</span>
+                </button>
+                
+                <div class="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-3 mt-6 mb-2">Storefront</div>
+                <button onclick="navigate('banners')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white font-semibold transition text-sm" data-target="banners">
+                    <i class="fa-solid fa-images w-5 text-center"></i> Home Banners
+                </button>
+                <button onclick="navigate('products')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white font-semibold transition text-sm" data-target="products">
+                    <i class="fa-solid fa-tags w-5 text-center"></i> Products
+                </button>
+                <button onclick="navigate('categories')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white font-semibold transition text-sm" data-target="categories">
+                    <i class="fa-solid fa-layer-group w-5 text-center"></i> Categories
+                </button>
+                
+                <div class="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-3 mt-6 mb-2">Partner Network</div>
+                <button onclick="navigate('affiliates')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white font-semibold transition text-sm" data-target="affiliates">
+                    <i class="fa-solid fa-users-viewfinder w-5 text-center"></i> Affiliates
+                </button>
+                <button onclick="navigate('payouts')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white font-semibold transition text-sm" data-target="payouts">
+                    <i class="fa-solid fa-money-bill-transfer w-5 text-center"></i> Payouts
+                </button>
+                
+                <div class="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-3 mt-6 mb-2">Settings</div>
+                <button onclick="navigate('settings')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white font-semibold transition text-sm" data-target="settings">
+                    <i class="fa-solid fa-gear w-5 text-center"></i> Configuration
+                </button>
+            </nav>
+
+            <div class="p-5 border-t border-white/10 shrink-0">
+                <div class="flex items-center gap-3 mb-4 px-2">
+                    <div class="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-white font-bold text-xs">AD</div>
+                    <div class="overflow-hidden">
+                        <p class="text-xs font-bold text-white truncate" id="adminEmailDisplay">admin@tobakart.com</p>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest">Super Admin</p>
+                    </div>
+                </div>
+                <button onclick="logoutAdmin()" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 font-bold transition text-sm">
+                    <i class="fa-solid fa-power-off"></i> Terminate Session
+                </button>
+            </div>
+        </aside>
+
+        <div id="sidebarBackdrop" class="fixed inset-0 z-30 bg-accent-dark/50 backdrop-blur-sm hidden md:hidden" onclick="toggleSidebar()"></div>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-brand-50">
+            <!-- Headerbar -->
+            <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-6 lg:px-10 shrink-0 z-20 shadow-sm">
+                <div class="flex items-center gap-4">
+                    <button class="md:hidden text-gray-600 hover:text-accent-dark transition" onclick="toggleSidebar()">
+                        <i class="fa-solid fa-bars-staggered text-xl"></i>
+                    </button>
+                    <h2 class="text-xl lg:text-2xl font-display font-bold text-accent-dark tracking-tight uppercase" id="headerTitle">Dashboard</h2>
+                </div>
+            </header>
+
+            <!-- Scrollable Content -->
+            <div class="flex-1 overflow-y-auto p-4 lg:p-10 hide-scrollbar" id="mainContentArea">
+                
+                <!-- ================= DASHBOARD ================= -->
+                <section id="sec-dashboard" class="admin-section active max-w-7xl mx-auto">
+                    <!-- KPIs -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Total Revenue</p>
+                            <h3 class="font-display text-3xl font-bold text-accent-dark" id="kpiRevenue">₹0</h3>
+                            <div class="absolute bottom-0 right-0 p-4 opacity-10"><i class="fa-solid fa-indian-rupee-sign text-6xl"></i></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Total Orders</p>
+                            <h3 class="font-display text-3xl font-bold text-accent-dark" id="kpiOrders">0</h3>
+                            <div class="absolute bottom-0 right-0 p-4 opacity-10"><i class="fa-solid fa-box-open text-6xl"></i></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Active Affiliates</p>
+                            <h3 class="font-display text-3xl font-bold text-brand-600" id="kpiAffiliates">0</h3>
+                            <div class="absolute bottom-0 right-0 p-4 opacity-10"><i class="fa-solid fa-users text-6xl text-brand-600"></i></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Pending Commissions</p>
+                            <h3 class="font-display text-3xl font-bold text-orange-500" id="kpiPendingComm">₹0</h3>
+                            <div class="absolute bottom-0 right-0 p-4 opacity-10"><i class="fa-solid fa-clock text-6xl text-orange-500"></i></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Chart -->
+                        <div class="bg-white p-6 lg:p-8 rounded-2xl border border-gray-100 shadow-sm lg:col-span-2">
+                            <h3 class="font-display text-lg font-bold text-accent-dark uppercase tracking-tight mb-6">Revenue Over Time</h3>
+                            <div class="relative h-64 w-full">
+                                <canvas id="salesChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- Recent Activity -->
+                        <div class="bg-white p-6 lg:p-8 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="font-display text-lg font-bold text-accent-dark uppercase tracking-tight">Recent Orders</h3>
+                                <button onclick="navigate('orders')" class="text-xs font-bold text-brand-600 uppercase hover:underline">View All</button>
+                            </div>
+                            <div class="space-y-4 flex-1 overflow-y-auto hide-scrollbar" id="recentOrdersList">
+                                <div class="flex justify-center py-10"><div class="loader"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= ORDERS ================= -->
+                <section id="sec-orders" class="admin-section max-w-7xl mx-auto">
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+                        <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4 bg-white">
+                            <div class="flex items-center gap-3 w-full sm:w-auto">
+                                <i class="fa-solid fa-filter text-gray-400"></i>
+                                <select id="orderFilterStatus" class="bg-brand-50 border-none text-sm font-semibold rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-accent-dark w-full sm:w-auto" onchange="renderOrdersTable()">
+                                    <option value="ALL">All Statuses</option>
+                                    <option value="NEW">New</option>
+                                    <option value="CONFIRMED">Confirmed</option>
+                                    <option value="PROCESSING">Processing</option>
+                                    <option value="READY_FOR_QIKINK">Ready for Print</option>
+                                    <option value="SHIPPED">Shipped</option>
+                                    <option value="DELIVERED">Delivered</option>
+                                    <option value="CANCELLED">Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="text-xs font-bold text-green-600 bg-green-50 px-4 py-2 rounded-lg flex items-center gap-2 border border-green-100">
+                                <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> Tracking Live
+                            </div>
+                        </div>
+                        
+                        <div class="overflow-x-auto table-container">
+                            <table class="w-full text-sm text-left whitespace-nowrap">
+                                <thead class="text-[10px] text-gray-400 uppercase tracking-widest bg-gray-50 border-b border-gray-100">
+                                    <tr>
+                                        <th class="px-6 py-4 font-bold">Order Details</th>
+                                        <th class="px-6 py-4 font-bold">Customer Info</th>
+                                        <th class="px-6 py-4 font-bold">Value & Auth</th>
+                                        <th class="px-6 py-4 font-bold">Affiliate</th>
+                                        <th class="px-6 py-4 font-bold">Fulfillment Status</th>
+                                        <th class="px-6 py-4 font-bold text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ordersTableBody" class="divide-y divide-gray-50 text-gray-600">
+                                    <tr><td colspan="6" class="px-6 py-16 text-center"><div class="loader mx-auto mb-3"></div> Fetching Orders...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= BANNERS (FIXED CAROUSEL SCROLL) ================= -->
+                <section id="sec-banners" class="admin-section max-w-7xl mx-auto">
+                    <div class="flex justify-between items-center gap-4 mb-8">
+                        <div>
+                            <h3 class="font-display text-2xl font-bold text-accent-dark uppercase tracking-tight">Dynamic Banners</h3>
+                            <p class="text-xs text-gray-500 mt-1">Manage Auto-sliding banners for the user storefront.</p>
+                        </div>
+                        <button onclick="openBannerModal()" class="bg-accent-dark text-white px-6 py-3.5 rounded-xl text-sm font-bold tracking-wide uppercase shadow-lg hover:bg-gray-800 transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Add Banner
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto table-container">
+                            <table class="w-full text-sm text-left whitespace-nowrap">
+                                <thead class="text-[10px] text-gray-400 uppercase tracking-widest bg-gray-50 border-b border-gray-100">
+                                    <tr>
+                                        <th class="px-6 py-4 font-bold">Banner Preview</th>
+                                        <th class="px-6 py-4 font-bold">Target Link (On Click)</th>
+                                        <th class="px-6 py-4 font-bold text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bannersTableBody" class="divide-y divide-gray-50 text-gray-600">
+                                    <tr><td colspan="3" class="px-6 py-16 text-center"><div class="loader mx-auto mb-3"></div> Fetching Banners...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= CATALOG (PRODUCTS - FIXED CAROUSEL SCROLL) ================= -->
+                <section id="sec-products" class="admin-section max-w-7xl mx-auto">
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
+                        <div class="relative w-full sm:w-96">
+                            <input type="text" id="productSearch" oninput="filterProducts()" placeholder="Search product name or SKU..." class="w-full bg-white border border-gray-200 rounded-xl pl-12 pr-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-accent-dark outline-none shadow-sm transition">
+                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                        <button onclick="openProductModal()" class="w-full sm:w-auto bg-accent-dark text-white px-6 py-3.5 rounded-xl text-sm font-bold tracking-wide uppercase shadow-lg hover:bg-gray-800 transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus"></i> New Product
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto table-container">
+                            <table class="w-full text-sm text-left whitespace-nowrap">
+                                <thead class="text-[10px] text-gray-400 uppercase tracking-widest bg-gray-50 border-b border-gray-100">
+                                    <tr>
+                                        <th class="px-6 py-4 font-bold">Product Item</th>
+                                        <th class="px-6 py-4 font-bold">Category & Tags</th>
+                                        <th class="px-6 py-4 font-bold">Pricing</th>
+                                        <th class="px-6 py-4 font-bold">Stock Info</th>
+                                        <th class="px-6 py-4 font-bold text-right">Manage</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productsTableBody" class="divide-y divide-gray-50 text-gray-600">
+                                    <tr><td colspan="5" class="px-6 py-16 text-center"><div class="loader mx-auto mb-3"></div> Fetching Catalog...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= CATEGORIES (FIXED CAROUSEL SCROLL) ================= -->
+                <section id="sec-categories" class="admin-section max-w-7xl mx-auto">
+                    <div class="flex justify-between items-center gap-4 mb-8">
+                        <h3 class="font-display text-2xl font-bold text-accent-dark uppercase tracking-tight">Manage Categories</h3>
+                        <button onclick="openCategoryModal()" class="bg-accent-dark text-white px-6 py-3.5 rounded-xl text-sm font-bold tracking-wide uppercase shadow-lg hover:bg-gray-800 transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus"></i> New Category
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto table-container">
+                            <table class="w-full text-sm text-left whitespace-nowrap">
+                                <thead class="text-[10px] text-gray-400 uppercase tracking-widest bg-gray-50 border-b border-gray-100">
+                                    <tr>
+                                        <th class="px-6 py-4 font-bold">Category Banner</th>
+                                        <th class="px-6 py-4 font-bold">Category Name</th>
+                                        <th class="px-6 py-4 font-bold text-right">Manage</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="categoriesTableBody" class="divide-y divide-gray-50 text-gray-600">
+                                    <tr><td colspan="3" class="px-6 py-16 text-center"><div class="loader mx-auto mb-3"></div> Fetching Categories...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= AFFILIATES ================= -->
+                <section id="sec-affiliates" class="admin-section max-w-7xl mx-auto">
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+                        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white">
+                            <h3 class="font-display text-lg font-bold text-accent-dark uppercase tracking-tight">Partner Directory</h3>
+                        </div>
+                        
+                        <div class="overflow-x-auto table-container">
+                            <table class="w-full text-sm text-left whitespace-nowrap">
+                                <thead class="text-[10px] text-gray-400 uppercase tracking-widest bg-gray-50 border-b border-gray-100">
+                                    <tr>
+                                        <th class="px-6 py-4 font-bold">Partner Name & Code</th>
+                                        <th class="px-6 py-4 font-bold">Contact</th>
+                                        <th class="px-6 py-4 font-bold">Total Referrals</th>
+                                        <th class="px-6 py-4 font-bold">Pending Comm.</th>
+                                        <th class="px-6 py-4 font-bold">Approved Comm.</th>
+                                        <th class="px-6 py-4 font-bold">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="affiliatesTableBody" class="divide-y divide-gray-50 text-gray-600">
+                                    <tr><td colspan="6" class="px-6 py-16 text-center"><div class="loader mx-auto mb-3"></div> Aggregating data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= PAYOUTS ================= -->
+                <section id="sec-payouts" class="admin-section max-w-7xl mx-auto">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-1 space-y-6">
+                            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 text-center relative overflow-hidden">
+                                <div class="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center text-2xl mx-auto mb-4 relative z-10"><i class="fa-solid fa-money-bill-transfer"></i></div>
+                                <h3 class="text-gray-500 font-bold text-xs uppercase tracking-widest mb-2 relative z-10">Total Required Payouts</h3>
+                                <p class="font-display text-4xl font-bold text-accent-dark relative z-10" id="totalRequiredPayouts">₹0</p>
+                                <div class="absolute bottom-0 right-0 p-4 opacity-5"><i class="fa-solid fa-wallet text-8xl"></i></div>
+                            </div>
+                            
+                            <div class="bg-blue-50 border border-blue-100 rounded-3xl p-6">
+                                <h4 class="font-bold text-blue-900 text-sm uppercase tracking-widest mb-3">Payout Protocol</h4>
+                                <p class="text-xs text-blue-800 font-medium leading-relaxed mb-4">Commissions become "Approved" automatically when the linked order status is changed to DELIVERED. Use this interface to log manual bank transfers to affiliates. Affiliates will see this update instantly.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="lg:col-span-2">
+                            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden h-full flex flex-col">
+                                <div class="p-6 border-b border-gray-50 bg-white flex justify-between items-center">
+                                    <h3 class="font-display text-lg font-bold text-accent-dark uppercase tracking-tight">Approved Balances</h3>
+                                </div>
+                                <div class="overflow-x-auto table-container flex-1">
+                                    <table class="w-full text-sm text-left whitespace-nowrap">
+                                        <thead class="text-[10px] text-gray-400 uppercase tracking-widest bg-gray-50 border-b border-gray-100">
+                                            <tr>
+                                                <th class="px-6 py-4 font-bold">Affiliate</th>
+                                                <th class="px-6 py-4 font-bold">Approved Balance</th>
+                                                <th class="px-6 py-4 font-bold text-right">Process Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="payoutsProcessingTable" class="divide-y divide-gray-50 text-gray-600">
+                                            <tr><td colspan="3" class="px-6 py-16 text-center"><div class="loader mx-auto mb-3"></div> Checking balances...</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+                        <div class="p-6 border-b border-gray-50 bg-white">
+                            <h3 class="font-display text-lg font-bold text-accent-dark uppercase tracking-tight">Recent Payout Logs</h3>
+                        </div>
+                        <div class="overflow-x-auto table-container">
+                            <table class="w-full text-sm text-left whitespace-nowrap">
+                                <thead class="text-[10px] text-gray-400 uppercase tracking-widest bg-gray-50 border-b border-gray-100">
+                                    <tr>
+                                        <th class="px-6 py-4 font-bold">Date Logged</th>
+                                        <th class="px-6 py-4 font-bold">Affiliate Name</th>
+                                        <th class="px-6 py-4 font-bold">Ref Code</th>
+                                        <th class="px-6 py-4 font-bold">Amount Paid</th>
+                                        <th class="px-6 py-4 font-bold">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="payoutHistoryTable" class="divide-y divide-gray-50 text-gray-600">
+                                    <tr><td colspan="5" class="px-6 py-10 text-center">Loading history...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- ================= SETTINGS ================= -->
+                <section id="sec-settings" class="admin-section max-w-4xl mx-auto space-y-8">
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-8">
+                        <div class="flex items-center gap-3 mb-2">
+                            <i class="fa-solid fa-qrcode text-accent-dark text-xl"></i>
+                            <h3 class="font-display text-2xl font-bold text-accent-dark uppercase tracking-tight">Online Payment QR Code</h3>
+                        </div>
+                        <p class="text-gray-500 text-sm mb-8">Upload your UPI QR code (via Google Drive link, same as product images). This QR will be shown to customers on checkout when they choose Online Payment.</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                    <i class="fa-brands fa-google-drive text-blue-500 text-lg"></i> QR Code Image Link
+                                </label>
+                                <input type="url" id="settingsQrUrl" placeholder="Paste Google Drive shareable link here..." class="w-full bg-brand-50 border border-gray-200 rounded-xl px-5 py-4 font-medium focus:ring-2 focus:ring-accent-dark outline-none text-sm transition shadow-sm mb-3">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-6">Ensure link access is set to "Anyone with the link"</p>
+                                <button onclick="saveSettings()" id="btnSaveSettings" class="w-full bg-accent-dark text-white px-6 py-3.5 rounded-xl text-sm font-bold tracking-wide uppercase shadow-lg hover:bg-gray-800 transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-floppy-disk"></i> Save QR Code
+                                </button>
+                            </div>
+                            <div class="bg-brand-50 rounded-2xl border border-gray-100 border-dashed p-6 flex flex-col items-center justify-center min-h-[220px]">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Current Live Preview</p>
+                                <img id="settingsQrPreview" src="" class="w-40 h-40 object-contain bg-white rounded-xl border border-gray-200 shadow-sm hidden">
+                                <div id="settingsQrEmpty" class="text-gray-400 text-center">
+                                    <i class="fa-solid fa-qrcode text-4xl mb-2 opacity-40"></i>
+                                    <p class="text-xs font-bold uppercase tracking-widest">No QR Added Yet</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 text-center">
+                        <i class="fa-solid fa-gears text-4xl text-gray-300 mb-4"></i>
+                        <h3 class="font-display text-2xl font-bold text-accent-dark uppercase tracking-tight mb-2">Platform Configuration</h3>
+                        <p class="text-gray-500">Global commission rates, shipping rules, and tax settings will be manageable here in future updates. Currently locked to 10% standard POD affiliate rate.</p>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODALS -->
+    
+    <!-- Banner Modal -->
+    <div id="bannerModal" class="fixed inset-0 z-[100] bg-accent-dark/80 hidden items-center justify-center backdrop-blur-sm p-4 transition-opacity">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg flex flex-col overflow-hidden">
+            <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-white z-10">
+                <h3 class="font-display text-2xl font-bold text-accent-dark uppercase tracking-tight" id="bannerModalTitle">Add Store Banner</h3>
+                <button onclick="closeBannerModal()" class="text-gray-400 hover:text-accent-dark bg-gray-50 w-10 h-10 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-8">
+                <form id="bannerForm" class="space-y-6">
+                    <div class="bg-brand-50 p-6 rounded-2xl border border-gray-100 border-dashed">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <i class="fa-brands fa-google-drive text-blue-500 text-lg"></i> Banner Image Link
+                        </label>
+                        <input type="url" id="bannerImageUrl" required placeholder="Paste Google Drive shareable link here..." class="w-full bg-white border border-gray-200 rounded-xl px-5 py-4 font-medium focus:ring-2 focus:ring-accent-dark outline-none text-sm transition shadow-sm">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-3">Recommended size for Desktop & Mobile views</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Target Link / Action</label>
+                        <input type="text" id="bannerTarget" placeholder="e.g. shop OR shop?category=hoodies" required class="w-full bg-brand-50 border-none rounded-xl px-5 py-4 font-medium focus:ring-2 focus:ring-accent-dark outline-none text-sm transition">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2">Where should the user go when they click this banner?</p>
+                    </div>
+                </form>
+            </div>
+            <div class="px-8 py-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 z-10">
+                <button onclick="closeBannerModal()" class="px-6 py-3.5 text-sm font-bold text-gray-500 hover:bg-gray-200 rounded-xl transition uppercase tracking-wider">Cancel</button>
+                <button onclick="saveBanner()" id="btnSaveBanner" class="px-8 py-3.5 text-sm font-bold bg-accent-dark text-white hover:bg-gray-800 shadow-lg rounded-xl transition uppercase tracking-wider flex items-center gap-2">
+                    Save Banner
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div id="productModal" class="fixed inset-0 z-[100] bg-accent-dark/80 hidden items-center justify-center backdrop-blur-sm p-4 transition-opacity">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
+            <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-white z-10">
+                <h3 class="font-display text-2xl font-bold text-accent-dark uppercase tracking-tight" id="prodModalTitle">Add New Product</h3>
+                <button onclick="closeProductModal()" class="text-gray-400 hover:text-accent-dark bg-gray-50 w-10 h-10 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-8 hide-scrollbar">
+                <form id="productForm" class="space-y-6">
+                    <input type="hidden" id="prodId">
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Product Title</label>
+                        <input type="text" id="prodName" required placeholder="e.g. OVERSIZED HEAVYWEIGHT TEE" class="w-full bg-brand-50 border-none rounded-xl px-5 py-4 font-medium focus:ring-2 focus:ring-accent-dark outline-none text-sm transition">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Regular Price (₹)</label>
+                            <input type="number" id="prodPrice" required placeholder="1499" class="w-full bg-brand-50 border-none rounded-xl px-5 py-4 font-medium focus:ring-2 focus:ring-accent-dark outline-none text-sm transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Sale Price (₹) <span class="font-normal text-gray-400 ml-1">(Optional)</span></label>
+                            <input type="number" id="prodSalePrice" placeholder="999" class="w-full bg-brand-50 border-none rounded-xl px-5 py-4 font-medium focus:ring-2 focus:ring-accent-dark outline-none text-sm transition">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Category</label>
+                            <select id="prodCategory" required class="w-full bg-brand-50 border-none rounded-xl px-5 py-4 font-medium focus:ring-2 focus:ring-accent-dark outline-none text-sm transition">
+                                <!-- Dynamic Options Populated via JS -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Tags <span class="font-normal text-gray-400 ml-1">(Comma separated)</span></label>
+                            <input type="text" id="prodTags" placeholder="trending, new, classic" class="w-full bg-brand-50 border-none rounded-xl px-5 py-4 font-medium focus:ring-2 focus:ring-accent-dark outline-none text-sm transition">
+                        </div>
+                    </div>
+
+                    <!-- GOOGLE DRIVE IMAGE LINK INTEGRATION -->
+                    <div class="bg-brand-50 p-6 rounded-2xl border border-gray-100 border-dashed">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <i class="fa-brands fa-google-drive text-blue-500 text-lg"></i> Product Image Link
+                        </label>
+                        <input type="url" id="prodImageUrl" placeholder="Paste Google Drive shareable link here..." class="w-full bg-white border border-gray-200 rounded-xl px-5 py-4 font-medium focus:ring-2 focus:ring-accent-dark outline-none text-sm transition shadow-sm">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-3">Ensure link access is set to "Anyone with the link"</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Sizes <span class="font-normal text-gray-400 ml-1">(Comma separated)</span></label>
+                            <input type="text" id="prodSizes" value="S, M, L, XL" required class="w-full bg-brand-50 border-none rounded-xl px-5 py-4 font-medium focus:ring-2 focus:ring-accent-dark outline-none text-sm transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Fabric / Material <span class="font-normal text-gray-400 ml-1">(Optional)</span></label>
+                            <input type="text" id="prodMaterial" placeholder="e.g. 100% Premium Cotton (240 GSM)" class="w-full bg-brand-50 border-none rounded-xl px-5 py-4 font-medium focus:ring-2 focus:ring-accent-dark outline-none text-sm transition">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Product Description <span class="font-normal text-gray-400 ml-1">(Optional)</span></label>
+                        <textarea id="prodDescription" rows="3" placeholder="Describe the fit, feel, and design details..." class="w-full bg-brand-50 border-none rounded-xl px-5 py-4 font-medium focus:ring-2 focus:ring-accent-dark outline-none text-sm transition resize-none"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="px-8 py-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 z-10">
+                <button onclick="closeProductModal()" class="px-6 py-3.5 text-sm font-bold text-gray-500 hover:bg-gray-200 rounded-xl transition uppercase tracking-wider">Cancel</button>
+                <button onclick="saveProduct()" id="btnSaveProduct" class="px-8 py-3.5 text-sm font-bold bg-accent-dark text-white hover:bg-gray-800 shadow-lg rounded-xl transition uppercase tracking-wider flex items-center gap-2">
+                    Save Product
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div id="categoryModal" class="fixed inset-0 z-[100] bg-accent-dark/80 hidden items-center justify-center backdrop-blur-sm p-4 transition-opacity">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg flex flex-col overflow-hidden">
+            <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-white z-10">
+                <h3 class="font-display text-2xl font-bold text-accent-dark uppercase tracking-tight" id="catModalTitle">Add Category</h3>
+                <button onclick="closeCategoryModal()" class="text-gray-400 hover:text-accent-dark bg-gray-50 w-10 h-10 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-8">
+                <form id="categoryForm" class="space-y-6">
+                    <input type="hidden" id="catId">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Category Name</label>
+                        <input type="text" id="catName" required placeholder="e.g. Hoodies" class="w-full bg-brand-50 border-none rounded-xl px-5 py-4 font-medium focus:ring-2 focus:ring-accent-dark outline-none text-sm transition">
+                    </div>
+                    <div class="bg-brand-50 p-6 rounded-2xl border border-gray-100 border-dashed">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <i class="fa-brands fa-google-drive text-blue-500 text-lg"></i> Category Banner Link
+                        </label>
+                        <input type="url" id="catImageUrl" required placeholder="Paste Google Drive shareable link here..." class="w-full bg-white border border-gray-200 rounded-xl px-5 py-4 font-medium focus:ring-2 focus:ring-accent-dark outline-none text-sm transition shadow-sm">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-3">Ensure link access is set to "Anyone with the link"</p>
+                    </div>
+                </form>
+            </div>
+            <div class="px-8 py-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 z-10">
+                <button onclick="closeCategoryModal()" class="px-6 py-3.5 text-sm font-bold text-gray-500 hover:bg-gray-200 rounded-xl transition uppercase tracking-wider">Cancel</button>
+                <button onclick="saveCategory()" id="btnSaveCategory" class="px-8 py-3.5 text-sm font-bold bg-accent-dark text-white hover:bg-gray-800 shadow-lg rounded-xl transition uppercase tracking-wider flex items-center gap-2">
+                    Save Category
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Detail Modal -->
+    <div id="orderDetailModal" class="fixed inset-0 z-[100] bg-accent-dark/80 hidden items-center justify-center backdrop-blur-sm p-4 transition-opacity">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+            <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-white z-10 shrink-0">
+                <div>
+                    <h3 class="font-display text-2xl font-bold text-accent-dark uppercase tracking-tight">Order Details</h3>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1" id="odModalOrderId">-</p>
+                </div>
+                <button onclick="closeOrderDetailModal()" class="text-gray-400 hover:text-accent-dark bg-gray-50 w-10 h-10 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-8 hide-scrollbar" id="odModalBody">
+                <!-- Populated via JS -->
+            </div>
+            <div class="px-8 py-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 z-10 shrink-0">
+                <button onclick="closeOrderDetailModal()" class="px-6 py-3.5 text-sm font-bold text-gray-500 hover:bg-gray-200 rounded-xl transition uppercase tracking-wider">Close</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= JAVASCRIPT & FIREBASE INTEGRATION ================= -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getDatabase, ref, onValue, set, update, remove, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHftpk6Z-JtHsK3PV-jbNH-klNvoqODLA",
+            authDomain: "khodal-81a54.firebaseapp.com",
+            databaseURL: "https://khodal-81a54-default-rtdb.firebaseio.com",
+            projectId: "khodal-81a54",
+            storageBucket: "khodal-81a54.firebasestorage.app",
+            messagingSenderId: "71002380705",
+            appId: "1:71002380705:web:baf1fbb8fe77ff91e6d3e0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app); 
+
+        let adminUser = null;
+        let currentActiveView = 'dashboard';
+        const State = {
+            orders: [],
+            products: [],
+            categories: [], 
+            banners: [],
+            affiliates: [],
+            payouts: [],
+            settings: {}
+        };
+
+        const COMMISSION_RATE = 0.10; 
+
+        const formatPrice = (price) => `₹${Number(price).toLocaleString('en-IN')}`;
+        const formatDate = (ts) => {
+            if(!ts) return 'N/A';
+            const d = new Date(ts);
+            return d.toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit'});
+        };
+        
+        window.showToast = (message, type = 'success') => {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').innerText = message;
+            document.getElementById('toastIcon').className = type === 'success' ? 'fa-solid fa-circle-check text-green-400' : 'fa-solid fa-circle-exclamation text-accent-red';
+            
+            toast.classList.remove('show');
+            setTimeout(() => {
+                toast.classList.add('show');
+                if(window._adminToastTimer) clearTimeout(window._adminToastTimer);
+                window._adminToastTimer = setTimeout(() => { 
+                    toast.classList.remove('show'); 
+                }, 3000);
+            }, 10);
+        };
+
+        const processImageUrl = (url) => {
+            if (!url) return ''; 
+            try {
+                if (url.includes('drive.google.com')) {
+                    let fileId = '';
+                    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                    if (match && match[1]) fileId = match[1];
+                    else {
+                        const urlObj = new URL(url);
+                        fileId = urlObj.searchParams.get('id');
+                    }
+                    if (fileId) return `https://lh3.googleusercontent.com/d/${fileId}=w1000`;
+                }
+            } catch (e) { console.error('Error parsing URL', e); }
+            return url; 
+        };
+
+        const setupRealtimeListeners = () => {
+            onValue(ref(db, 'categories'), (snapshot) => {
+                const arr = [];
+                snapshot.forEach(child => { arr.push({ id: child.key, ...child.val() }); });
+                State.categories = arr;
+                if (currentActiveView === 'categories') window.renderCategoriesTable();
+                
+                const prodCatSelect = document.getElementById('prodCategory');
+                if(prodCatSelect) {
+                    prodCatSelect.innerHTML = State.categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+                }
+            });
+
+            onValue(ref(db, 'banners'), (snapshot) => {
+                const arr = [];
+                snapshot.forEach(child => { arr.push({ id: child.key, ...child.val() }); });
+                State.banners = arr;
+                if (currentActiveView === 'banners') window.renderBannersTable();
+            });
+
+            onValue(ref(db, 'orders'), (snapshot) => {
+                const arr = [];
+                snapshot.forEach(child => { arr.push({ id: child.key, ...child.val() }); });
+                State.orders = arr;
+                refreshActiveView();
+            });
+
+            onValue(ref(db, 'products'), (snapshot) => {
+                const arr = [];
+                snapshot.forEach(child => { 
+                    const data = child.val();
+                    arr.push({ 
+                        id: child.key,
+                        name: data.name,
+                        price: data.price,
+                        salePrice: data.salePrice,
+                        category: data.category,
+                        tags: data.tags,
+                        image: data.image,
+                        sizes: data.sizes,
+                        material: data.material !== undefined ? data.material : "",
+                        description: data.description !== undefined ? data.description : ""
+                    }); 
+                });
+                State.products = arr;
+                if (currentActiveView === 'products') window.renderProductsTable();
+                if (currentActiveView === 'dashboard') initDashboard();
+            });
+
+            onValue(ref(db, 'affiliates'), (snapshot) => {
+                const arr = [];
+                snapshot.forEach(child => { arr.push({ id: child.key, ...child.val() }); });
+                State.affiliates = arr;
+                if (currentActiveView === 'affiliates') window.renderAffiliates();
+                if (currentActiveView === 'dashboard') initDashboard();
+            });
+
+            onValue(ref(db, 'payouts'), (snapshot) => {
+                const arr = [];
+                snapshot.forEach(child => { arr.push({ id: child.key, ...child.val() }); });
+                State.payouts = arr;
+                if (currentActiveView === 'payouts') window.renderPayouts();
+            });
+
+            onValue(ref(db, 'settings'), (snapshot) => {
+                State.settings = snapshot.val() || {};
+                if (currentActiveView === 'settings') window.renderSettings();
+            });
+        };
+
+        const refreshActiveView = () => {
+            if (currentActiveView === 'dashboard') initDashboard();
+            else if (currentActiveView === 'orders') window.renderOrdersTable();
+            else if (currentActiveView === 'affiliates') window.renderAffiliates();
+            else if (currentActiveView === 'payouts') window.renderPayouts();
+            else if (currentActiveView === 'categories') window.renderCategoriesTable();
+            else if (currentActiveView === 'banners') window.renderBannersTable();
+            else if (currentActiveView === 'settings') window.renderSettings();
+        };
+
+        window.navigate = (target) => {
+            currentActiveView = target;
+            if(window.innerWidth < 768) toggleSidebar();
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white font-semibold transition text-sm";
+                if(btn.dataset.target === target) {
+                    btn.className = "nav-btn w-full flex items-center justify-between px-4 py-3 rounded-xl bg-white/10 text-white font-semibold transition text-sm";
+                }
+            });
+            
+            const titles = { dashboard: 'Dashboard', orders: 'Order Fulfillment', products: 'Product Catalog', categories: 'Store Categories', banners: 'Storefront Banners', affiliates: 'Partner Directory', payouts: 'Payout Operations', settings: 'Configuration' };
+            document.getElementById('headerTitle').innerText = titles[target] || 'Admin';
+            
+            document.querySelectorAll('.admin-section').forEach(sec => sec.classList.remove('active'));
+            const activeSec = document.getElementById(`sec-${target}`);
+            if(activeSec) activeSec.classList.add('active');
+
+            refreshActiveView();
+            if (target === 'products') window.renderProductsTable();
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                adminUser = user;
+                document.getElementById('authView').classList.add('hidden');
+                document.getElementById('appView').classList.remove('hidden');
+                document.getElementById('adminEmailDisplay').innerText = user.email;
+                setupRealtimeListeners(); 
+            } else {
+                adminUser = null;
+                document.getElementById('authView').classList.remove('hidden');
+                document.getElementById('appView').classList.add('hidden');
+            }
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnLogin');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<div class="loader border-white border-t-transparent mx-auto"></div>`;
+            try {
+                await signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
+                showToast('Authentication Successful');
+            } catch (error) {
+                showToast("Invalid Admin Credentials", 'error');
+                btn.innerHTML = originalText;
+            }
+        });
+
+        window.logoutAdmin = async () => {
+            await signOut(auth);
+            showToast('Session Terminated');
+            setTimeout(() => window.location.reload(), 1000); 
+        };
+
+        window.toggleSidebar = () => {
+            const sb = document.getElementById('sidebar');
+            const bd = document.getElementById('sidebarBackdrop');
+            if(sb.classList.contains('-translate-x-full')) {
+                sb.classList.remove('-translate-x-full');
+                bd.classList.remove('hidden');
+            } else {
+                sb.classList.add('-translate-x-full');
+                bd.classList.add('hidden');
+            }
+        };
+
+        const initDashboard = async () => {
+            let revenue = 0;
+            let pendingComm = 0;
+            let pendingOrders = 0;
+            
+            State.orders.forEach(o => {
+                const amt = Number(o.totalAmount || 0);
+                if(o.status !== 'CANCELLED' && o.status !== 'RETURNED') revenue += amt;
+                
+                if(['NEW', 'CONFIRMED', 'PROCESSING'].includes(o.status)) pendingOrders++;
+                
+                let commStatus = o.commissionStatus;
+                if(!commStatus) {
+                    if (o.status === 'DELIVERED') commStatus = 'APPROVED';
+                    else if (o.status === 'CANCELLED' || o.status === 'RETURNED') commStatus = 'REJECTED';
+                    else commStatus = 'PENDING';
+                }
+                if(commStatus === 'PENDING') {
+                    const rate = o.commissionRate || COMMISSION_RATE;
+                    pendingComm += Number(o.commissionAmount || (amt * rate));
+                }
+            });
+
+            document.getElementById('kpiRevenue').innerText = formatPrice(revenue);
+            document.getElementById('kpiOrders').innerText = State.orders.length;
+            document.getElementById('kpiAffiliates').innerText = State.affiliates.length;
+            document.getElementById('kpiPendingComm').innerText = formatPrice(pendingComm);
+            
+            const badge = document.getElementById('badgePendingOrders');
+            if(badge) badge.innerText = pendingOrders;
+
+            const recent = [...State.orders].sort((a,b) => new Date(b.createdAt || b.date || 0) - new Date(a.createdAt || a.date || 0)).slice(0, 5);
+
+            const statusColors = { 'NEW': 'bg-blue-50 text-blue-700', 'PROCESSING': 'bg-orange-50 text-orange-700', 'DELIVERED': 'bg-green-50 text-green-700', 'CANCELLED': 'bg-red-50 text-red-700' };
+
+            document.getElementById('recentOrdersList').innerHTML = recent.map(o => {
+                const sc = statusColors[o.status] || 'bg-gray-100 text-gray-700';
+                return `
+                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl border border-gray-100 hover:border-gray-200 transition">
+                    <div>
+                        <p class="text-sm font-bold text-accent-dark tracking-tight">${o.orderId || o.id}</p>
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">${o.customerName || 'Unknown'} • ${formatDate(o.createdAt || o.date)}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-bold text-accent-dark mb-1">${formatPrice(o.totalAmount)}</p>
+                        <span class="text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-widest ${sc}">${o.status || 'NEW'}</span>
+                    </div>
+                </div>
+            `}).join('');
+
+            renderSalesChart();
+        };
+
+        let salesChartInstance;
+        const renderSalesChart = () => {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            if(salesChartInstance) salesChartInstance.destroy();
+            
+            const last7Days = Array.from({length: 7}, (_, i) => {
+                const d = new Date(); d.setDate(d.getDate() - i); return d.toISOString().split('T')[0];
+            }).reverse();
+
+            const revenueMap = {};
+            last7Days.forEach(d => revenueMap[d] = 0);
+
+            State.orders.forEach(o => {
+                if(o.status === 'CANCELLED' || o.status === 'RETURNED') return;
+                const dateStr = new Date(o.createdAt || o.date || 0).toISOString().split('T')[0];
+                if(revenueMap[dateStr] !== undefined) revenueMap[dateStr] += Number(o.totalAmount || 0);
+            });
+
+            salesChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: last7Days.map(d => new Date(d).toLocaleDateString('en-US', {weekday: 'short', month: 'short', day:'numeric'})),
+                    datasets: [{
+                        label: 'Gross Revenue (₹)', data: last7Days.map(d => revenueMap[d]),
+                        borderColor: '#020617', backgroundColor: 'rgba(2, 6, 23, 0.05)', borderWidth: 2, tension: 0.3, fill: true, pointBackgroundColor: '#fff', pointBorderColor: '#020617', pointRadius: 4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { borderDash: [4, 4], color: '#f1f5f9' } }, x: { grid: { display: false } } } }
+            });
+        };
+
+        window.renderOrdersTable = () => {
+            const filter = document.getElementById('orderFilterStatus').value;
+            let filtered = filter === 'ALL' ? State.orders : State.orders.filter(o => o.status === filter);
+            filtered.sort((a,b) => new Date(b.createdAt || b.date || 0) - new Date(a.createdAt || a.date || 0));
+
+            const tbody = document.getElementById('ordersTableBody');
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-16 text-center text-gray-500 font-medium">No orders found matching criteria.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(o => {
+                const statusColors = { 'NEW': 'bg-blue-50 text-blue-700', 'CONFIRMED': 'bg-blue-50 text-blue-700', 'PROCESSING': 'bg-orange-50 text-orange-700', 'READY_FOR_QIKINK': 'bg-indigo-50 text-indigo-700', 'SHIPPED': 'bg-purple-50 text-purple-700', 'DELIVERED': 'bg-green-100 text-green-700', 'CANCELLED': 'bg-red-50 text-red-700' };
+                const sc = statusColors[o.status] || 'bg-gray-100 text-gray-700';
+                const affTag = o.affiliateCode ? `<span class="bg-brand-50 text-brand-600 px-2 py-1 rounded text-[10px] font-bold uppercase border border-brand-100"><i class="fa-solid fa-link mr-1"></i> ${o.affiliateCode}</span>` : `<span class="text-[10px] text-gray-400 uppercase tracking-widest">Direct Sale</span>`;
+                const isOnline = o.paymentMethod === 'ONLINE';
+                const utrTag = isOnline ? `<p class="text-[10px] font-bold text-blue-600 uppercase tracking-widest mt-1">UTR: ${o.utrNumber || 'N/A'}</p>` : '';
+
+                return `
+                <tr class="hover:bg-gray-50 transition border-b border-gray-50 last:border-0">
+                    <td class="px-6 py-4">
+                        <p class="font-bold text-accent-dark tracking-tight">${o.orderId || o.id}</p>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1">${formatDate(o.createdAt || o.date)}</p>
+                    </td>
+                    <td class="px-6 py-4">
+                        <p class="font-bold text-accent-dark text-xs uppercase tracking-tight">${o.customerName || 'N/A'}</p>
+                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">${o.mobile || 'N/A'}</p>
+                    </td>
+                    <td class="px-6 py-4">
+                        <p class="font-display font-bold text-accent-dark">${formatPrice(o.totalAmount)}</p>
+                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">${o.paymentMethod || 'COD'}</p>
+                        ${utrTag}
+                    </td>
+                    <td class="px-6 py-4">${affTag}</td>
+                    <td class="px-6 py-4"><span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-md ${sc}">${o.status || 'NEW'}</span></td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                            <button onclick="viewOrderDetails('${o.id}')" class="w-9 h-9 rounded-lg bg-brand-50 text-brand-600 hover:bg-brand-100 transition inline-flex items-center justify-center shrink-0" title="View Full Details"><i class="fa-solid fa-eye text-xs"></i></button>
+                            <select onchange="updateOrderStatus('${o.id}', this.value)" class="text-[10px] font-bold uppercase tracking-widest border border-gray-200 bg-white rounded-lg px-3 py-2 outline-none focus:border-accent-dark text-accent-dark cursor-pointer shadow-sm hover:bg-gray-50 transition">
+                                <option value="">Update Status...</option>
+                                <option value="CONFIRMED">Confirm Order</option>
+                                <option value="PROCESSING">Processing</option>
+                                <option value="READY_FOR_QIKINK">Ready (Qikink)</option>
+                                <option value="SHIPPED">Shipped</option>
+                                <option value="DELIVERED">Delivered</option>
+                                <option value="CANCELLED">Cancel Order</option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        };
+
+        window.viewOrderDetails = (id) => {
+            const o = State.orders.find(x => x.id === id);
+            if(!o) return;
+
+            const isOnline = o.paymentMethod === 'ONLINE';
+            const addressHtml = `
+                ${o.addressLine1 || o.address || 'N/A'}<br>
+                ${o.addressLine2 ? o.addressLine2 + '<br>' : ''}
+                ${[o.city, o.state, o.pincode].filter(Boolean).join(', ')}
+            `;
+
+            const paymentHtml = isOnline ? `
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">Payment Method</span>
+                    <span class="text-xs font-bold text-blue-600 uppercase">Online (UPI/QR)</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">UTR / Txn ID</span>
+                    <span class="text-sm font-bold text-accent-dark">${o.utrNumber || 'N/A'}</span>
+                </div>
+                <div class="flex justify-between items-center py-2">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">Payment Status</span>
+                    <span class="text-xs font-bold ${o.paymentStatus === 'VERIFIED' ? 'text-green-600' : 'text-orange-500'} uppercase">${o.paymentStatus || 'UTR_SUBMITTED'}</span>
+                </div>
+            ` : `
+                <div class="flex justify-between items-center py-2">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">Payment Method</span>
+                    <span class="text-xs font-bold text-accent-dark uppercase">Cash on Delivery</span>
+                </div>
+            `;
+
+            document.getElementById('odModalOrderId').innerText = o.orderId || o.id;
+            document.getElementById('odModalBody').innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-brand-50 rounded-2xl p-5">
+                        <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Customer Details</h4>
+                        <p class="text-sm font-bold text-accent-dark mb-1">${o.customerName || 'N/A'}</p>
+                        <p class="text-xs text-gray-600 mb-1"><i class="fa-solid fa-envelope w-4 text-gray-400"></i> ${o.email || 'N/A'}</p>
+                        <p class="text-xs text-gray-600"><i class="fa-solid fa-phone w-4 text-gray-400"></i> ${o.mobile || 'N/A'}</p>
+                    </div>
+                    <div class="bg-brand-50 rounded-2xl p-5">
+                        <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Shipping Address</h4>
+                        <p class="text-xs text-gray-700 leading-relaxed">${addressHtml}</p>
+                    </div>
+                </div>
+                <div class="bg-white border border-gray-100 rounded-2xl p-5 mb-6">
+                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Payment Information</h4>
+                    ${paymentHtml}
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Order Items</h4>
+                    <div class="space-y-3">
+                        ${(o.products || []).map(p => `
+                            <div class="flex items-center gap-3 bg-gray-50 rounded-xl p-3">
+                                <img src="${processImageUrl(p.image)}" class="w-12 h-14 object-cover rounded-lg bg-gray-200">
+                                <div class="flex-1">
+                                    <p class="text-xs font-bold text-accent-dark uppercase line-clamp-1">${p.name}</p>
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-widest">Qty: ${p.qty} • Size: ${p.size}</p>
+                                </div>
+                                <span class="text-xs font-bold text-accent-dark">${formatPrice(p.price * p.qty)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
+                        <span class="text-sm font-bold text-gray-500 uppercase tracking-widest">Total Amount</span>
+                        <span class="font-display text-xl font-bold text-accent-dark">${formatPrice(o.totalAmount)}</span>
+                    </div>
+                </div>
+            `;
+
+            const modal = document.getElementById('orderDetailModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => modal.style.opacity = '1', 10);
+        };
+
+        window.closeOrderDetailModal = () => {
+            const modal = document.getElementById('orderDetailModal');
+            modal.style.opacity = '0';
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+        };
+
+        window.updateOrderStatus = async (docId, newStatus) => {
+            if(!newStatus) return;
+            try {
+                const updateData = { status: newStatus, updatedAt: serverTimestamp() };
+                if (newStatus === 'DELIVERED') updateData.commissionStatus = 'APPROVED';
+                if (newStatus === 'CANCELLED' || newStatus === 'RETURNED') updateData.commissionStatus = 'REJECTED';
+                await update(ref(db, `orders/${docId}`), updateData);
+                showToast(`Order status updated to ${newStatus}`);
+            } catch(e) {
+                console.error(e);
+                showToast('Write Error: Database issue.', 'error');
+            }
+        };
+
+        window.renderBannersTable = () => {
+            const tbody = document.getElementById('bannersTableBody');
+            if(State.banners.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="px-6 py-16 text-center text-gray-500 font-medium">No banners found. Add your first banner.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = State.banners.map(b => `
+                <tr class="hover:bg-gray-50 transition border-b border-gray-50 last:border-0">
+                    <td class="px-6 py-4">
+                        <img src="${processImageUrl(b.imageUrl)}" class="w-32 h-16 rounded-lg object-cover bg-gray-100 border border-gray-200 shadow-sm">
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="font-bold text-gray-700 tracking-tight text-sm">${b.targetLink || 'shop'}</span>
+                    </td>
+                    <td class="px-6 py-4 text-right space-x-2">
+                        <button onclick="deleteBanner('${b.id}')" class="w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition inline-flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        };
+
+        window.openBannerModal = () => {
+            document.getElementById('bannerForm').reset();
+            const modal = document.getElementById('bannerModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => modal.style.opacity = '1', 10);
+        };
+
+        window.closeBannerModal = () => {
+            const modal = document.getElementById('bannerModal');
+            modal.style.opacity = '0';
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+        };
+
+        window.saveBanner = async () => {
+            const form = document.getElementById('bannerForm');
+            if(!form.checkValidity()) { form.reportValidity(); return; }
+
+            const btn = document.getElementById('btnSaveBanner');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<div class="loader w-4 h-4 border-white"></div>`;
+            btn.disabled = true;
+
+            try {
+                let rawUrl = document.getElementById('bannerImageUrl').value;
+                let finalImageUrl = processImageUrl(rawUrl); 
+
+                const bannerData = {
+                    imageUrl: finalImageUrl,
+                    targetLink: document.getElementById('bannerTarget').value || 'shop',
+                    createdAt: serverTimestamp()
+                };
+
+                await push(ref(db, 'banners'), bannerData);
+                showToast('Banner Added Successfully');
+                closeBannerModal();
+            } catch(e) {
+                console.error(e);
+                showToast('Permission Denied.', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        };
+
+        window.deleteBanner = async (id) => {
+            if(!confirm("Delete this banner? It will be removed from the Storefront immediately.")) return;
+            try {
+                await remove(ref(db, `banners/${id}`));
+                showToast('Banner Deleted');
+            } catch(e) {
+                showToast('Error removing banner', 'error');
+            }
+        };
+
+        window.renderCategoriesTable = () => {
+            const tbody = document.getElementById('categoriesTableBody');
+            if(State.categories.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="px-6 py-16 text-center text-gray-500 font-medium">No categories found. Create one.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = State.categories.map(c => `
+                <tr class="hover:bg-gray-50 transition border-b border-gray-50 last:border-0">
+                    <td class="px-6 py-4">
+                        <img src="${processImageUrl(c.image)}" class="w-16 h-16 rounded-xl object-cover bg-gray-100 border border-gray-200 shadow-sm">
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="font-bold text-accent-dark uppercase tracking-tight text-sm">${c.name}</span>
+                    </td>
+                    <td class="px-6 py-4 text-right space-x-2">
+                        <button onclick="deleteCategory('${c.id}')" class="w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition inline-flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        };
+
+        window.openCategoryModal = () => {
+            document.getElementById('categoryForm').reset();
+            const modal = document.getElementById('categoryModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => modal.style.opacity = '1', 10);
+        };
+
+        window.closeCategoryModal = () => {
+            const modal = document.getElementById('categoryModal');
+            modal.style.opacity = '0';
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+        };
+
+        window.saveCategory = async () => {
+            const form = document.getElementById('categoryForm');
+            if(!form.checkValidity()) { form.reportValidity(); return; }
+
+            const btn = document.getElementById('btnSaveCategory');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<div class="loader w-4 h-4 border-white"></div>`;
+            btn.disabled = true;
+
+            try {
+                let rawUrl = document.getElementById('catImageUrl').value;
+                let finalImageUrl = processImageUrl(rawUrl); 
+
+                const catData = {
+                    name: document.getElementById('catName').value,
+                    image: finalImageUrl,
+                    createdAt: serverTimestamp()
+                };
+
+                await push(ref(db, 'categories'), catData);
+                showToast('Category Added Successfully');
+                closeCategoryModal();
+            } catch(e) {
+                console.error(e);
+                showToast('Permission Denied.', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        };
+
+        window.deleteCategory = async (id) => {
+            if(!confirm("Delete this category? It will be removed from the User Store immediately.")) return;
+            try {
+                await remove(ref(db, `categories/${id}`));
+                showToast('Category Deleted');
+            } catch(e) {
+                showToast('Error removing category', 'error');
+            }
+        };
+
+        window.filterProducts = () => window.renderProductsTable();
+
+        window.renderProductsTable = () => {
+            const tbody = document.getElementById('productsTableBody');
+            const queryText = document.getElementById('productSearch').value.toLowerCase();
+            let filtered = State.products;
+            if(queryText) filtered = filtered.filter(p => p.name.toLowerCase().includes(queryText) || (p.tags && p.tags.join(' ').toLowerCase().includes(queryText)));
+
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-16 text-center text-gray-500 font-medium">No products found in catalog.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = filtered.map(p => `
+                <tr class="hover:bg-gray-50 transition border-b border-gray-50 last:border-0">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-4">
+                            <img src="${processImageUrl(p.image)}" class="w-12 h-14 rounded-lg object-cover bg-gray-100 border border-gray-200 shadow-sm">
+                            <div>
+                                <span class="font-bold text-accent-dark uppercase tracking-tight text-xs line-clamp-1 block w-48 truncate">${p.name}</span>
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1 block">ID: ${p.id.substring(0,8)}...</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="text-[10px] font-bold uppercase tracking-widest bg-gray-100 text-gray-600 px-2 py-1 rounded block w-fit mb-1">${p.category}</span>
+                        <span class="text-[10px] text-gray-400 truncate w-32 block">${(p.tags || []).join(', ')}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="font-display font-bold text-accent-dark block">${formatPrice(p.salePrice || p.price)}</span>
+                        ${p.salePrice ? `<span class="text-[10px] font-bold text-gray-400 line-through">${formatPrice(p.price)}</span>` : ''}
+                    </td>
+                    <td class="px-6 py-4"><span class="text-[10px] font-bold uppercase tracking-widest bg-green-50 text-green-600 border border-green-100 px-2 py-1 rounded inline-flex items-center gap-1"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> In Stock</span></td>
+                    <td class="px-6 py-4 text-right space-x-2">
+                        <button onclick="editProduct('${p.id}')" class="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 hover:bg-brand-100 transition inline-flex items-center justify-center"><i class="fa-solid fa-pen text-xs"></i></button>
+                        <button onclick="deleteProduct('${p.id}')" class="w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition inline-flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        };
+
+        window.openProductModal = () => {
+            document.getElementById('productForm').reset();
+            document.getElementById('prodId').value = '';
+            document.getElementById('prodModalTitle').innerText = 'Add New Product';
+            const modal = document.getElementById('productModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => modal.style.opacity = '1', 10);
+        };
+
+        window.closeProductModal = () => {
+            const modal = document.getElementById('productModal');
+            modal.style.opacity = '0';
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+        };
+
+        window.editProduct = (id) => {
+            const p = State.products.find(x => x.id === id);
+            if(!p) return;
+            document.getElementById('prodId').value = p.id;
+            document.getElementById('prodName').value = p.name;
+            document.getElementById('prodPrice').value = p.price;
+            document.getElementById('prodSalePrice').value = p.salePrice || '';
+            document.getElementById('prodCategory').value = p.category || 'tshirts';
+            document.getElementById('prodTags').value = (p.tags || []).join(', ');
+            document.getElementById('prodSizes').value = (p.sizes || []).join(', ');
+            document.getElementById('prodMaterial').value = p.material || '';
+            document.getElementById('prodDescription').value = p.description || '';
+            document.getElementById('prodImageUrl').value = p.image || ''; 
+            
+            document.getElementById('prodModalTitle').innerText = 'Edit Product';
+            const modal = document.getElementById('productModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => modal.style.opacity = '1', 10);
+        };
+
+        window.saveProduct = async () => {
+            const form = document.getElementById('productForm');
+            if(!form.checkValidity()) { form.reportValidity(); return; }
+
+            const btn = document.getElementById('btnSaveProduct');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<div class="loader w-4 h-4 border-white"></div> Saving...`;
+            btn.disabled = true;
+
+            try {
+                let rawUrl = document.getElementById('prodImageUrl').value;
+                let finalImageUrl = processImageUrl(rawUrl); 
+
+                const productData = {
+                    name: document.getElementById('prodName').value,
+                    price: Number(document.getElementById('prodPrice').value),
+                    salePrice: document.getElementById('prodSalePrice').value ? Number(document.getElementById('prodSalePrice').value) : null,
+                    category: document.getElementById('prodCategory').value,
+                    tags: document.getElementById('prodTags').value.split(',').map(t => t.trim()).filter(t=>t),
+                    sizes: document.getElementById('prodSizes').value.split(',').map(s => s.trim()).filter(s=>s),
+                    material: document.getElementById('prodMaterial').value,
+                    description: document.getElementById('prodDescription').value,
+                    image: finalImageUrl,
+                    updatedAt: serverTimestamp()
+                };
+
+                const id = document.getElementById('prodId').value;
+                if(id) {
+                    await update(ref(db, `products/${id}`), productData);
+                    showToast('Product Updated Successfully');
+                } else {
+                    productData.createdAt = serverTimestamp();
+                    await push(ref(db, 'products'), productData);
+                    showToast('New Product Added Successfully');
+                }
+                closeProductModal();
+            } catch(e) {
+                console.error(e);
+                showToast('Write Permission Denied.', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        };
+
+        window.deleteProduct = async (id) => {
+            if(!confirm("Are you sure you want to delete this product?")) return;
+            try {
+                await remove(ref(db, `products/${id}`));
+                showToast('Product Deleted');
+            } catch(e) { showToast('Error removing product', 'error'); }
+        };
+
+        window.renderAffiliates = () => {
+            const tbody = document.getElementById('affiliatesTableBody');
+            if(State.affiliates.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-16 text-center text-gray-500 font-medium">No registered affiliates found.</td></tr>`;
+                return;
+            }
+
+            const affStats = State.affiliates.map(aff => {
+                let totalRefs = 0, pending = 0, approved = 0;
+                State.orders.forEach(o => {
+                    if(o.affiliateCode === aff.affiliateCode) {
+                        totalRefs++;
+                        let commStatus = o.commissionStatus;
+                        if(!commStatus) {
+                            if (o.status === 'DELIVERED') commStatus = 'APPROVED';
+                            else if (o.status === 'CANCELLED' || o.status === 'RETURNED') commStatus = 'REJECTED';
+                            else commStatus = 'PENDING';
+                        }
+                        const commAmt = Number(o.commissionAmount || (Number(o.totalAmount || 0) * (o.commissionRate || COMMISSION_RATE)));
+                        if(commStatus === 'PENDING') pending += commAmt;
+                        if(commStatus === 'APPROVED') approved += commAmt;
+                    }
+                });
+                return { ...aff, totalRefs, pending, approved };
+            });
+
+            tbody.innerHTML = affStats.map(aff => {
+                const st = aff.status === 'ACTIVE' ? `<span class="bg-green-50 text-green-600 px-2 py-1 rounded text-[10px] font-bold uppercase border border-green-100">Active</span>` : `<span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-[10px] font-bold uppercase">Inactive</span>`;
+                return `
+                <tr class="hover:bg-gray-50 transition border-b border-gray-50 last:border-0">
+                    <td class="px-6 py-4">
+                        <p class="font-bold text-accent-dark text-sm tracking-tight">${aff.name}</p>
+                        <p class="text-[10px] font-bold text-brand-600 uppercase tracking-widest mt-1"><i class="fa-solid fa-link mr-1"></i> ${aff.affiliateCode}</p>
+                    </td>
+                    <td class="px-6 py-4">
+                        <p class="text-xs font-bold text-gray-700">${aff.email}</p>
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">${aff.phone || 'No Phone'}</p>
+                    </td>
+                    <td class="px-6 py-4 font-bold text-gray-900">${aff.totalRefs}</td>
+                    <td class="px-6 py-4 font-display font-bold text-orange-500">${formatPrice(aff.pending)}</td>
+                    <td class="px-6 py-4 font-display font-bold text-green-600">${formatPrice(aff.approved)}</td>
+                    <td class="px-6 py-4">${st}</td>
+                </tr>`;
+            }).join('');
+        };
+
+        window.renderPayouts = () => {
+            const tbodyProc = document.getElementById('payoutsProcessingTable');
+            const tbodyHist = document.getElementById('payoutHistoryTable');
+            
+            let requiredPayoutTotal = 0;
+            let payoutBalances = [];
+
+            State.affiliates.forEach(aff => {
+                let totalApprovedComm = 0;
+                State.orders.forEach(o => {
+                    if(o.affiliateCode === aff.affiliateCode) {
+                        let commStatus = o.commissionStatus;
+                        if(!commStatus) {
+                            if (o.status === 'DELIVERED') commStatus = 'APPROVED';
+                            else if (o.status === 'CANCELLED' || o.status === 'RETURNED') commStatus = 'REJECTED';
+                            else commStatus = 'PENDING';
+                        }
+                        if(commStatus === 'APPROVED') totalApprovedComm += Number(o.commissionAmount || (Number(o.totalAmount || 0) * (o.commissionRate || COMMISSION_RATE)));
+                    }
+                });
+
+                let totalPaidToAff = 0;
+                State.payouts.forEach(p => { if(p.affiliateId === aff.id && p.status === 'PAID') totalPaidToAff += Number(p.amount || 0); });
+
+                const availableBalance = totalApprovedComm - totalPaidToAff;
+                if(availableBalance > 0) {
+                    requiredPayoutTotal += availableBalance;
+                    payoutBalances.push({ affiliateId: aff.id, affiliateName: aff.name, affiliateCode: aff.affiliateCode, balance: availableBalance });
+                }
+            });
+
+            document.getElementById('totalRequiredPayouts').innerText = formatPrice(requiredPayoutTotal);
+
+            if(payoutBalances.length === 0) tbodyProc.innerHTML = `<tr><td colspan="3" class="px-6 py-10 text-center text-gray-500 font-medium">All approved commissions have been paid out!</td></tr>`;
+            else tbodyProc.innerHTML = payoutBalances.map(pb => `
+                <tr class="hover:bg-gray-50 transition border-b border-gray-50 last:border-0">
+                    <td class="px-6 py-4"><p class="font-bold text-accent-dark">${pb.affiliateName}</p><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">CODE: ${pb.affiliateCode}</p></td>
+                    <td class="px-6 py-4 font-display font-bold text-green-600 text-lg">${formatPrice(pb.balance)}</td>
+                    <td class="px-6 py-4 text-right"><button onclick="processManualPayout('${pb.affiliateId}', '${pb.affiliateCode}', ${pb.balance})" class="bg-accent-dark text-white px-5 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest shadow-md hover:bg-gray-800 transition">Mark as Paid</button></td>
+                </tr>`).join('');
+
+            if(State.payouts.length === 0) tbodyHist.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-gray-500 font-medium">No historical payouts found.</td></tr>`;
+            else {
+                const hist = [...State.payouts].sort((a,b) => new Date(b.createdAt || b.date || 0) - new Date(a.createdAt || a.date || 0));
+                tbodyHist.innerHTML = hist.map(p => {
+                    const d = p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-IN') : 'N/A';
+                    const affName = State.affiliates.find(a => a.id === p.affiliateId)?.name || 'Unknown';
+                    return `
+                    <tr class="hover:bg-gray-50 transition border-b border-gray-50 last:border-0">
+                        <td class="px-6 py-4 text-xs font-bold text-gray-700">${d}</td>
+                        <td class="px-6 py-4 text-sm font-bold text-accent-dark">${affName}</td>
+                        <td class="px-6 py-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">${p.affiliateCode}</td>
+                        <td class="px-6 py-4 font-display font-bold text-accent-dark">${formatPrice(p.amount)}</td>
+                        <td class="px-6 py-4"><span class="bg-green-50 text-green-600 px-2 py-1 rounded text-[10px] font-bold uppercase border border-green-100">${p.status}</span></td>
+                    </tr>`;
+                }).join('');
+            }
+        };
+
+        window.processManualPayout = async (affiliateId, affiliateCode, amount) => {
+            if(!confirm(`Confirm manual payout of ${formatPrice(amount)} for ${affiliateCode}? This will record a paid transaction instantly.`)) return;
+            try {
+                const payoutData = { affiliateId, affiliateCode, amount, status: 'PAID', method: 'Manual Bank Transfer', transactionReference: `MANUAL-${Date.now()}`, createdAt: serverTimestamp(), processedBy: adminUser?.email || 'admin' };
+                await push(ref(db, 'payouts'), payoutData);
+                showToast(`Successfully recorded payout for ${affiliateCode}`);
+            } catch (e) {
+                console.error("Payout error", e);
+                showToast("Permission Denied.", "error");
+            }
+        };
+
+        window.renderSettings = () => {
+            const urlInput = document.getElementById('settingsQrUrl');
+            const preview = document.getElementById('settingsQrPreview');
+            const emptyState = document.getElementById('settingsQrEmpty');
+            if(!urlInput) return;
+
+            const qrUrl = State.settings.paymentQR || '';
+            urlInput.value = qrUrl;
+
+            if(qrUrl) {
+                preview.src = processImageUrl(qrUrl);
+                preview.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+            } else {
+                preview.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+            }
+        };
+
+        window.saveSettings = async () => {
+            const rawUrl = document.getElementById('settingsQrUrl').value.trim();
+            if(!rawUrl) { showToast('Please paste a Google Drive QR link first', 'error'); return; }
+
+            const btn = document.getElementById('btnSaveSettings');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<div class="loader w-4 h-4 border-white"></div>`;
+            btn.disabled = true;
+
+            try {
+                const finalUrl = processImageUrl(rawUrl);
+                await update(ref(db, 'settings'), { paymentQR: finalUrl, updatedAt: serverTimestamp() });
+                showToast('Payment QR Code Updated Successfully');
+            } catch(e) {
+                console.error(e);
+                showToast('Write Permission Denied.', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        };
+    </script>
+</body>
+</html>
