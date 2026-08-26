@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#000000">
-    <title>TobaKart | Premium POD Store</title>
+    <title>Khodal | Premium POD Store</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -106,7 +106,7 @@
                     <i class="fa-solid fa-bars-staggered"></i>
                 </button>
                 <div class="font-display font-bold text-2xl tracking-tighter text-brand-900 cursor-pointer" onclick="navigate('home')">
-                    TOBAKART<span class="text-accent-red">.</span>
+                    KHODAL<span class="text-accent-red">.</span>
                 </div>
             </div>
             
@@ -137,7 +137,7 @@
     <!-- MOBILE SIDEBAR -->
     <div id="sidebarMenu" class="fixed inset-y-0 left-0 w-[300px] bg-white z-[80] transform -translate-x-full transition-transform duration-400 ease-in-out shadow-2xl flex flex-col lg:hidden">
         <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white">
-            <div class="font-display font-bold text-xl tracking-tighter">TOBAKART<span class="text-accent-red">.</span></div>
+            <div class="font-display font-bold text-xl tracking-tighter">KHODAL<span class="text-accent-red">.</span></div>
             <button onclick="toggleSidebar()" class="text-gray-400 hover:text-brand-900 transition"><i class="fa-solid fa-xmark text-2xl"></i></button>
         </div>
         <div class="flex-1 overflow-y-auto py-6 px-4">
@@ -157,6 +157,8 @@
                     <span>Contact Support</span>
                 </a>
             </nav>
+            <!-- SELLING STRATEGY: SIDEBAR RECOMMENDATIONS -->
+            <div id="sidebarRecommendations" class="px-4 pb-2 border-t border-gray-100 pt-4 mt-4"></div>
         </div>
         <div class="p-6 bg-gray-50">
             <a href="#track" onclick="toggleSidebar()" class="w-full bg-brand-900 text-white text-center py-3.5 rounded-xl font-bold flex justify-center items-center gap-2 shadow-soft">
@@ -242,7 +244,7 @@
             <footer class="bg-brand-900 text-white pt-16 pb-8 px-5 lg:px-10 mt-auto">
                 <div class="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 border-b border-white/10 pb-12 mb-8">
                     <div class="md:col-span-1">
-                        <div class="font-display font-bold text-2xl tracking-tighter mb-6">TOBAKART<span class="text-accent-red">.</span></div>
+                        <div class="font-display font-bold text-2xl tracking-tighter mb-6">KHODAL<span class="text-accent-red">.</span></div>
                         <p class="text-white/60 text-sm leading-relaxed mb-6">Premium print-on-demand fashion. Original designs for those who want to stand out from the crowd.</p>
                         <div class="flex gap-4">
                             <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white hover:text-brand-900 transition"><i class="fa-brands fa-instagram"></i></a>
@@ -275,7 +277,7 @@
                     </div>
                 </div>
                 <div class="max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-center text-xs text-white/40 gap-4">
-                    <p>&copy; 2026 TobaKart. All rights reserved.</p>
+                    <p>&copy; 2026 Khodal. All rights reserved.</p>
                     <div class="flex gap-4 text-lg">
                         <i class="fa-brands fa-cc-visa"></i>
                         <i class="fa-brands fa-cc-mastercard"></i>
@@ -315,7 +317,7 @@
             
             <footer class="bg-brand-900 text-white pt-16 pb-8 px-5 lg:px-10 mt-auto">
                 <div class="max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-center text-xs text-white/40 gap-4">
-                    <p>&copy; 2026 TobaKart. Premium Print-on-Demand.</p>
+                    <p>&copy; 2026 Khodal. Premium Print-on-Demand.</p>
                 </div>
             </footer>
         </section>
@@ -471,6 +473,9 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        <!-- SELLING STRATEGY: CHECKOUT RECOMMENDATIONS -->
+                        <div id="checkoutRecommendations" class="mt-8"></div>
                     </div>
 
                     <div class="w-full lg:w-2/5">
@@ -530,7 +535,7 @@
             <div class="max-w-3xl mx-auto w-full px-5 py-12 lg:py-20 flex-1 policy-content">
                 <button onclick="history.back()" class="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-brand-900 hover:bg-gray-50 transition mb-6"><i class="fa-solid fa-arrow-left text-sm"></i></button>
                 <h1 class="font-display text-4xl font-bold text-brand-900 tracking-tight mb-8">Returns & Exchanges</h1>
-                <p>At TobaKart, every garment is custom-printed precisely to your specifications upon order. Due to the nature of Print-On-Demand manufacturing, we have a strict policy to ensure quality and sustainability.</p>
+                <p>At Khodal, every garment is custom-printed precisely to your specifications upon order. Due to the nature of Print-On-Demand manufacturing, we have a strict policy to ensure quality and sustainability.</p>
                 <h2>No Size Exchanges or Buyer's Remorse</h2>
                 <p>Because your item is uniquely made for you, <b>we do not accept returns or process exchanges for incorrect size selection, buyer's remorse, or color preference changes.</b> We strongly encourage reviewing our Size Guide carefully before placing your order.</p>
                 <h2>Damaged or Defective Items</h2>
@@ -585,8 +590,8 @@
         <section id="view-about" class="view-section bg-white">
             <div class="max-w-3xl mx-auto w-full px-5 py-12 lg:py-20 flex-1 policy-content">
                 <button onclick="history.back()" class="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-brand-900 hover:bg-gray-50 transition mb-6"><i class="fa-solid fa-arrow-left text-sm"></i></button>
-                <h1 class="font-display text-4xl font-bold text-brand-900 tracking-tight mb-8">About TobaKart</h1>
-                <p>Welcome to TobaKart, where streetwear meets modern culture. We are an independent apparel brand focused on delivering premium, heavyweight garments with striking graphic designs.</p>
+                <h1 class="font-display text-4xl font-bold text-brand-900 tracking-tight mb-8">About Khodal</h1>
+                <p>Welcome to Khodal, where streetwear meets modern culture. We are an independent apparel brand focused on delivering premium, heavyweight garments with striking graphic designs.</p>
                 <h2>Our Mission</h2>
                 <p>To empower individual expression through high-quality, print-on-demand fashion. By utilizing a POD model, we eliminate mass overproduction and reduce fashion waste, ensuring that every garment created is one that was specifically desired by our community.</p>
             </div>
@@ -599,7 +604,7 @@
                 <p>Have an issue with your order or want to collaborate? We'd love to hear from you.</p>
                 <div class="bg-gray-50 p-6 rounded-2xl mt-8">
                     <p class="font-bold text-brand-900 mb-2">Customer Service Email:</p>
-                    <p class="mb-6">support@tobakart.com</p>
+                    <p class="mb-6">support@khodal.com</p>
                     <p class="font-bold text-brand-900 mb-2">Business Hours:</p>
                     <p>Monday - Friday (10:00 AM - 6:00 PM IST)</p>
                 </div>
@@ -610,11 +615,11 @@
             <div class="max-w-3xl mx-auto w-full px-5 py-12 lg:py-20 flex-1 policy-content">
                 <button onclick="history.back()" class="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-brand-900 hover:bg-gray-50 transition mb-6"><i class="fa-solid fa-arrow-left text-sm"></i></button>
                 <h1 class="font-display text-4xl font-bold text-brand-900 tracking-tight mb-8">Privacy Policy & Terms</h1>
-                <p>Your privacy is important to us. TobaKart collects necessary information (Name, Phone, Address) strictly for order fulfillment and communication regarding your purchase. We do not sell your personal data to third parties.</p>
+                <p>Your privacy is important to us. Khodal collects necessary information (Name, Phone, Address) strictly for order fulfillment and communication regarding your purchase. We do not sell your personal data to third parties.</p>
                 <h2>Payment Security</h2>
                 <p>We do not store your credit/debit card information. All transactions are securely processed through encrypted, bank-grade payment gateways.</p>
                 <h2>Terms of Service</h2>
-                <p>By using TobaKart, you agree to our standard terms of use. Product prices and availability are subject to change without notice. We reserve the right to cancel orders if fraudulent activity is suspected.</p>
+                <p>By using Khodal, you agree to our standard terms of use. Product prices and availability are subject to change without notice. We reserve the right to cancel orders if fraudulent activity is suspected.</p>
             </div>
         </section>
 
@@ -660,7 +665,7 @@
             🔥 You are eligible for Free Shipping!
         </div>
 
-        <div id="cartItemsContainer" class="flex-1 overflow-y-auto p-6 space-y-6 hide-scrollbar"></div>
+        <div id="cartItemsContainer" class="flex-1 overflow-y-auto p-6 hide-scrollbar"></div>
         
         <div class="p-6 bg-white border-t border-gray-100 shadow-[0_-10px_20px_rgba(0,0,0,0.03)] z-10">
             <div class="flex justify-between items-center mb-6">
@@ -757,6 +762,36 @@
                 localStorage.setItem('pod_affiliate_timestamp', Date.now().toString());
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
+        };
+
+        // --- NEW SELLING STRATEGY COMPONENT ---
+        window.getRecommendationsHtml = (context) => {
+            if (AppState.products.length === 0) return '';
+            
+            let recs = [...AppState.products].sort(() => 0.5 - Math.random()).slice(0, 4);
+            let closeAction = context === 'cart' ? 'toggleCart();' : (context === 'sidebar' ? 'toggleSidebar();' : '');
+
+            let cardsHtml = recs.map(p => `
+                <div class="w-36 shrink-0 snap-start group relative flex flex-col">
+                    <div class="bg-brand-50 rounded-xl aspect-[4/5] overflow-hidden mb-2 relative cursor-pointer" onclick="${closeAction} navigate('product?id=${p.id}')">
+                        <img src="${p.image}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <button onclick="quickAdd('${p.id}', event)" class="absolute top-2 right-2 w-7 h-7 bg-white text-brand-900 rounded-full shadow-sm flex items-center justify-center hover:bg-brand-900 hover:text-white transition z-10"><i class="fa-solid fa-plus text-[10px]"></i></button>
+                    <p class="text-xs font-bold text-brand-900 uppercase tracking-tight line-clamp-1 cursor-pointer" onclick="${closeAction} navigate('product?id=${p.id}')">${p.name}</p>
+                    <p class="text-[10px] font-bold text-gray-500 mt-1">${formatPrice(p.salePrice || p.price)}</p>
+                </div>
+            `).join('');
+
+            return `
+            <div class="w-full mt-6 mb-2">
+                <h4 class="font-display font-bold text-brand-900 uppercase tracking-tight mb-4 text-sm flex items-center justify-between">
+                    <span>You May Also Like</span>
+                    <i class="fa-solid fa-fire text-accent-red"></i>
+                </h4>
+                <div class="flex gap-4 overflow-x-auto hide-scrollbar snap-x pb-2 -mx-1 px-1">
+                    ${cardsHtml}
+                </div>
+            </div>`;
         };
 
         // --- BANNERS SLIDER LOGIC ---
@@ -859,7 +894,6 @@
                 document.getElementById('loadingHomeProducts').classList.remove('hidden');
                 document.getElementById('loadingShopProducts').classList.remove('hidden');
                 
-                // Fetch Categories
                 onValue(ref(db, 'categories'), (snapshot) => {
                     const cats = [];
                     snapshot.forEach((child) => {
@@ -869,7 +903,6 @@
                     renderCategoriesUI();
                 });
 
-                // Fetch Dynamic Banners
                 onValue(ref(db, 'banners'), (snapshot) => {
                     const arr = [];
                     snapshot.forEach(child => { arr.push({ id: child.key, ...child.val() }); });
@@ -877,22 +910,28 @@
                     renderBanners();
                 });
 
-                // Fetch Products
                 onValue(ref(db, 'products'), (snapshot) => {
                     const products = [];
                     snapshot.forEach((childSnapshot) => {
                         const data = childSnapshot.val();
+                        
+                        let rawImages = data.images || [];
+                        if (!Array.isArray(rawImages)) rawImages = [];
+                        if (rawImages.length === 0 && data.image) rawImages = [data.image];
+                        let processedImages = rawImages.map(img => processImageUrl(img));
+
                         products.push({
                             id: childSnapshot.key,
                             name: data.name,
-                            brand: data.brand || "TobaKart",
+                            brand: data.brand || "Khodal",
                             price: Number(data.price),
                             salePrice: data.salePrice ? Number(data.salePrice) : null,
                             rating: data.rating || 4.5,
                             reviews: data.reviewCount || Math.floor(Math.random() * 500) + 10,
                             category: data.category || 'tshirts',
                             tags: data.tags || [],
-                            image: processImageUrl(data.image),
+                            images: processedImages,
+                            image: processedImages.length > 0 ? processedImages[0] : '', // Main thumbnail
                             description: data.description !== undefined ? data.description : "",
                             material: data.material !== undefined ? data.material : "",
                             fit: data.fit || "Standard Fit",
@@ -907,7 +946,6 @@
                     updateCurrentView();
                 });
 
-                // Fetch Platform Settings
                 onValue(ref(db, 'settings'), (snapshot) => {
                     const data = snapshot.val() || {};
                     AppState.settings.paymentQR = processImageUrl(data.paymentQR || '');
@@ -936,6 +974,7 @@
                 sidebar.classList.remove('-translate-x-full');
                 backdrop.classList.remove('hidden');
                 updateSidebarBadges();
+                document.getElementById('sidebarRecommendations').innerHTML = window.getRecommendationsHtml('sidebar');
             } else {
                 sidebar.classList.add('-translate-x-full');
                 backdrop.classList.add('hidden');
@@ -1069,7 +1108,13 @@
             
             saveCart();
             showToast('Added to Cart');
-            toggleCart();
+            
+            const drawer = document.getElementById('cartDrawer');
+            if(drawer.classList.contains('drawer-closed')) {
+                toggleCart();
+            } else {
+                renderCartUI();
+            }
         };
 
         const renderHome = () => {
@@ -1120,6 +1165,11 @@
             document.getElementById('shopCategoriesList').innerHTML = pillsHtml;
         };
 
+        window.scrollPdpThumbs = (dir) => {
+            const container = document.getElementById('pdpThumbContainer');
+            if(container) container.scrollBy({ left: dir * 150, behavior: 'smooth' });
+        };
+
         const renderProduct = (queryStr) => {
             const id = new URLSearchParams(queryStr).get('id');
             const product = AppState.products.find(p => p.id === id);
@@ -1138,21 +1188,43 @@
             document.getElementById('pdpStickyPrice').innerText = formatPrice(activePrice);
 
             const html = `
-                <div class="flex flex-col lg:flex-row gap-0 lg:gap-16">
-                    <div class="w-full lg:w-[55%] relative">
-                        <div class="absolute top-4 left-4 lg:top-10 lg:left-0 flex gap-2 z-10">
-                            <button onclick="history.back()" class="w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-brand-900 shadow-sm lg:hidden">
-                                <i class="fa-solid fa-arrow-left text-sm"></i>
-                            </button>
-                        </div>
-                        <div class="bg-brand-50 w-full aspect-[4/5] lg:aspect-auto lg:h-[calc(100vh-80px)] sticky top-20 overflow-hidden">
-                            <img src="${product.image}" class="w-full h-full object-cover object-center" alt="${product.name}">
+                <div class="flex flex-col lg:flex-row gap-8 lg:gap-16">
+                    <div class="w-full lg:w-[55%]">
+                        <div class="sticky top-24 flex flex-col gap-4">
+                            <div class="absolute top-4 left-4 flex gap-2 z-10 lg:hidden">
+                                <button onclick="history.back()" class="w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-brand-900 shadow-sm">
+                                    <i class="fa-solid fa-arrow-left text-sm"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- SWIPEABLE IMAGE SLIDER ADDED HERE -->
+                            <div class="bg-brand-50 w-full aspect-[4/5] lg:aspect-auto lg:h-[65vh] overflow-hidden rounded-3xl relative border border-gray-100 shadow-sm">
+                                <div id="pdpMainSlider" class="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar w-full h-full scroll-smooth">
+                                    ${product.images && product.images.length > 0 ? product.images.map((img, index) => `
+                                        <img id="mainImg-${index}" src="${img}" class="w-full h-full object-cover object-center snap-center snap-always shrink-0" alt="${product.name}">
+                                    `).join('') : `<img src="${product.image}" class="w-full h-full object-cover object-center snap-center snap-always shrink-0" alt="${product.name}">`}
+                                </div>
+                            </div>
+                            
+                            ${product.images && product.images.length > 1 ? `
+                            <div class="relative flex items-center group px-1">
+                                <button onclick="scrollPdpThumbs(-1)" class="absolute left-0 z-10 w-8 h-8 bg-white shadow-md text-brand-900 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition disabled:opacity-0 -translate-x-1/2 hover:scale-110"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                                
+                                <div id="pdpThumbContainer" class="flex gap-3 overflow-x-auto hide-scrollbar snap-x w-full scroll-smooth py-2 px-1">
+                                    ${product.images.map((img, i) => `
+                                        <img src="${img}" onclick="document.getElementById('mainImg-${i}').scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'}); document.querySelectorAll('.pdp-thumb').forEach(el=>el.classList.replace('border-brand-900', 'border-transparent')); this.classList.replace('border-transparent', 'border-brand-900');" class="w-20 h-24 lg:w-24 lg:h-28 object-cover rounded-xl cursor-pointer border-2 ${i===0 ? 'border-brand-900' : 'border-transparent'} hover:border-brand-900 transition-colors snap-start shrink-0 pdp-thumb bg-brand-50 shadow-sm">
+                                    `).join('')}
+                                </div>
+                                
+                                <button onclick="scrollPdpThumbs(1)" class="absolute right-0 z-10 w-8 h-8 bg-white shadow-md text-brand-900 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition disabled:opacity-0 translate-x-1/2 hover:scale-110"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                            </div>
+                            ` : ''}
                         </div>
                     </div>
 
-                    <div class="w-full lg:w-[45%] px-5 lg:px-0 py-8 lg:py-16">
+                    <div class="w-full lg:w-[45%] px-5 lg:px-0 py-4 lg:py-10">
                         <div class="flex items-center justify-between mb-4">
-                            <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">TobaKart Official</div>
+                            <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Khodal Official</div>
                             <div class="flex items-center gap-1 text-xs font-bold text-brand-900 bg-brand-50 px-2 py-1 rounded">
                                 <i class="fa-solid fa-star text-accent-red text-[10px]"></i> ${product.rating} <span class="text-gray-400 ml-1">(${product.reviews})</span>
                             </div>
@@ -1288,7 +1360,13 @@
             
             saveCart();
             showToast('Added to Cart');
-            toggleCart(); 
+            
+            const drawer = document.getElementById('cartDrawer');
+            if(drawer.classList.contains('drawer-closed')) {
+                toggleCart();
+            } else {
+                renderCartUI();
+            }
         };
 
         const updateCartQty = (index, delta) => {
@@ -1319,16 +1397,16 @@
                         </div>
                         <h4 class="font-display font-bold text-brand-900 uppercase tracking-tight mb-2">Your Cart is Empty</h4>
                         <button onclick="toggleCart(); navigate('shop')" class="text-xs font-bold text-gray-500 uppercase tracking-widest border-b border-gray-400 hover:text-brand-900 transition mt-2">Start Shopping</button>
-                    </div>`;
+                    </div>` + window.getRecommendationsHtml('cart');
                 document.getElementById('cartTotal').innerText = '₹0';
                 return;
             }
             
             let total = 0;
-            container.innerHTML = AppState.cart.map((item, i) => {
+            let cartItemsHtml = AppState.cart.map((item, i) => {
                 total += item.price * item.qty;
                 return `
-                <div class="flex gap-4">
+                <div class="flex gap-4 mb-6">
                     <img src="${item.image}" class="w-20 h-24 object-cover bg-brand-50 cursor-pointer" onclick="navigate('product?id=${item.id}'); toggleCart()">
                     <div class="flex-1 flex flex-col justify-between py-1">
                         <div>
@@ -1349,6 +1427,9 @@
                     </div>
                 </div>`;
             }).join('');
+            
+            // Add Selling Strategy (Cross-sell) at the end of the cart items
+            container.innerHTML = cartItemsHtml + `<div class="border-t border-gray-100 pt-2 mt-4">` + window.getRecommendationsHtml('cart') + `</div>`;
             document.getElementById('cartTotal').innerText = formatPrice(total);
         };
 
@@ -1412,6 +1493,9 @@
                 </div>
             `).join('');
             document.getElementById('chkOrderItems').innerHTML = itemsHtml;
+
+            // Render Selling Strategy in Checkout
+            document.getElementById('checkoutRecommendations').innerHTML = window.getRecommendationsHtml('checkout');
         };
 
         window.placeOrder = async () => {
@@ -1425,7 +1509,7 @@
             
             const orderTotal = AppState.cart.reduce((sum, item) => sum + item.price * item.qty, 0);
             
-            const prefix = "TBK";
+            const prefix = "KHO"; // Khodal Prefix
             const year = new Date().getFullYear();
             const randomCode = Math.floor(100000 + Math.random() * 900000);
             const orderId = `${prefix}-${year}-${randomCode}`;
