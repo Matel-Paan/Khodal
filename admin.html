@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TobaKart | Admin Command Center</title>
+    <title>Khodal | Admin Command Center</title>
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -67,7 +67,7 @@
                     <i class="fa-solid fa-shield-halved"></i>
                 </div>
                 <h1 class="font-display text-3xl font-extrabold text-accent-dark tracking-tight uppercase">Command Center</h1>
-                <p class="text-gray-500 text-sm mt-2 font-medium">TobaKart Admin Access</p>
+                <p class="text-gray-500 text-sm mt-2 font-medium">Khodal Admin Access</p>
             </div>
             <form id="loginForm" class="space-y-5">
                 <div>
@@ -91,7 +91,7 @@
         <!-- SIDEBAR -->
         <aside id="sidebar" class="w-[280px] bg-accent-dark text-gray-300 flex flex-col transition-transform absolute z-40 h-full md:relative md:translate-x-0 -translate-x-full shadow-2xl md:shadow-none">
             <div class="h-20 flex items-center justify-between px-6 border-b border-white/10 bg-accent-dark shrink-0">
-                <span class="font-display text-2xl font-bold text-white tracking-tighter">TOBAKART<span class="text-accent-red">.</span></span>
+                <span class="font-display text-2xl font-bold text-white tracking-tighter">KHODAL<span class="text-accent-red">.</span></span>
                 <button class="md:hidden text-gray-400 hover:text-white" onclick="toggleSidebar()"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
@@ -134,7 +134,7 @@
                 <div class="flex items-center gap-3 mb-4 px-2">
                     <div class="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-white font-bold text-xs">AD</div>
                     <div class="overflow-hidden">
-                        <p class="text-xs font-bold text-white truncate" id="adminEmailDisplay">admin@tobakart.com</p>
+                        <p class="text-xs font-bold text-white truncate" id="adminEmailDisplay">admin@khodal.com</p>
                         <p class="text-[10px] text-gray-400 uppercase tracking-widest">Super Admin</p>
                     </div>
                 </div>
@@ -251,7 +251,7 @@
                     </div>
                 </section>
 
-                <!-- ================= BANNERS (FIXED CAROUSEL SCROLL) ================= -->
+                <!-- ================= BANNERS ================= -->
                 <section id="sec-banners" class="admin-section max-w-7xl mx-auto">
                     <div class="flex justify-between items-center gap-4 mb-8">
                         <div>
@@ -281,7 +281,7 @@
                     </div>
                 </section>
 
-                <!-- ================= CATALOG (PRODUCTS - FIXED CAROUSEL SCROLL) ================= -->
+                <!-- ================= CATALOG (PRODUCTS) ================= -->
                 <section id="sec-products" class="admin-section max-w-7xl mx-auto">
                     <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
                         <div class="relative w-full sm:w-96">
@@ -313,7 +313,7 @@
                     </div>
                 </section>
 
-                <!-- ================= CATEGORIES (FIXED CAROUSEL SCROLL) ================= -->
+                <!-- ================= CATEGORIES ================= -->
                 <section id="sec-categories" class="admin-section max-w-7xl mx-auto">
                     <div class="flex justify-between items-center gap-4 mb-8">
                         <h3 class="font-display text-2xl font-bold text-accent-dark uppercase tracking-tight">Manage Categories</h3>
@@ -509,7 +509,7 @@
     <!-- Product Modal -->
     <div id="productModal" class="fixed inset-0 z-[100] bg-accent-dark/80 hidden items-center justify-center backdrop-blur-sm p-4 transition-opacity">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
-            <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-white z-10">
+            <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-white z-10 shrink-0">
                 <h3 class="font-display text-2xl font-bold text-accent-dark uppercase tracking-tight" id="prodModalTitle">Add New Product</h3>
                 <button onclick="closeProductModal()" class="text-gray-400 hover:text-accent-dark bg-gray-50 w-10 h-10 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -546,13 +546,18 @@
                         </div>
                     </div>
 
-                    <!-- GOOGLE DRIVE IMAGE LINK INTEGRATION -->
+                    <!-- GOOGLE DRIVE MULTIPLE IMAGE LINK INTEGRATION (DYNAMIC) -->
                     <div class="bg-brand-50 p-6 rounded-2xl border border-gray-100 border-dashed">
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
-                            <i class="fa-brands fa-google-drive text-blue-500 text-lg"></i> Product Image Link
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center justify-between">
+                            <span class="flex items-center gap-2"><i class="fa-brands fa-google-drive text-blue-500 text-lg"></i> Product Image Links</span>
+                            <button type="button" onclick="addProductImageInput()" class="text-xs font-bold text-brand-600 bg-brand-100 hover:bg-brand-200 px-3 py-1.5 rounded-lg transition">+ Add Link</button>
                         </label>
-                        <input type="url" id="prodImageUrl" placeholder="Paste Google Drive shareable link here..." class="w-full bg-white border border-gray-200 rounded-xl px-5 py-4 font-medium focus:ring-2 focus:ring-accent-dark outline-none text-sm transition shadow-sm">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-3">Ensure link access is set to "Anyone with the link"</p>
+                        
+                        <div id="dynamicImageInputs" class="space-y-3">
+                            <!-- Injected via JS -->
+                        </div>
+                        
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-3">The first link will automatically be the main cover image</p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -572,7 +577,7 @@
                     </div>
                 </form>
             </div>
-            <div class="px-8 py-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 z-10">
+            <div class="px-8 py-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 z-10 shrink-0">
                 <button onclick="closeProductModal()" class="px-6 py-3.5 text-sm font-bold text-gray-500 hover:bg-gray-200 rounded-xl transition uppercase tracking-wider">Cancel</button>
                 <button onclick="saveProduct()" id="btnSaveProduct" class="px-8 py-3.5 text-sm font-bold bg-accent-dark text-white hover:bg-gray-800 shadow-lg rounded-xl transition uppercase tracking-wider flex items-center gap-2">
                     Save Product
@@ -706,6 +711,18 @@
             return url; 
         };
 
+        // --- DYNAMIC IMAGE INPUTS LOGIC ---
+        window.addProductImageInput = (value = '') => {
+            const container = document.getElementById('dynamicImageInputs');
+            const inputDiv = document.createElement('div');
+            inputDiv.className = 'flex gap-2 items-center';
+            inputDiv.innerHTML = `
+                <input type="url" name="prodImageUrls[]" value="${value}" placeholder="Paste Google Drive shareable link..." class="w-full bg-white border border-gray-200 rounded-xl px-5 py-4 font-medium focus:ring-2 focus:ring-accent-dark outline-none text-sm transition shadow-sm">
+                <button type="button" onclick="this.parentElement.remove()" class="w-12 h-12 shrink-0 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 transition flex items-center justify-center"><i class="fa-solid fa-trash"></i></button>
+            `;
+            container.appendChild(inputDiv);
+        };
+
         const setupRealtimeListeners = () => {
             onValue(ref(db, 'categories'), (snapshot) => {
                 const arr = [];
@@ -737,6 +754,11 @@
                 const arr = [];
                 snapshot.forEach(child => { 
                     const data = child.val();
+                    
+                    let rawImages = data.images || [];
+                    if (!Array.isArray(rawImages)) rawImages = [];
+                    if (rawImages.length === 0 && data.image) rawImages = [data.image];
+
                     arr.push({ 
                         id: child.key,
                         name: data.name,
@@ -745,6 +767,7 @@
                         category: data.category,
                         tags: data.tags,
                         image: data.image,
+                        images: rawImages,
                         sizes: data.sizes,
                         material: data.material !== undefined ? data.material : "",
                         description: data.description !== undefined ? data.description : ""
@@ -1282,6 +1305,7 @@
         window.openProductModal = () => {
             document.getElementById('productForm').reset();
             document.getElementById('prodId').value = '';
+            document.getElementById('dynamicImageInputs').innerHTML = `<input type="url" name="prodImageUrls[]" placeholder="Paste Google Drive shareable link..." class="w-full bg-white border border-gray-200 rounded-xl px-5 py-4 font-medium focus:ring-2 focus:ring-accent-dark outline-none text-sm transition shadow-sm">`;
             document.getElementById('prodModalTitle').innerText = 'Add New Product';
             const modal = document.getElementById('productModal');
             modal.classList.remove('hidden');
@@ -1307,7 +1331,22 @@
             document.getElementById('prodSizes').value = (p.sizes || []).join(', ');
             document.getElementById('prodMaterial').value = p.material || '';
             document.getElementById('prodDescription').value = p.description || '';
-            document.getElementById('prodImageUrl').value = p.image || ''; 
+            
+            let imagesArray = p.images && p.images.length > 0 ? p.images : (p.image ? [p.image] : []);
+            const imgContainer = document.getElementById('dynamicImageInputs');
+            imgContainer.innerHTML = '';
+            
+            if(imagesArray.length === 0) {
+                imgContainer.innerHTML = `<input type="url" name="prodImageUrls[]" placeholder="Paste Google Drive shareable link..." class="w-full bg-white border border-gray-200 rounded-xl px-5 py-4 font-medium focus:ring-2 focus:ring-accent-dark outline-none text-sm transition shadow-sm">`;
+            } else {
+                imagesArray.forEach((img, i) => {
+                    if(i === 0) {
+                        imgContainer.innerHTML = `<input type="url" name="prodImageUrls[]" value="${img}" placeholder="Paste Google Drive shareable link..." class="w-full bg-white border border-gray-200 rounded-xl px-5 py-4 font-medium focus:ring-2 focus:ring-accent-dark outline-none text-sm transition shadow-sm">`;
+                    } else {
+                        window.addProductImageInput(img);
+                    }
+                });
+            }
             
             document.getElementById('prodModalTitle').innerText = 'Edit Product';
             const modal = document.getElementById('productModal');
@@ -1326,8 +1365,14 @@
             btn.disabled = true;
 
             try {
-                let rawUrl = document.getElementById('prodImageUrl').value;
-                let finalImageUrl = processImageUrl(rawUrl); 
+                const inputs = document.querySelectorAll('input[name="prodImageUrls[]"]');
+                let rawUrls = [];
+                inputs.forEach(inp => {
+                    if(inp.value.trim()) rawUrls.push(inp.value.trim());
+                });
+                
+                let finalImages = rawUrls.map(url => processImageUrl(url)); 
+                let mainImage = finalImages.length > 0 ? finalImages[0] : '';
 
                 const productData = {
                     name: document.getElementById('prodName').value,
@@ -1338,7 +1383,8 @@
                     sizes: document.getElementById('prodSizes').value.split(',').map(s => s.trim()).filter(s=>s),
                     material: document.getElementById('prodMaterial').value,
                     description: document.getElementById('prodDescription').value,
-                    image: finalImageUrl,
+                    image: mainImage,
+                    images: finalImages,
                     updatedAt: serverTimestamp()
                 };
 
