@@ -31,7 +31,8 @@
     </script>
 
     <style>
-        body { background-color: #f6f6f6; color: #525252; }
+        /* Bug 1 Fix: Ensure exact viewport height to prevent bottom cut-offs */
+        body { background-color: #f6f6f6; color: #525252; height: 100dvh; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
@@ -39,8 +40,9 @@
         .affiliate-section.active { display: block; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* Bug 2 Fix: Toast CSS properly targeted */
         .toast { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); transform: translateY(150%) scale(0.95); opacity: 0; pointer-events: none; z-index: 9999; }
-        .toast.show { transform: translateY(0) scale(1); opacity: 1; }
+        .toast.show { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
 
         .loader { border: 2px solid #e7e7e7; border-top: 2px solid #0a0a0a; border-radius: 50%; width: 24px; height: 24px; animation: spin 0.8s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -53,9 +55,9 @@
         .group:hover .img-hover-zoom { transform: scale(1.05); }
     </style>
 </head>
-<body class="h-screen overflow-hidden flex selection:bg-brand-900 selection:text-white font-sans antialiased relative">
+<body class="overflow-hidden flex selection:bg-brand-900 selection:text-white font-sans antialiased relative">
 
-    <!-- GLOBAL LOADING SPLASH SCREEN (Bug 1 Fix) -->
+    <!-- GLOBAL LOADING SPLASH SCREEN -->
     <div id="globalLoader" class="fixed inset-0 z-[200] bg-brand-50 flex items-center justify-center transition-opacity duration-300">
         <div class="text-center">
             <div class="w-16 h-16 bg-brand-900 text-white rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg">
@@ -65,8 +67,8 @@
         </div>
     </div>
 
-    <!-- TOAST NOTIFICATION (Bug 5 Fix) -->
-    <div id="toast" class="fixed bottom-6 right-6 bg-brand-900 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center space-x-3 text-sm font-semibold border border-white/10">
+    <!-- TOAST NOTIFICATION (Bug 2 Fix: Included 'toast' class) -->
+    <div id="toast" class="toast fixed bottom-6 lg:bottom-10 right-6 lg:right-10 bg-brand-900 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center space-x-3 text-sm font-semibold border border-white/10">
         <i id="toastIcon" class="fa-solid fa-circle-check text-green-400 text-lg"></i>
         <span id="toastMessage">Success</span>
     </div>
@@ -185,8 +187,8 @@
                 </div>
             </header>
 
-            <!-- Scrollable Content -->
-            <div class="flex-1 overflow-y-auto p-4 lg:p-10 hide-scrollbar" id="mainContentArea">
+            <!-- Scrollable Content (Bug 1 Fix: Added pb-32 to prevent bottom cut-offs) -->
+            <div class="flex-1 overflow-y-auto p-4 lg:p-10 pb-32 lg:pb-32 hide-scrollbar" id="mainContentArea">
                 
                 <!-- ================= DASHBOARD ================= -->
                 <section id="sec-dashboard" class="affiliate-section active max-w-7xl mx-auto">
@@ -201,7 +203,7 @@
                                 <i class="fa-solid fa-link text-gray-400 mr-4"></i>
                                 <input type="text" id="refLinkDisplay" readonly class="bg-transparent border-none outline-none text-white w-full text-sm font-bold tracking-wide" value="Loading...">
                             </div>
-                            <button onclick="copyToClipboard(document.getElementById('refLinkDisplay').value)" class="bg-white text-brand-900 hover:bg-gray-100 px-8 py-4 rounded-xl font-bold uppercase tracking-wider text-sm transition shadow-lg whitespace-nowrap flex items-center justify-center gap-2">
+                            <button onclick="copyToClipboard(document.getElementById('refLinkDisplay').value, 'Universal store link copied!')" class="bg-white text-brand-900 hover:bg-gray-100 px-8 py-4 rounded-xl font-bold uppercase tracking-wider text-sm transition shadow-lg whitespace-nowrap flex items-center justify-center gap-2">
                                 <i class="fa-regular fa-copy"></i> Copy Link
                             </button>
                         </div>
@@ -256,11 +258,11 @@
                                 <p class="text-[10px] font-bold text-green-700 uppercase tracking-widest mb-1">Your Tracking Link</p>
                                 <input type="text" id="customLinkResult" readonly class="bg-transparent border-none outline-none text-green-900 font-bold text-sm w-full truncate">
                             </div>
-                            <button onclick="copyToClipboard(document.getElementById('customLinkResult').value)" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold uppercase tracking-widest text-[10px] transition whitespace-nowrap">Copy</button>
+                            <button onclick="copyToClipboard(document.getElementById('customLinkResult').value, 'Custom tracking link copied!')" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold uppercase tracking-widest text-[10px] transition whitespace-nowrap">Copy</button>
                         </div>
                     </div>
 
-                    <!-- Product Showcase (Bug 2 Fixed) -->
+                    <!-- Product Showcase -->
                     <div class="mb-6 flex justify-between items-end">
                         <div>
                             <h3 class="font-display text-xl font-bold text-brand-900 uppercase tracking-tight">Product Showcase</h3>
@@ -273,7 +275,7 @@
                     </div>
                 </section>
 
-                <!-- ================= PRODUCT DETAIL (Bug 3 Fixed) ================= -->
+                <!-- ================= PRODUCT DETAIL ================= -->
                 <section id="sec-product-detail" class="affiliate-section max-w-7xl mx-auto">
                     <div class="mb-6">
                         <button onclick="navigate('marketing')" class="bg-white border border-gray-200 text-brand-900 w-10 h-10 rounded-full flex items-center justify-center hover:bg-brand-50 transition shadow-sm">
@@ -459,7 +461,7 @@
             if(el) el.innerText = text;
         };
         
-        // Bug 5 Fix: Toast Notification Timeout Handling
+        // BUG 2 FIX: Robust Moment-Specific Toast System
         window.toastTimer = null;
         window.showToast = (message, type = 'success') => {
             const toast = document.getElementById('toast');
@@ -478,17 +480,17 @@
             }, 50);
         };
 
-        // Bug 4 Fix: Advanced Robust Copy Function
-        window.copyToClipboard = (text) => {
+        // Advanced Fallback Copy Mechanism
+        window.copyToClipboard = (text, successMessage = 'Link copied to clipboard!') => {
             if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(text).then(() => showToast('Link copied to clipboard!'))
-                .catch(() => fallbackCopy(text));
+                navigator.clipboard.writeText(text).then(() => showToast(successMessage))
+                .catch(() => fallbackCopy(text, successMessage));
             } else {
-                fallbackCopy(text);
+                fallbackCopy(text, successMessage);
             }
         };
 
-        const fallbackCopy = (text) => {
+        const fallbackCopy = (text, successMessage) => {
             let textArea = document.createElement("textarea");
             textArea.value = text;
             textArea.style.position = "fixed";
@@ -498,7 +500,7 @@
             textArea.select();
             try {
                 document.execCommand('copy');
-                showToast('Link copied to clipboard!');
+                showToast(successMessage);
             } catch (err) {
                 showToast('Failed to copy link', 'error');
             }
@@ -512,7 +514,6 @@
             document.getElementById('tabRegister').className = `flex-1 font-bold pb-2 transition uppercase tracking-wider text-sm ${tab === 'register' ? 'text-brand-900 border-b-2 border-brand-900' : 'text-gray-400 hover:text-gray-600'}`;
         };
 
-        // UI toggles for Payment settings
         window.togglePaymentInput = () => {
             const method = document.getElementById('payMethodSelect').value;
             const label = document.getElementById('payMethodLabel');
@@ -610,7 +611,7 @@
 
                 await update(ref(db, `affiliates/${currentAffiliate.uid}`), { paymentDetails: pDetails });
                 currentAffiliate.paymentDetails = pDetails;
-                showToast('Payment Details Saved Successfully!');
+                showToast('Payment details saved securely!'); // Specific Toast
             } catch (err) {
                 showToast('Failed to save details', 'error');
             } finally {
@@ -646,7 +647,7 @@
                 };
 
                 await push(ref(db, 'payouts'), payoutData);
-                showToast("Withdrawal Request sent successfully!");
+                showToast("Withdrawal request sent to Admin!"); // Specific Toast
             } catch (err) {
                 showToast('Request failed. Check connection.', 'error');
                 btn.innerHTML = originalText;
@@ -674,6 +675,7 @@
                 
                 document.getElementById('customLinkResult').value = url.toString();
                 document.getElementById('customLinkResultBox').classList.remove('hidden');
+                showToast('Custom link generated successfully!'); // Specific Toast
             } catch(e) { showToast('Invalid URL format', 'error'); }
         };
 
@@ -686,7 +688,6 @@
             return url;
         };
 
-        // Bug 2 Fix: Premium Product Grid
         const renderMarketingProducts = () => {
             const grid = document.getElementById('marketingProductsGrid');
             if(!grid) return;
@@ -714,7 +715,6 @@
             }).join('');
         };
 
-        // Bug 3 Fix: Product Detail View logic
         window.viewProductDetail = (id) => {
             const p = State.products.find(x => x.id === id);
             if(!p) return;
@@ -757,7 +757,7 @@
                             </div>
                         </div>
 
-                        <button onclick="copyToClipboard('${affUrl}')" class="w-full bg-brand-900 text-white py-4 rounded-xl font-bold uppercase tracking-wider text-sm transition shadow-lg flex items-center justify-center gap-2 hover:bg-gray-800">
+                        <button onclick="copyToClipboard('${affUrl}', 'Product link copied to clipboard!')" class="w-full bg-brand-900 text-white py-4 rounded-xl font-bold uppercase tracking-wider text-sm transition shadow-lg flex items-center justify-center gap-2 hover:bg-gray-800">
                             <i class="fa-solid fa-link"></i> Copy Affiliate Link
                         </button>
                     </div>
@@ -948,7 +948,6 @@
                 document.getElementById('appView').classList.add('hidden');
             }
             
-            // Bug 1 Fix: Hide Global Loader Smoothly
             if(loader) {
                 loader.style.opacity = '0';
                 setTimeout(() => loader.classList.add('hidden'), 300);
