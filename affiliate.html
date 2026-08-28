@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TobaKart | Affiliate Partner Program</title>
+    <title>TobaKart | Premium Affiliate Partner</title>
     
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Tailwind CSS -->
@@ -15,9 +17,13 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Outfit', 'sans-serif'] },
+                    fontFamily: { 
+                        sans: ['Plus Jakarta Sans', 'sans-serif'], 
+                        display: ['Space Grotesk', 'sans-serif'] 
+                    },
                     colors: {
-                        brand: { 50: '#f0fdfa', 500: '#14b8a6', 600: '#0d9488', 900: '#0f172a' }
+                        brand: { 50: '#f6f6f6', 100: '#e7e7e7', 500: '#525252', 900: '#0a0a0a' },
+                        accent: { dark: '#0a0a0a', red: '#ef4444' }
                     }
                 }
             }
@@ -25,74 +31,83 @@
     </script>
 
     <style>
-        body { background-color: #f8fafc; color: #334155; }
+        body { background-color: #f6f6f6; color: #525252; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
         .affiliate-section { display: none; }
-        .affiliate-section.active { display: block; animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .affiliate-section.active { display: block; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        .toast { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translateY(100%); opacity: 0; pointer-events: none; }
-        .toast.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+        .toast { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); transform: translateY(150%) scale(0.95); opacity: 0; pointer-events: none; }
+        .toast.show { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
 
-        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #14b8a6; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        .loader { border: 2px solid #e7e7e7; border-top: 2px solid #0a0a0a; border-radius: 50%; width: 24px; height: 24px; animation: spin 0.8s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Table Styles */
         .table-container::-webkit-scrollbar { height: 6px; }
-        .table-container::-webkit-scrollbar-track { background: #f1f5f9; }
-        .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .table-container::-webkit-scrollbar-track { background: #f6f6f6; }
+        .table-container::-webkit-scrollbar-thumb { background: #e7e7e7; border-radius: 4px; }
     </style>
 </head>
-<body class="h-screen overflow-hidden flex selection:bg-brand-500 selection:text-white">
+<body class="h-screen overflow-hidden flex selection:bg-brand-900 selection:text-white font-sans antialiased">
 
     <!-- TOAST NOTIFICATION -->
-    <div id="toast" class="fixed bottom-6 right-6 bg-gray-900 text-white px-6 py-3 rounded-xl shadow-2xl z-[100] flex items-center space-x-3 pointer-events-none">
-        <i id="toastIcon" class="fa-solid fa-circle-check text-green-400"></i>
-        <span id="toastMessage" class="font-medium text-sm">Success</span>
+    <div id="toast" class="fixed bottom-6 right-6 bg-brand-900 text-white px-6 py-4 rounded-xl shadow-2xl z-[100] flex items-center space-x-3 text-sm font-semibold border border-white/10">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-green-400 text-lg"></i>
+        <span id="toastMessage">Success</span>
     </div>
 
     <!-- 1. AUTHENTICATION VIEW -->
-    <div id="authView" class="fixed inset-0 z-50 bg-white flex">
-        <!-- Left Side (Branding) -->
-        <div class="hidden lg:flex w-1/2 bg-brand-900 flex-col justify-center items-center p-12 relative overflow-hidden">
-            <div class="absolute inset-0 opacity-10 bg-[url('https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1000')] bg-cover bg-center mix-blend-overlay"></div>
-            <div class="relative z-10 text-center">
-                <h1 class="font-display text-5xl font-extrabold text-white mb-6">Partner With<br>TobaKart<span class="text-brand-500">.</span></h1>
-                <p class="text-gray-300 text-lg max-w-md mx-auto">Earn a flat 10% commission on every successful referral. Join India's fastest-growing premium POD fashion brand.</p>
+    <div id="authView" class="fixed inset-0 z-50 bg-brand-50 flex items-center justify-center p-4">
+        <div class="bg-white p-10 rounded-3xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] max-w-md w-full border border-gray-100">
+            <div class="text-center mb-10">
+                <h1 class="font-display text-4xl font-extrabold text-brand-900 tracking-tighter uppercase">TOBAKART<span class="text-accent-red">.</span></h1>
+                <p class="text-gray-500 text-sm mt-2 font-medium uppercase tracking-widest">Affiliate Partner Portal</p>
             </div>
-        </div>
-
-        <!-- Right Side (Forms) -->
-        <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50">
-            <div class="max-w-md w-full bg-white p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
-                <div class="lg:hidden text-center mb-8">
-                    <h1 class="font-display text-4xl font-extrabold text-brand-900">TobaKart<span class="text-brand-500">.</span></h1>
-                    <p class="text-sm text-gray-500 mt-2">Affiliate Partner Program</p>
-                </div>
-                
-                <div class="flex gap-4 mb-8 border-b border-gray-100 pb-4">
-                    <button id="tabLogin" onclick="switchAuthTab('login')" class="flex-1 font-bold text-brand-600 border-b-2 border-brand-600 pb-2 transition">Login</button>
-                    <button id="tabRegister" onclick="switchAuthTab('register')" class="flex-1 font-bold text-gray-400 hover:text-gray-600 pb-2 transition">Register</button>
-                </div>
-
-                <!-- Login Form -->
-                <form id="loginForm" class="space-y-4">
-                    <input type="email" id="loginEmail" placeholder="Email Address" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
-                    <input type="password" id="loginPassword" placeholder="Password" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
-                    <button type="submit" id="btnLogin" class="w-full bg-brand-900 hover:bg-brand-800 text-white py-3.5 rounded-xl font-bold shadow-sm transition flex justify-center">Login to Dashboard</button>
-                </form>
-
-                <!-- Register Form -->
-                <form id="registerForm" class="space-y-4 hidden">
-                    <input type="text" id="regName" placeholder="Full Name" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
-                    <input type="email" id="regEmail" placeholder="Email Address" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
-                    <input type="tel" id="regPhone" placeholder="WhatsApp Number" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
-                    <input type="password" id="regPassword" placeholder="Create Password" required minlength="6" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
-                    <button type="submit" id="btnRegister" class="w-full bg-brand-500 hover:bg-brand-600 text-white py-3.5 rounded-xl font-bold shadow-sm transition flex justify-center">Become a Partner</button>
-                </form>
+            
+            <div class="flex gap-4 mb-8 border-b border-gray-100 pb-4">
+                <button id="tabLogin" onclick="switchAuthTab('login')" class="flex-1 font-bold text-brand-900 border-b-2 border-brand-900 pb-2 transition uppercase tracking-wider text-sm">Login</button>
+                <button id="tabRegister" onclick="switchAuthTab('register')" class="flex-1 font-bold text-gray-400 hover:text-gray-600 pb-2 transition uppercase tracking-wider text-sm">Register</button>
             </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Email Address</label>
+                    <input type="email" id="loginEmail" required class="w-full bg-brand-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Password</label>
+                    <input type="password" id="loginPassword" required class="w-full bg-brand-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
+                </div>
+                <button type="submit" id="btnLogin" class="w-full bg-brand-900 hover:bg-gray-800 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-sm shadow-lg transition flex justify-center items-center h-14">
+                    Authenticate
+                </button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" class="space-y-5 hidden">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Full Name</label>
+                    <input type="text" id="regName" required class="w-full bg-brand-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Email Address</label>
+                    <input type="email" id="regEmail" required class="w-full bg-brand-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Mobile Number</label>
+                    <input type="tel" id="regPhone" required class="w-full bg-brand-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Create Password</label>
+                    <input type="password" id="regPassword" required minlength="6" class="w-full bg-brand-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
+                </div>
+                <button type="submit" id="btnRegister" class="w-full bg-brand-900 hover:bg-gray-800 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-sm shadow-lg transition flex justify-center items-center h-14">
+                    Become a Partner
+                </button>
+            </form>
         </div>
     </div>
 
@@ -100,150 +115,216 @@
     <div id="appView" class="hidden flex w-full h-full relative">
         
         <!-- SIDEBAR -->
-        <aside class="w-64 bg-white border-r border-gray-100 flex flex-col transition-all z-40 hidden md:flex absolute md:relative h-full" id="sidebar">
-            <div class="h-20 flex items-center justify-between px-6 border-b border-gray-50">
-                <span class="font-display text-2xl font-extrabold text-brand-900">TobaKart<span class="text-brand-500">.</span></span>
-                <button class="md:hidden text-gray-500" onclick="toggleMobileMenu()"><i class="fa-solid fa-xmark text-xl"></i></button>
+        <aside class="w-[280px] bg-brand-900 text-gray-300 flex flex-col transition-transform absolute z-40 h-full md:relative md:translate-x-0 -translate-x-full shadow-2xl md:shadow-none" id="sidebar">
+            <div class="h-20 flex items-center justify-between px-6 border-b border-white/10 shrink-0">
+                <span class="font-display text-2xl font-bold text-white tracking-tighter uppercase">TOBAKART<span class="text-accent-red">.</span></span>
+                <button class="md:hidden text-gray-400 hover:text-white" onclick="toggleMobileMenu()"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
-            <div class="p-6 border-b border-gray-50 text-center">
-                <div class="w-16 h-16 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-3 font-display font-bold" id="sidebarAvatar">A</div>
-                <h3 class="font-bold text-gray-900 line-clamp-1" id="sidebarName">Affiliate Partner</h3>
-                <p class="text-xs text-gray-500 mt-1">10% Commission Rate</p>
-                <div class="mt-2 inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-600 text-[10px] font-bold rounded-md uppercase tracking-wider">
-                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> RTDB Live Sync
-                </div>
+            <div class="p-6 border-b border-white/10 text-center">
+                <div class="w-16 h-16 bg-white/10 text-white rounded-full flex items-center justify-center text-2xl mx-auto mb-4 font-display font-bold shadow-sm" id="sidebarAvatar">A</div>
+                <h3 class="font-bold text-white line-clamp-1 text-sm tracking-wide uppercase" id="sidebarName">Partner</h3>
+                <p class="text-xs text-gray-400 mt-1 uppercase tracking-widest">10% Commission Rate</p>
             </div>
 
-            <nav class="flex-1 overflow-y-auto py-6 space-y-2 px-4">
-                <button onclick="navigate('dashboard')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-brand-50 text-brand-600 font-semibold transition text-sm" data-target="dashboard">
-                    <i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard
+            <nav class="flex-1 overflow-y-auto py-6 space-y-2 px-4 hide-scrollbar">
+                <div class="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-3 mb-2">Growth</div>
+                <button onclick="navigate('dashboard')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white/10 text-white font-semibold transition text-sm" data-target="dashboard">
+                    <i class="fa-solid fa-house w-5 text-center"></i> Overview
                 </button>
-                <button onclick="navigate('orders')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-semibold transition text-sm" data-target="orders">
-                    <i class="fa-solid fa-cart-shopping w-5 text-center"></i> Referrals & Sales
+                <button onclick="navigate('marketing')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white font-semibold transition text-sm" data-target="marketing">
+                    <i class="fa-solid fa-bullhorn w-5 text-center"></i> Marketing & Links
                 </button>
-                <button onclick="navigate('payouts')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-semibold transition text-sm" data-target="payouts">
+                
+                <div class="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-3 mt-6 mb-2">Performance</div>
+                <button onclick="navigate('reports')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white font-semibold transition text-sm" data-target="reports">
+                    <i class="fa-solid fa-chart-pie w-5 text-center"></i> Advanced Reports
+                </button>
+                <button onclick="navigate('orders')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white font-semibold transition text-sm" data-target="orders">
+                    <i class="fa-solid fa-box-open w-5 text-center"></i> Orders List
+                </button>
+                <button onclick="navigate('payouts')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white font-semibold transition text-sm" data-target="payouts">
                     <i class="fa-solid fa-wallet w-5 text-center"></i> Payout History
                 </button>
             </nav>
 
-            <div class="p-4 border-t border-gray-50">
-                <button onclick="logoutAffiliate()" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gray-50 text-red-500 hover:bg-red-50 font-bold transition text-sm">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+            <div class="p-5 border-t border-white/10 shrink-0">
+                <button onclick="logoutAffiliate()" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 font-bold transition text-sm uppercase tracking-wider">
+                    <i class="fa-solid fa-power-off"></i> Logout
                 </button>
             </div>
         </aside>
 
-        <div id="sidebarBackdrop" class="fixed inset-0 z-30 bg-brand-900/50 backdrop-blur-sm hidden md:hidden" onclick="toggleMobileMenu()"></div>
+        <div id="sidebarBackdrop" class="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm hidden md:hidden transition-opacity" onclick="toggleMobileMenu()"></div>
 
         <!-- MAIN CONTENT AREA -->
-        <main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-gray-50">
+        <main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-brand-50">
             <!-- Headerbar -->
-            <header class="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-6 shrink-0 z-30 shadow-sm">
+            <header class="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-6 lg:px-10 shrink-0 z-20 shadow-sm">
                 <div class="flex items-center gap-4">
-                    <button class="md:hidden text-gray-600 hover:text-brand-500 transition" onclick="toggleMobileMenu()">
+                    <button class="md:hidden text-brand-900 hover:opacity-70 transition" onclick="toggleMobileMenu()">
                         <i class="fa-solid fa-bars-staggered text-xl"></i>
                     </button>
-                    <h2 class="text-xl font-display font-bold text-gray-900 uppercase tracking-tight" id="headerTitle">Overview</h2>
+                    <h2 class="text-xl lg:text-2xl font-display font-bold text-brand-900 tracking-tight uppercase" id="headerTitle">Overview</h2>
                 </div>
-                <div class="bg-brand-50 text-brand-600 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 border border-brand-100">
-                    <i class="fa-solid fa-fire text-orange-500"></i> Partner Status: Active
+                <div class="bg-brand-50 text-brand-900 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest flex items-center gap-2 border border-gray-200 shadow-sm">
+                    <i class="fa-solid fa-circle-check text-green-500"></i> Partner Active
                 </div>
             </header>
 
             <!-- Scrollable Content -->
-            <div class="flex-1 overflow-y-auto p-4 md:p-8 hide-scrollbar" id="mainContentArea">
+            <div class="flex-1 overflow-y-auto p-4 lg:p-10 hide-scrollbar" id="mainContentArea">
                 
                 <!-- ================= DASHBOARD ================= -->
-                <section id="sec-dashboard" class="affiliate-section active max-w-6xl mx-auto">
+                <section id="sec-dashboard" class="affiliate-section active max-w-7xl mx-auto">
                     
-                    <!-- Referral Link Card -->
-                    <div class="bg-brand-900 rounded-3xl p-6 md:p-8 text-white mb-8 relative overflow-hidden shadow-lg border border-gray-800">
-                        <div class="absolute right-0 top-0 w-64 h-64 bg-brand-500 rounded-full blur-3xl opacity-20 -translate-y-1/2 translate-x-1/3"></div>
-                        <h3 class="text-lg font-bold text-brand-50 mb-2">Your Unique Referral Link</h3>
-                        <p class="text-sm text-gray-400 mb-6 max-w-xl">Share this link on your Instagram, YouTube, or WhatsApp. You will earn 10% commission on every eligible order placed through this link.</p>
+                    <!-- Universal Link Card -->
+                    <div class="bg-brand-900 rounded-3xl p-8 lg:p-10 text-white mb-8 relative overflow-hidden shadow-xl border border-gray-800">
+                        <div class="absolute right-0 top-0 w-64 h-64 bg-accent-red/20 rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+                        <h3 class="font-display text-2xl lg:text-3xl font-bold text-white mb-3 tracking-tight uppercase">Your Universal Store Link</h3>
+                        <p class="text-sm text-gray-400 mb-8 max-w-xl leading-relaxed">Share this link to direct users to the Khodal homepage. Any purchase made across the entire store will earn you a flat 10% commission.</p>
                         
-                        <div class="flex flex-col sm:flex-row gap-3 relative z-10">
-                            <div class="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 flex items-center backdrop-blur-sm">
-                                <i class="fa-solid fa-link text-brand-400 mr-3"></i>
-                                <input type="text" id="refLinkDisplay" readonly class="bg-transparent border-none outline-none text-white w-full text-sm font-medium" value="Loading...">
+                        <div class="flex flex-col sm:flex-row gap-4 relative z-10 max-w-3xl">
+                            <div class="flex-1 bg-white/10 border border-white/20 rounded-xl px-5 py-4 flex items-center backdrop-blur-sm">
+                                <i class="fa-solid fa-link text-gray-400 mr-4"></i>
+                                <input type="text" id="refLinkDisplay" readonly class="bg-transparent border-none outline-none text-white w-full text-sm font-bold tracking-wide" value="Loading...">
                             </div>
-                            <button onclick="copyRefLink()" class="bg-brand-500 hover:bg-brand-400 text-white px-6 py-3 rounded-xl font-bold transition shadow-sm whitespace-nowrap flex items-center justify-center gap-2">
-                                <i class="fa-regular fa-copy"></i> Copy
-                            </button>
-                            <button onclick="shareToWhatsApp()" class="bg-[#25D366] hover:bg-[#20bd5a] text-white px-6 py-3 rounded-xl font-bold transition shadow-sm whitespace-nowrap flex items-center justify-center gap-2">
-                                <i class="fa-brands fa-whatsapp text-lg"></i> Share
+                            <button onclick="copyToClipboard(document.getElementById('refLinkDisplay').value)" class="bg-white text-brand-900 hover:bg-gray-100 px-8 py-4 rounded-xl font-bold uppercase tracking-wider text-sm transition shadow-lg whitespace-nowrap flex items-center justify-center gap-2">
+                                <i class="fa-regular fa-copy"></i> Copy Link
                             </button>
                         </div>
                     </div>
 
                     <!-- Earnings KPIs -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-                        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
-                            <div class="absolute top-0 right-0 w-16 h-16 bg-blue-50 rounded-bl-full flex items-start justify-end p-3"><i class="fa-solid fa-chart-line text-blue-500"></i></div>
-                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Total Sales Generated</p>
-                            <h3 class="font-display text-3xl font-bold text-gray-900" id="kpiTotalSales">₹0</h3>
-                            <p class="text-xs text-gray-400 mt-2"><span id="kpiTotalOrders" class="font-bold text-gray-700">0</span> Successful Orders</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white p-6 lg:p-8 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden">
+                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Total Revenue Generated</p>
+                            <h3 class="font-display text-3xl font-bold text-brand-900" id="kpiTotalSales">₹0</h3>
+                            <p class="text-xs font-bold text-gray-400 mt-3 uppercase tracking-widest"><span id="kpiTotalOrders" class="text-brand-900">0</span> Successful Orders</p>
                         </div>
                         
-                        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
-                            <div class="absolute top-0 right-0 w-16 h-16 bg-yellow-50 rounded-bl-full flex items-start justify-end p-3"><i class="fa-solid fa-hourglass-half text-yellow-500"></i></div>
-                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Pending Commission</p>
-                            <h3 class="font-display text-3xl font-bold text-yellow-600" id="kpiPendingComm">₹0</h3>
-                            <p class="text-xs text-gray-400 mt-2">Awaiting delivery</p>
+                        <div class="bg-white p-6 lg:p-8 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden">
+                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Pending Commission</p>
+                            <h3 class="font-display text-3xl font-bold text-orange-500" id="kpiPendingComm">₹0</h3>
+                            <p class="text-xs font-bold text-gray-400 mt-3 uppercase tracking-widest">Awaiting Delivery</p>
                         </div>
 
-                        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
-                            <div class="absolute top-0 right-0 w-16 h-16 bg-green-50 rounded-bl-full flex items-start justify-end p-3"><i class="fa-solid fa-check-double text-green-500"></i></div>
-                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Available to Withdraw</p>
+                        <div class="bg-white p-6 lg:p-8 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden">
+                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Available to Withdraw</p>
                             <h3 class="font-display text-3xl font-bold text-green-600" id="kpiApprovedComm">₹0</h3>
-                            <p class="text-xs text-gray-400 mt-2">Approved & Ready for payout</p>
+                            <p class="text-xs font-bold text-gray-400 mt-3 uppercase tracking-widest">Approved for Payout</p>
                         </div>
 
-                        <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
-                            <div class="absolute top-0 right-0 w-16 h-16 bg-purple-50 rounded-bl-full flex items-start justify-end p-3"><i class="fa-solid fa-wallet text-purple-500"></i></div>
-                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Total Paid Out</p>
-                            <h3 class="font-display text-3xl font-bold text-gray-900" id="kpiPaidComm">₹0</h3>
-                            <p class="text-xs text-gray-400 mt-2">Lifetime earnings transferred</p>
+                        <div class="bg-white p-6 lg:p-8 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden">
+                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Total Paid Out</p>
+                            <h3 class="font-display text-3xl font-bold text-brand-900" id="kpiPaidComm">₹0</h3>
+                            <p class="text-xs font-bold text-gray-400 mt-3 uppercase tracking-widest">Lifetime Earnings</p>
                         </div>
-                    </div>
-
-                    <!-- Guidelines -->
-                    <div class="bg-blue-50 border border-blue-100 rounded-2xl p-6">
-                        <h4 class="font-bold text-blue-900 mb-2 flex items-center gap-2"><i class="fa-solid fa-circle-info"></i> How it works? (RTDB Live Sync Active)</h4>
-                        <ul class="text-sm text-blue-800 space-y-2 pl-6 list-disc">
-                            <li>Commission is calculated as <b>10% of the Total Order Value</b> (excluding shipping).</li>
-                            <li>Your referrals instantly appear in the system as soon as the user checks out.</li>
-                            <li>Commissions stay in <b>Pending</b> until Admin successfully updates the order status to <b>DELIVERED</b>.</li>
-                            <li>Once delivered, it automatically moves to <b>Available to Withdraw</b>. Admin processes payouts regularly.</li>
-                        </ul>
                     </div>
                 </section>
 
-                <!-- ================= ORDERS & REFERRALS ================= -->
-                <section id="sec-orders" class="affiliate-section max-w-6xl mx-auto">
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
-                        <div class="p-6 border-b border-gray-50 flex justify-between items-center bg-white">
-                            <h3 class="font-bold text-gray-900 text-lg">Referred Orders</h3>
-                            <div class="text-[10px] font-bold text-green-600 bg-green-50 px-2.5 py-1 rounded flex items-center gap-1.5 border border-green-100">
-                                <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> RTDB Updating
+                <!-- ================= MARKETING & LINKS ================= -->
+                <section id="sec-marketing" class="affiliate-section max-w-7xl mx-auto">
+                    <!-- Custom Link Generator -->
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 lg:p-10 mb-8">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 bg-brand-50 text-brand-900 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                            <div>
+                                <h3 class="font-display text-xl font-bold text-brand-900 uppercase tracking-tight">Custom Link Generator</h3>
+                                <p class="text-xs text-gray-500 font-medium">Paste any page link from Khodal.online to convert it into your tracking link.</p>
                             </div>
+                        </div>
+                        
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <input type="url" id="customLinkInput" placeholder="e.g. khodal.online/index.html#shop" class="flex-1 bg-brand-50 border border-gray-200 rounded-xl px-5 py-4 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
+                            <button onclick="generateCustomLink()" class="bg-brand-900 hover:bg-gray-800 text-white px-8 py-4 rounded-xl font-bold uppercase tracking-wider text-sm transition shadow-lg flex items-center justify-center gap-2 whitespace-nowrap">
+                                Generate Link
+                            </button>
+                        </div>
+                        
+                        <div id="customLinkResultBox" class="hidden mt-6 p-5 bg-green-50 border border-green-200 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div class="flex-1 w-full overflow-hidden">
+                                <p class="text-[10px] font-bold text-green-700 uppercase tracking-widest mb-1">Your Tracking Link</p>
+                                <input type="text" id="customLinkResult" readonly class="bg-transparent border-none outline-none text-green-900 font-bold text-sm w-full truncate">
+                            </div>
+                            <button onclick="copyToClipboard(document.getElementById('customLinkResult').value)" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold uppercase tracking-widest text-[10px] transition whitespace-nowrap">Copy</button>
+                        </div>
+                    </div>
+
+                    <!-- Product Showcase for Easy Linking -->
+                    <div class="mb-6 flex justify-between items-end">
+                        <div>
+                            <h3 class="font-display text-xl font-bold text-brand-900 uppercase tracking-tight">Product Showcase</h3>
+                            <p class="text-xs text-gray-500 font-medium mt-1">Generate direct links for specific products to increase conversions.</p>
+                        </div>
+                    </div>
+                    
+                    <div id="marketingProductsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <div class="col-span-full text-center py-10 text-gray-400"><div class="loader mx-auto mb-3"></div> Fetching Store Products...</div>
+                    </div>
+                </section>
+
+                <!-- ================= ADVANCED REPORTS ================= -->
+                <section id="sec-reports" class="affiliate-section max-w-7xl mx-auto">
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 lg:p-10 mb-8">
+                        <h3 class="font-display text-xl font-bold text-brand-900 uppercase tracking-tight mb-8">Performance Analytics</h3>
+                        
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8 mb-10">
+                            <div class="bg-brand-50 rounded-2xl p-6 border border-gray-100">
+                                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Conversion Rate</p>
+                                <h4 class="font-display text-2xl font-bold text-brand-900" id="repConvRate">0%</h4>
+                            </div>
+                            <div class="bg-green-50 rounded-2xl p-6 border border-green-100">
+                                <p class="text-[10px] font-bold text-green-700 uppercase tracking-widest mb-1">Approved Orders</p>
+                                <h4 class="font-display text-2xl font-bold text-green-800" id="repApprovedOrders">0</h4>
+                            </div>
+                            <div class="bg-red-50 rounded-2xl p-6 border border-red-100">
+                                <p class="text-[10px] font-bold text-red-700 uppercase tracking-widest mb-1">Cancelled Orders</p>
+                                <h4 class="font-display text-2xl font-bold text-red-800" id="repCancelledOrders">0</h4>
+                            </div>
+                            <div class="bg-brand-50 rounded-2xl p-6 border border-gray-100">
+                                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Est. Earnings / Order</p>
+                                <h4 class="font-display text-2xl font-bold text-brand-900" id="repAvgEarn">₹0</h4>
+                            </div>
+                        </div>
+                        
+                        <div class="border-t border-gray-100 pt-8">
+                            <h4 class="text-sm font-bold text-brand-900 uppercase tracking-wider mb-4">Commission Pipeline</h4>
+                            <div class="w-full bg-gray-100 rounded-full h-4 overflow-hidden flex" id="pipelineBar">
+                                <div class="bg-green-500 h-full transition-all duration-500" style="width: 0%" title="Approved"></div>
+                                <div class="bg-orange-400 h-full transition-all duration-500" style="width: 0%" title="Pending"></div>
+                                <div class="bg-red-500 h-full transition-all duration-500" style="width: 0%" title="Rejected"></div>
+                            </div>
+                            <div class="flex gap-6 mt-4 text-xs font-bold uppercase tracking-widest">
+                                <div class="flex items-center gap-2 text-green-600"><span class="w-3 h-3 bg-green-500 rounded"></span> Approved</div>
+                                <div class="flex items-center gap-2 text-orange-500"><span class="w-3 h-3 bg-orange-400 rounded"></span> Pending</div>
+                                <div class="flex items-center gap-2 text-red-500"><span class="w-3 h-3 bg-red-500 rounded"></span> Rejected</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= ORDERS ================= -->
+                <section id="sec-orders" class="affiliate-section max-w-7xl mx-auto">
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+                        <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4 bg-white">
+                            <h3 class="font-display text-xl font-bold text-brand-900 uppercase tracking-tight">Order Transactions</h3>
                         </div>
                         
                         <div class="overflow-x-auto table-container">
                             <table class="w-full text-sm text-left whitespace-nowrap">
-                                <thead class="text-[10px] text-gray-400 uppercase tracking-widest bg-gray-50 border-b border-gray-100">
+                                <thead class="text-[10px] text-gray-400 uppercase tracking-widest bg-brand-50 border-b border-gray-100">
                                     <tr>
-                                        <th class="px-6 py-4 font-bold">Date</th>
-                                        <th class="px-6 py-4 font-bold">Order ID</th>
-                                        <th class="px-6 py-4 font-bold">Order Value</th>
-                                        <th class="px-6 py-4 font-bold">Est. Commission (10%)</th>
-                                        <th class="px-6 py-4 font-bold">Fulfillment Status</th>
-                                        <th class="px-6 py-4 font-bold">Commission Status</th>
+                                        <th class="px-6 py-5 font-bold">Date</th>
+                                        <th class="px-6 py-5 font-bold">Order ID</th>
+                                        <th class="px-6 py-5 font-bold">Sale Amount</th>
+                                        <th class="px-6 py-5 font-bold">Your Commission</th>
+                                        <th class="px-6 py-5 font-bold">Order Status</th>
+                                        <th class="px-6 py-5 font-bold text-right">Commission Status</th>
                                     </tr>
                                 </thead>
-                                <tbody id="referredOrdersTable" class="divide-y divide-gray-50 text-gray-600">
-                                    <tr><td colspan="6" class="px-6 py-10 text-center"><div class="loader mx-auto mb-3"></div> Fetching live referrals...</td></tr>
+                                <tbody id="referredOrdersTable" class="divide-y divide-gray-50 text-gray-600 font-medium">
+                                    <tr><td colspan="6" class="px-6 py-16 text-center">Loading transactions...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -251,36 +332,25 @@
                 </section>
 
                 <!-- ================= PAYOUTS ================= -->
-                <section id="sec-payouts" class="affiliate-section max-w-6xl mx-auto">
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div class="lg:col-span-1">
-                            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 text-center">
-                                <div class="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center text-2xl mx-auto mb-4"><i class="fa-solid fa-money-bill-transfer"></i></div>
-                                <h3 class="text-gray-500 font-bold text-xs uppercase tracking-widest mb-1">Available for Payout</h3>
-                                <p class="font-display text-4xl font-bold text-gray-900 mb-6" id="payoutAvailable">₹0</p>
-                                <p class="text-xs text-gray-400 mb-4 bg-gray-50 p-3 rounded-lg text-left border border-gray-100">Payouts are processed automatically every Monday via UPI or Bank Transfer for balances above ₹500 by the store admin.</p>
-                                <button class="w-full bg-gray-900 text-white py-3 rounded-xl font-bold uppercase tracking-widest text-xs opacity-50 cursor-not-allowed">Request Payout</button>
-                            </div>
+                <section id="sec-payouts" class="affiliate-section max-w-7xl mx-auto">
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+                        <div class="p-6 border-b border-gray-100 bg-white flex justify-between items-center">
+                            <h3 class="font-display text-xl font-bold text-brand-900 uppercase tracking-tight">Payout History</h3>
                         </div>
-                        
-                        <div class="lg:col-span-2">
-                            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden h-full flex flex-col">
-                                <div class="p-6 border-b border-gray-50 flex justify-between items-center">
-                                    <h3 class="font-bold text-gray-900 text-lg">Payout History</h3>
-                                    <div class="text-[10px] font-bold text-green-600 bg-green-50 px-2.5 py-1 rounded flex items-center gap-1.5 border border-green-100">
-                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> RTDB Updating
-                                    </div>
-                                </div>
-                                <div class="p-6 flex-1 overflow-y-auto">
-                                    <div id="payoutHistoryList" class="space-y-4">
-                                        <!-- Injected via JS -->
-                                        <div class="text-center py-10 text-gray-400">
-                                            <i class="fa-solid fa-receipt text-3xl mb-3 opacity-50"></i>
-                                            <p class="text-sm">No payouts recorded yet.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="overflow-x-auto table-container flex-1">
+                            <table class="w-full text-sm text-left whitespace-nowrap">
+                                <thead class="text-[10px] text-gray-400 uppercase tracking-widest bg-brand-50 border-b border-gray-100">
+                                    <tr>
+                                        <th class="px-6 py-5 font-bold">Transfer Date</th>
+                                        <th class="px-6 py-5 font-bold">Payment Mode / Ref</th>
+                                        <th class="px-6 py-5 font-bold">Amount Transferred</th>
+                                        <th class="px-6 py-5 font-bold text-right">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="payoutHistoryList" class="divide-y divide-gray-50 text-gray-600 font-medium">
+                                    <tr><td colspan="4" class="px-6 py-16 text-center">Loading history...</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </section>
@@ -289,14 +359,12 @@
         </main>
     </div>
 
-
-    <!-- ================= FIREBASE & LOGIC (REAL-TIME RTDB SYNC) ================= -->
+    <!-- ================= FIREBASE & LOGIC ================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getDatabase, ref, get, child, set, onValue, query, orderByChild, equalTo, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        // TobaKart Actual Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyBHftpk6Z-JtHsK3PV-jbNH-klNvoqODLA",
             authDomain: "khodal-81a54.firebaseapp.com",
@@ -311,139 +379,264 @@
         const auth = getAuth(app);
         const db = getDatabase(app); 
 
-        // State
+        // Globals
         let currentAffiliate = null;
-        const COMMISSION_RATE = 0.10; // 10%
-        const DOMAIN = window.location.origin + window.location.pathname.replace('/affiliate.html', ''); 
+        const COMMISSION_RATE = 0.10; 
+        const DOMAIN = "https://khodal.online"; 
 
-        const State = {
-            orders: [],
-            payouts: []
+        const State = { orders: [], payouts: [], products: [] };
+
+        const formatPrice = (price) => `₹${Number(price || 0).toLocaleString('en-IN')}`;
+        
+        const safeSetText = (id, text) => {
+            const el = document.getElementById(id);
+            if(el) el.innerText = text;
         };
-
-        let unsubOrders = null;
-        let unsubPayouts = null;
-
-        // Utilities
-        const formatPrice = (price) => `₹${Number(price).toLocaleString('en-IN')}`;
+        
         window.showToast = (message, type = 'success') => {
             const toast = document.getElementById('toast');
+            if(!toast) return;
             document.getElementById('toastMessage').innerText = message;
-            document.getElementById('toastIcon').className = type === 'success' ? 'fa-solid fa-circle-check text-green-400' : 'fa-solid fa-circle-exclamation text-red-400';
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+            document.getElementById('toastIcon').className = type === 'success' ? 'fa-solid fa-circle-check text-green-400 text-lg' : 'fa-solid fa-circle-exclamation text-accent-red text-lg';
+            
+            toast.classList.remove('show');
+            setTimeout(() => { toast.classList.add('show'); }, 10);
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
         };
 
-        // --- AUTH UI TOGGLE ---
-        window.switchAuthTab = (tab) => {
-            if(tab === 'login') {
-                document.getElementById('loginForm').classList.remove('hidden');
-                document.getElementById('registerForm').classList.add('hidden');
-                document.getElementById('tabLogin').className = "flex-1 font-bold text-brand-600 border-b-2 border-brand-600 pb-2 transition";
-                document.getElementById('tabRegister').className = "flex-1 font-bold text-gray-400 hover:text-gray-600 pb-2 transition";
+        // Advanced Fallback Copy Mechanism 
+        window.copyToClipboard = (text) => {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => showToast('Link copied to clipboard!'));
             } else {
-                document.getElementById('loginForm').classList.add('hidden');
-                document.getElementById('registerForm').classList.remove('hidden');
-                document.getElementById('tabRegister').className = "flex-1 font-bold text-brand-600 border-b-2 border-brand-600 pb-2 transition";
-                document.getElementById('tabLogin').className = "flex-1 font-bold text-gray-400 hover:text-gray-600 pb-2 transition";
+                let textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.position = "fixed";
+                textArea.style.left = "-999999px";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showToast('Link copied to clipboard!');
+                } catch (err) {
+                    showToast('Failed to copy link', 'error');
+                }
+                textArea.remove();
             }
         };
 
-        // --- REAL-TIME RTDB LISTENERS SETUP ---
+        // UI Tabs
+        window.switchAuthTab = (tab) => {
+            document.getElementById('loginForm').classList.toggle('hidden', tab !== 'login');
+            document.getElementById('registerForm').classList.toggle('hidden', tab !== 'register');
+            document.getElementById('tabLogin').className = `flex-1 font-bold pb-2 transition uppercase tracking-wider text-sm ${tab === 'login' ? 'text-brand-900 border-b-2 border-brand-900' : 'text-gray-400 hover:text-gray-600'}`;
+            document.getElementById('tabRegister').className = `flex-1 font-bold pb-2 transition uppercase tracking-wider text-sm ${tab === 'register' ? 'text-brand-900 border-b-2 border-brand-900' : 'text-gray-400 hover:text-gray-600'}`;
+        };
+
+        // Core Listeners
         const setupRealtimeListeners = () => {
             if (!currentAffiliate) return;
             const myCode = currentAffiliate.affiliateCode;
 
-            // 1. Listen to Orders referred by this affiliate
-            const ordersRef = query(ref(db, "orders"), orderByChild("affiliateCode"), equalTo(myCode));
-            unsubOrders = onValue(ordersRef, (snapshot) => {
+            // 1. Orders (FIXED Reference Error & Null Pointer)
+            onValue(query(ref(db, "orders"), orderByChild("affiliateCode"), equalTo(myCode)), (snapshot) => {
                 const orders = [];
-                snapshot.forEach(childSnapshot => {
-                    const o = childSnapshot.val();
-                    const orderValue = Number(o.totalAmount || 0);
-                    const commissionRate = o.commissionRate || COMMISSION_RATE;
-                    const commissionAmount = Number(o.commissionAmount || (orderValue * commissionRate));
-                    
-                    let commissionStatus = o.commissionStatus;
-                    if(!commissionStatus) {
-                        if (o.status === 'DELIVERED') commissionStatus = 'APPROVED';
-                        else if (o.status === 'CANCELLED' || o.status === 'RETURNED') commissionStatus = 'REJECTED';
-                        else commissionStatus = 'PENDING';
-                    }
-
-                    orders.push({
-                        id: childSnapshot.key,
-                        ...o,
-                        commissionAmount,
-                        commissionStatus
+                if(snapshot.exists()) {
+                    snapshot.forEach(child => {
+                        const o = child.val();
+                        let commStatus = o.commissionStatus;
+                        if(!commStatus) {
+                            if (o.status === 'DELIVERED') commStatus = 'APPROVED';
+                            else if (o.status === 'CANCELLED' || o.status === 'RETURNED') commStatus = 'REJECTED';
+                            else commStatus = 'PENDING';
+                        }
+                        orders.push({
+                            id: child.key, ...o,
+                            commissionAmount: Number(o.commissionAmount) || (Number(o.totalAmount || 0) * (Number(o.commissionRate) || COMMISSION_RATE)),
+                            commissionStatus: commStatus // Correctly mapped variable
+                        });
                     });
-                });
-                
-                orders.sort((a,b) => {
-                    const dateA = new Date(a.createdAt || a.date || 0);
-                    const dateB = new Date(b.createdAt || b.date || 0);
-                    return dateB - dateA;
-                });
-
-                State.orders = orders;
+                }
+                State.orders = orders.sort((a,b) => new Date(b.createdAt || b.date || 0) - new Date(a.createdAt || a.date || 0));
                 updateDashboardUI();
-            }, (error) => {
-                console.error("Firebase Orders Sync Error:", error);
-                showToast("Connection to RTDB failed.", "error");
+                updateReportsUI();
             });
 
-            // 2. Listen to Payouts specific to this affiliate
-            const payoutsRef = query(ref(db, "payouts"), orderByChild("affiliateId"), equalTo(currentAffiliate.uid));
-            unsubPayouts = onValue(payoutsRef, (snapshot) => {
+            // 2. Payouts
+            onValue(query(ref(db, "payouts"), orderByChild("affiliateId"), equalTo(currentAffiliate.uid)), (snapshot) => {
                 const payouts = [];
-                snapshot.forEach(childSnapshot => {
-                    payouts.push({id: childSnapshot.key, ...childSnapshot.val()});
-                });
-                
-                payouts.sort((a,b) => {
-                    const dateA = new Date(a.createdAt || a.date || 0);
-                    const dateB = new Date(b.createdAt || b.date || 0);
-                    return dateB - dateA;
-                });
-
-                State.payouts = payouts;
+                if(snapshot.exists()){
+                    snapshot.forEach(child => payouts.push({id: child.key, ...child.val()}));
+                }
+                State.payouts = payouts.sort((a,b) => new Date(b.createdAt || b.date || 0) - new Date(a.createdAt || a.date || 0));
                 updateDashboardUI();
-            }, (error) => {
-                console.error("Firebase Payouts Sync Error:", error);
+            });
+
+            // 3. Products
+            onValue(ref(db, "products"), (snapshot) => {
+                const prods = [];
+                if(snapshot.exists()){
+                    snapshot.forEach(child => {
+                        const p = child.val();
+                        let img = p.image || (p.images && p.images.length > 0 ? p.images[0] : '');
+                        prods.push({id: child.key, name: p.name, price: p.price, salePrice: p.salePrice, image: img});
+                    });
+                }
+                State.products = prods;
+                renderMarketingProducts();
             });
         };
 
-        const updateDashboardUI = () => {
-            let totalSales = 0;
-            let pendingComm = 0;
-            let approvedComm = 0;
-            let totalPaid = 0;
+        // Generate Custom Link 
+        window.generateCustomLink = () => {
+            let input = document.getElementById('customLinkInput').value.trim();
+            if(!input) {
+                showToast('Please paste a valid link first', 'error');
+                return;
+            }
+            
+            // Fix missing protocol
+            if(!input.startsWith('http://') && !input.startsWith('https://')) {
+                input = 'https://' + input;
+            }
+
+            try {
+                const url = new URL(input);
+                if(!url.hostname.includes('khodal.online')) {
+                    showToast('Please enter a valid khodal.online URL', 'error');
+                    return;
+                }
+                
+                let hash = url.hash;
+                if(hash) {
+                    if(hash.includes('?')) hash += `&ref=${currentAffiliate.affiliateCode}`;
+                    else hash += `?ref=${currentAffiliate.affiliateCode}`;
+                    url.hash = hash;
+                } else {
+                    url.searchParams.set('ref', currentAffiliate.affiliateCode);
+                }
+                
+                const resultBox = document.getElementById('customLinkResultBox');
+                const resultInput = document.getElementById('customLinkResult');
+                resultInput.value = url.toString();
+                resultBox.classList.remove('hidden');
+                
+            } catch(e) {
+                showToast('Invalid URL format', 'error');
+            }
+        };
+
+        // Render Product Showcase
+        const renderMarketingProducts = () => {
+            const grid = document.getElementById('marketingProductsGrid');
+            if(!grid) return;
+            if(State.products.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-10 text-gray-400 font-bold uppercase text-xs tracking-widest">No products found in store.</div>';
+                return;
+            }
+
+            const processImg = (url) => {
+                if(!url) return '';
+                if(url.includes('drive.google.com')) {
+                    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                    if(match && match[1]) return `https://lh3.googleusercontent.com/d/${match[1]}=w500`;
+                }
+                return url;
+            };
+
+            grid.innerHTML = State.products.map(p => {
+                const activePrice = p.salePrice || p.price;
+                const estComm = activePrice * COMMISSION_RATE;
+                const affUrl = `${DOMAIN}/index.html#product?id=${p.id}&ref=${currentAffiliate.affiliateCode}`;
+                
+                return `
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition">
+                    <img src="${processImg(p.image)}" class="w-full aspect-[4/5] object-cover bg-brand-50">
+                    <div class="p-5 flex-1 flex flex-col">
+                        <h4 class="text-sm font-bold text-brand-900 uppercase tracking-tight line-clamp-2 mb-2">${p.name}</h4>
+                        <div class="flex justify-between items-end mb-4 mt-auto">
+                            <span class="font-display font-bold text-brand-900 text-lg">${formatPrice(activePrice)}</span>
+                            <div class="text-right">
+                                <span class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Est. Comm.</span>
+                                <span class="font-bold text-green-600 text-sm">${formatPrice(estComm)}</span>
+                            </div>
+                        </div>
+                        <button onclick="copyToClipboard('${affUrl}')" class="w-full bg-brand-50 hover:bg-brand-900 hover:text-white text-brand-900 py-3 rounded-xl font-bold uppercase tracking-wider text-xs transition border border-gray-200 shadow-sm">
+                            Get Product Link
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+        };
+
+        // Analytics Logic
+        const updateReportsUI = () => {
+            let total = State.orders.length;
+            let approved = 0, cancelled = 0, pending = 0;
+            let totalEarnings = 0;
 
             State.orders.forEach(o => {
-                if(o.commissionStatus !== 'REJECTED') {
-                    totalSales += Number(o.totalAmount || 0);
+                if(o.commissionStatus === 'APPROVED' || o.commissionStatus === 'PAID') { 
+                    approved++; 
+                    totalEarnings += Number(o.commissionAmount || 0); 
                 }
-                if(o.commissionStatus === 'APPROVED') {
-                    approvedComm += o.commissionAmount;
-                } else if(o.commissionStatus === 'PENDING') {
-                    pendingComm += o.commissionAmount;
+                else if(o.commissionStatus === 'REJECTED' || o.status === 'CANCELLED' || o.status === 'RETURNED') { 
+                    cancelled++; 
+                }
+                else { pending++; }
+            });
+
+            let convRate = total > 0 ? Math.round((approved / total) * 100) : 0;
+            let avgEarn = approved > 0 ? Math.round(totalEarnings / approved) : 0;
+
+            safeSetText('repConvRate', `${convRate}%`);
+            safeSetText('repApprovedOrders', approved);
+            safeSetText('repCancelledOrders', cancelled);
+            safeSetText('repAvgEarn', formatPrice(avgEarn));
+
+            // Pipeline Bar Logic
+            const bar = document.getElementById('pipelineBar');
+            if(bar && bar.children.length >= 3) {
+                if(total > 0) {
+                    bar.children[0].style.width = `${(approved/total)*100}%`;
+                    bar.children[1].style.width = `${(pending/total)*100}%`;
+                    bar.children[2].style.width = `${(cancelled/total)*100}%`;
+                } else {
+                    bar.children[0].style.width = '0%'; 
+                    bar.children[1].style.width = '0%'; 
+                    bar.children[2].style.width = '0%';
+                }
+            }
+        };
+
+        const updateDashboardUI = () => {
+            let totalSales = 0, pendingComm = 0, approvedComm = 0, totalPaid = 0;
+
+            State.orders.forEach(o => {
+                if(o.commissionStatus !== 'REJECTED' && o.status !== 'CANCELLED' && o.status !== 'RETURNED') { 
+                    totalSales += Number(o.totalAmount || 0); 
+                }
+                if(o.commissionStatus === 'APPROVED' || o.commissionStatus === 'PAID') { 
+                    approvedComm += Number(o.commissionAmount || 0); 
+                } 
+                else if(o.commissionStatus === 'PENDING') { 
+                    pendingComm += Number(o.commissionAmount || 0); 
                 }
             });
 
             State.payouts.forEach(p => {
-                if(p.status === 'PAID') {
-                    totalPaid += Number(p.amount || 0);
-                }
+                if(p.status === 'PAID') { totalPaid += Number(p.amount || 0); }
             });
 
-            const availableToWithdraw = approvedComm - totalPaid;
+            const availableToWithdraw = Math.max(0, approvedComm - totalPaid);
+            const validOrders = State.orders.filter(o => o.commissionStatus !== 'REJECTED' && o.status !== 'CANCELLED' && o.status !== 'RETURNED').length;
 
-            document.getElementById('kpiTotalSales').innerText = formatPrice(totalSales);
-            document.getElementById('kpiTotalOrders').innerText = State.orders.filter(o => o.commissionStatus !== 'REJECTED').length;
-            document.getElementById('kpiPendingComm').innerText = formatPrice(pendingComm);
-            document.getElementById('kpiApprovedComm').innerText = formatPrice(Math.max(0, availableToWithdraw));
-            document.getElementById('kpiPaidComm').innerText = formatPrice(totalPaid);
-            document.getElementById('payoutAvailable').innerText = formatPrice(Math.max(0, availableToWithdraw));
+            safeSetText('kpiTotalSales', formatPrice(totalSales));
+            safeSetText('kpiTotalOrders', validOrders);
+            safeSetText('kpiPendingComm', formatPrice(pendingComm));
+            safeSetText('kpiApprovedComm', formatPrice(availableToWithdraw));
+            safeSetText('kpiPaidComm', formatPrice(totalPaid));
 
             renderOrdersTable(State.orders);
             renderPayoutsTable(State.payouts);
@@ -451,79 +644,61 @@
 
         const renderOrdersTable = (orders) => {
             const tbody = document.getElementById('referredOrdersTable');
+            if(!tbody) return;
             if(orders.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center text-gray-400">No referrals yet. Share your link to start earning!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-16 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">No transactions found.</td></tr>`;
                 return;
             }
-
             tbody.innerHTML = orders.map(o => {
-                const dateStr = new Date(o.createdAt || o.date || Date.now()).toLocaleDateString('en-IN');
+                const dateStr = new Date(o.createdAt || o.date || Date.now()).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric'});
+                const statusColors = { 'DELIVERED': 'bg-green-50 text-green-700 border-green-200', 'SHIPPED': 'bg-blue-50 text-blue-700 border-blue-200', 'PROCESSING': 'bg-orange-50 text-orange-700 border-orange-200', 'CANCELLED': 'bg-red-50 text-red-700 border-red-200', 'RETURNED': 'bg-red-50 text-red-700 border-red-200', 'NEW': 'bg-gray-100 text-gray-700 border-gray-200' };
+                const oStatusClass = statusColors[o.status] || 'bg-gray-50 text-gray-700 border-gray-200';
                 
-                const statusColors = {
-                    'DELIVERED': 'bg-green-50 text-green-700', 'SHIPPED': 'bg-blue-50 text-blue-700',
-                    'PROCESSING': 'bg-orange-50 text-orange-700', 'CANCELLED': 'bg-red-50 text-red-700',
-                    'READY_FOR_QIKINK': 'bg-indigo-50 text-indigo-700'
-                };
-                const oStatusClass = statusColors[o.status] || 'bg-gray-50 text-gray-700';
-                
-                let commColor = 'text-yellow-600 bg-yellow-50';
-                if(o.commissionStatus === 'APPROVED') commColor = 'text-green-600 bg-green-50';
-                if(o.commissionStatus === 'PAID') commColor = 'text-brand-600 bg-brand-50';
-                if(o.commissionStatus === 'REJECTED') commColor = 'text-red-600 bg-red-50';
+                let commColor = 'text-orange-500 bg-orange-50 border-orange-100';
+                if(o.commissionStatus === 'APPROVED') commColor = 'text-green-600 bg-green-50 border-green-100';
+                if(o.commissionStatus === 'PAID') commColor = 'text-brand-900 bg-brand-50 border-gray-200';
+                if(o.commissionStatus === 'REJECTED') commColor = 'text-red-500 bg-red-50 border-red-100';
 
                 return `
-                <tr class="hover:bg-gray-50 transition border-b border-gray-50 last:border-0">
-                    <td class="px-6 py-4 text-xs font-bold text-gray-700">${dateStr}</td>
-                    <td class="px-6 py-4 font-bold text-gray-900 tracking-tight">${o.orderId || o.id}</td>
-                    <td class="px-6 py-4 font-bold text-gray-900">${formatPrice(o.totalAmount)}</td>
-                    <td class="px-6 py-4 font-display font-bold text-brand-600 text-lg">${formatPrice(o.commissionAmount)}</td>
-                    <td class="px-6 py-4"><span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-md ${oStatusClass}">${o.status || 'NEW'}</span></td>
-                    <td class="px-6 py-4"><span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-md ${commColor}">${o.commissionStatus}</span></td>
+                <tr class="hover:bg-brand-50 transition border-b border-gray-100">
+                    <td class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">${dateStr}</td>
+                    <td class="px-6 py-4 font-bold text-brand-900">${o.orderId || o.id}</td>
+                    <td class="px-6 py-4 font-bold text-brand-900">${formatPrice(o.totalAmount)}</td>
+                    <td class="px-6 py-4 font-display font-bold text-brand-900 text-lg">${formatPrice(o.commissionAmount)}</td>
+                    <td class="px-6 py-4"><span class="px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded border ${oStatusClass}">${o.status || 'NEW'}</span></td>
+                    <td class="px-6 py-4 text-right"><span class="px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded border ${commColor}">${o.commissionStatus}</span></td>
                 </tr>`;
             }).join('');
         };
 
         const renderPayoutsTable = (payouts) => {
             const list = document.getElementById('payoutHistoryList');
+            if(!list) return;
             if(payouts.length === 0) {
-                list.innerHTML = `
-                    <div class="text-center py-10 text-gray-400">
-                        <i class="fa-solid fa-receipt text-3xl mb-3 opacity-50"></i>
-                        <p class="text-sm">No payouts recorded yet.</p>
-                    </div>`;
+                list.innerHTML = `<tr><td colspan="4" class="px-6 py-16 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">No payouts recorded.</td></tr>`;
                 return;
             }
-
             list.innerHTML = payouts.map(p => {
-                const d = new Date(p.createdAt || p.date || Date.now()).toLocaleDateString('en-IN');
-                
-                let pStatusColor = 'bg-yellow-50 text-yellow-600';
-                if(p.status === 'PAID') pStatusColor = 'bg-green-50 text-green-600';
-                if(p.status === 'REJECTED') pStatusColor = 'bg-red-50 text-red-600';
+                const d = new Date(p.createdAt || p.date || Date.now()).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric'});
+                let pStatusColor = p.status === 'PAID' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-orange-50 text-orange-500 border-orange-100';
+                if(p.status === 'REJECTED') pStatusColor = 'bg-red-50 text-red-500 border-red-100';
                 
                 return `
-                <div class="flex justify-between items-center p-4 border border-gray-100 rounded-xl bg-white hover:shadow-sm transition">
-                    <div>
-                        <p class="font-bold text-gray-900">Payout • ${p.method || 'Transfer'}</p>
-                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1">${d} • Ref: ${p.transactionReference || p.id || 'N/A'}</p>
-                    </div>
-                    <div class="text-right flex flex-col items-end">
-                        <p class="font-display font-bold text-gray-900 text-xl mb-1">${formatPrice(p.amount)}</p>
-                        <span class="text-[9px] font-bold ${pStatusColor} px-2 py-0.5 rounded uppercase tracking-widest">${p.status}</span>
-                    </div>
-                </div>
-                `;
+                <tr class="hover:bg-brand-50 transition border-b border-gray-100">
+                    <td class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">${d}</td>
+                    <td class="px-6 py-4 font-bold text-brand-900"><span class="block">${p.method || 'Bank Transfer'}</span><span class="text-[10px] text-gray-400 uppercase tracking-widest mt-1 block">REF: ${p.transactionReference || p.id || 'N/A'}</span></td>
+                    <td class="px-6 py-4 font-display font-bold text-brand-900 text-lg">${formatPrice(p.amount)}</td>
+                    <td class="px-6 py-4 text-right"><span class="px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded border ${pStatusColor}">${p.status}</span></td>
+                </tr>`;
             }).join('');
         };
 
-        // --- AUTHENTICATION LOGIC ---
+        // --- AUTH ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
-                    // RTDB fetch for affiliate profile
                     const dbRef = ref(db);
                     const snapshot = await get(child(dbRef, `affiliates/${user.uid}`));
-                    
                     if (snapshot.exists()) {
                         currentAffiliate = snapshot.val();
                         currentAffiliate.uid = user.uid;
@@ -534,18 +709,16 @@
                         document.getElementById('sidebarName').innerText = currentAffiliate.name;
                         document.getElementById('sidebarAvatar').innerText = currentAffiliate.name.charAt(0).toUpperCase();
                         
-                        // Create Universal Referral Link
                         document.getElementById('refLinkDisplay').value = `${DOMAIN}/index.html?ref=${currentAffiliate.affiliateCode}`;
                         
                         navigate('dashboard');
                         setupRealtimeListeners();
                     } else {
                         await signOut(auth);
-                        showToast('Account is not registered as an Affiliate.', 'error');
+                        showToast('Not registered as an Affiliate.', 'error');
                     }
                 } catch (err) {
-                    console.error("Auth fetch error:", err);
-                    showToast('Failed to load profile. Check RTDB Rules.', 'error');
+                    showToast('Failed to load profile.', 'error');
                 }
             } else {
                 currentAffiliate = null;
@@ -561,40 +734,20 @@
             const originalText = btn.innerHTML;
             btn.innerHTML = `<div class="loader border-white border-t-transparent mx-auto"></div>`;
             btn.disabled = true;
-            
             try {
-                const name = document.getElementById('regName').value;
-                const email = document.getElementById('regEmail').value;
-                const phone = document.getElementById('regPhone').value;
-                const pass = document.getElementById('regPassword').value;
-
-                const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+                const userCredential = await createUserWithEmailAndPassword(auth, document.getElementById('regEmail').value, document.getElementById('regPassword').value);
                 const uid = userCredential.user.uid;
-                
-                const affiliateCode = `AFF${uid.substring(0, 5).toUpperCase()}${Math.floor(100 + Math.random() * 900)}`;
-
+                const affiliateCode = `TBK${uid.substring(0, 5).toUpperCase()}${Math.floor(100 + Math.random() * 900)}`; 
                 const affiliateData = {
-                    name: name,
-                    email: email,
-                    phone: phone,
-                    affiliateCode: affiliateCode,
-                    role: 'affiliate',
-                    status: 'ACTIVE',
-                    createdAt: serverTimestamp() // RTDB server timestamp
+                    name: document.getElementById('regName').value, email: document.getElementById('regEmail').value,
+                    phone: document.getElementById('regPhone').value, affiliateCode: affiliateCode,
+                    role: 'affiliate', status: 'ACTIVE', createdAt: serverTimestamp()
                 };
-
-                // Save to RTDB. Essential for Admin Sync!
                 await set(ref(db, `affiliates/${uid}`), affiliateData);
                 await set(ref(db, `users/${uid}`), affiliateData);
-
-                showToast('Registration Successful! Welcome Partner.');
-            } catch (error) {
-                console.error(error);
-                showToast(error.message, 'error');
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
+                showToast('Welcome to TobaKart Partners!');
+            } catch (error) { showToast(error.message, 'error'); } 
+            finally { btn.innerHTML = originalText; btn.disabled = false; }
         });
 
         // Login
@@ -604,70 +757,34 @@
             const originalText = btn.innerHTML;
             btn.innerHTML = `<div class="loader border-white border-t-transparent mx-auto"></div>`;
             btn.disabled = true;
-            
-            try {
-                await signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPassword').value);
-            } catch (error) {
-                console.error(error);
-                showToast("Invalid credentials", 'error');
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
+            try { await signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPassword').value); } 
+            catch (error) { showToast("Invalid credentials", 'error'); } 
+            finally { btn.innerHTML = originalText; btn.disabled = false; }
         });
 
-        window.logoutAffiliate = async () => {
-            await signOut(auth);
-            showToast('Logged out successfully');
-            setTimeout(() => window.location.reload(), 1000);
-        };
+        window.logoutAffiliate = async () => { await signOut(auth); setTimeout(() => window.location.reload(), 1000); };
 
-        // --- NAVIGATION UI LOGIC ---
+        // Navigation
         window.toggleMobileMenu = () => {
             const sb = document.getElementById('sidebar');
             const bd = document.getElementById('sidebarBackdrop');
-            if(sb.classList.contains('hidden')) {
-                sb.classList.remove('hidden');
-                sb.classList.add('absolute', 'w-full', 'max-w-[280px]', 'shadow-2xl');
-                bd.classList.remove('hidden');
-            } else {
-                sb.classList.add('hidden');
-                bd.classList.add('hidden');
-            }
+            sb.classList.toggle('-translate-x-full');
+            bd.classList.toggle('hidden');
         };
 
         window.navigate = (target) => {
             if(window.innerWidth < 768) toggleMobileMenu();
-            
             document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.className = "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-semibold transition text-sm";
-                if(btn.dataset.target === target) {
-                    btn.className = "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-brand-50 text-brand-600 font-semibold transition text-sm";
-                }
+                btn.className = `nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition text-sm ${btn.dataset.target === target ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`;
             });
-            
-            const titles = { dashboard: 'Overview', orders: 'Referrals & Sales', payouts: 'Payout History' };
-            document.getElementById('headerTitle').innerText = titles[target];
+            const titles = { dashboard: 'Overview', marketing: 'Marketing & Links', reports: 'Advanced Reports', orders: 'Order List', payouts: 'Payout History' };
+            const titleEl = document.getElementById('headerTitle');
+            if(titleEl) titleEl.innerText = titles[target];
             
             document.querySelectorAll('.affiliate-section').forEach(sec => sec.classList.remove('active'));
-            document.getElementById(`sec-${target}`).classList.add('active');
+            const secEl = document.getElementById(`sec-${target}`);
+            if(secEl) secEl.classList.add('active');
         };
-
-        // --- SHARING UTILITIES ---
-        window.copyRefLink = () => {
-            const link = document.getElementById('refLinkDisplay');
-            link.select();
-            link.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(link.value);
-            showToast('Referral link copied to clipboard!');
-        };
-
-        window.shareToWhatsApp = () => {
-            const link = document.getElementById('refLinkDisplay').value;
-            const text = encodeURIComponent(`Hey! Check out TobaKart's premium streetwear collection. Use my link to shop: ${link}`);
-            window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
-        };
-
     </script>
 </body>
 </html>
