@@ -39,8 +39,8 @@
         .affiliate-section.active { display: block; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        .toast { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); transform: translateY(150%) scale(0.95); opacity: 0; pointer-events: none; }
-        .toast.show { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
+        .toast { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); transform: translateY(150%) scale(0.95); opacity: 0; pointer-events: none; z-index: 9999; }
+        .toast.show { transform: translateY(0) scale(1); opacity: 1; }
 
         .loader { border: 2px solid #e7e7e7; border-top: 2px solid #0a0a0a; border-radius: 50%; width: 24px; height: 24px; animation: spin 0.8s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -48,18 +48,31 @@
         .table-container::-webkit-scrollbar { height: 6px; }
         .table-container::-webkit-scrollbar-track { background: #f6f6f6; }
         .table-container::-webkit-scrollbar-thumb { background: #e7e7e7; border-radius: 4px; }
+        
+        .img-hover-zoom { transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .group:hover .img-hover-zoom { transform: scale(1.05); }
     </style>
 </head>
-<body class="h-screen overflow-hidden flex selection:bg-brand-900 selection:text-white font-sans antialiased">
+<body class="h-screen overflow-hidden flex selection:bg-brand-900 selection:text-white font-sans antialiased relative">
 
-    <!-- TOAST NOTIFICATION -->
-    <div id="toast" class="fixed bottom-6 right-6 bg-brand-900 text-white px-6 py-4 rounded-xl shadow-2xl z-[100] flex items-center space-x-3 text-sm font-semibold border border-white/10">
+    <!-- GLOBAL LOADING SPLASH SCREEN (Bug 1 Fix) -->
+    <div id="globalLoader" class="fixed inset-0 z-[200] bg-brand-50 flex items-center justify-center transition-opacity duration-300">
+        <div class="text-center">
+            <div class="w-16 h-16 bg-brand-900 text-white rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg">
+                <span class="font-display font-bold">T</span>
+            </div>
+            <div class="loader mx-auto border-gray-300 border-t-brand-900"></div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION (Bug 5 Fix) -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-brand-900 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center space-x-3 text-sm font-semibold border border-white/10">
         <i id="toastIcon" class="fa-solid fa-circle-check text-green-400 text-lg"></i>
         <span id="toastMessage">Success</span>
     </div>
 
     <!-- 1. AUTHENTICATION VIEW -->
-    <div id="authView" class="fixed inset-0 z-50 bg-brand-50 flex items-center justify-center p-4">
+    <div id="authView" class="fixed inset-0 z-50 bg-brand-50 items-center justify-center p-4 hidden">
         <div class="bg-white p-10 rounded-3xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] max-w-md w-full border border-gray-100">
             <div class="text-center mb-10">
                 <h1 class="font-display text-4xl font-extrabold text-brand-900 tracking-tighter uppercase">TOBAKART<span class="text-accent-red">.</span></h1>
@@ -247,7 +260,7 @@
                         </div>
                     </div>
 
-                    <!-- Product Showcase for Easy Linking -->
+                    <!-- Product Showcase (Bug 2 Fixed) -->
                     <div class="mb-6 flex justify-between items-end">
                         <div>
                             <h3 class="font-display text-xl font-bold text-brand-900 uppercase tracking-tight">Product Showcase</h3>
@@ -255,8 +268,21 @@
                         </div>
                     </div>
                     
-                    <div id="marketingProductsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        <div class="col-span-full text-center py-10 text-gray-400"><div class="loader mx-auto mb-3"></div> Fetching Store Products...</div>
+                    <div id="marketingProductsGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
+                        <div class="col-span-full text-center py-10 text-gray-400"><div class="loader mx-auto mb-3 border-gray-300 border-t-gray-500"></div> Fetching Store Products...</div>
+                    </div>
+                </section>
+
+                <!-- ================= PRODUCT DETAIL (Bug 3 Fixed) ================= -->
+                <section id="sec-product-detail" class="affiliate-section max-w-7xl mx-auto">
+                    <div class="mb-6">
+                        <button onclick="navigate('marketing')" class="bg-white border border-gray-200 text-brand-900 w-10 h-10 rounded-full flex items-center justify-center hover:bg-brand-50 transition shadow-sm">
+                            <i class="fa-solid fa-arrow-left text-sm"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 lg:p-10" id="affiliatePdpContainer">
+                        <!-- Populated via JS -->
                     </div>
                 </section>
 
@@ -327,7 +353,7 @@
                     </div>
                 </section>
 
-                <!-- ================= WALLET & PAYOUTS (NEW WORKFLOW) ================= -->
+                <!-- ================= WALLET & PAYOUTS ================= -->
                 <section id="sec-payouts" class="affiliate-section max-w-7xl mx-auto">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         
@@ -419,7 +445,7 @@
 
         // Globals
         let currentAffiliate = null;
-        let finalAvailableBalance = 0; // Tracks actual withdrawal capability
+        let finalAvailableBalance = 0; 
         const COMMISSION_RATE = 0.10; 
         const DOMAIN = "https://khodal.online"; 
         const MIN_PAYOUT = 500;
@@ -433,36 +459,50 @@
             if(el) el.innerText = text;
         };
         
+        // Bug 5 Fix: Toast Notification Timeout Handling
+        window.toastTimer = null;
         window.showToast = (message, type = 'success') => {
             const toast = document.getElementById('toast');
             if(!toast) return;
             document.getElementById('toastMessage').innerText = message;
             document.getElementById('toastIcon').className = type === 'success' ? 'fa-solid fa-circle-check text-green-400 text-lg' : 'fa-solid fa-circle-exclamation text-accent-red text-lg';
             
+            if(window.toastTimer) clearTimeout(window.toastTimer);
+            
             toast.classList.remove('show');
-            setTimeout(() => { toast.classList.add('show'); }, 10);
-            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+            setTimeout(() => { 
+                toast.classList.add('show'); 
+                window.toastTimer = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }, 50);
         };
 
+        // Bug 4 Fix: Advanced Robust Copy Function
         window.copyToClipboard = (text) => {
             if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(text).then(() => showToast('Link copied to clipboard!'));
+                navigator.clipboard.writeText(text).then(() => showToast('Link copied to clipboard!'))
+                .catch(() => fallbackCopy(text));
             } else {
-                let textArea = document.createElement("textarea");
-                textArea.value = text;
-                textArea.style.position = "fixed";
-                textArea.style.left = "-999999px";
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    showToast('Link copied to clipboard!');
-                } catch (err) {
-                    showToast('Failed to copy link', 'error');
-                }
-                textArea.remove();
+                fallbackCopy(text);
             }
+        };
+
+        const fallbackCopy = (text) => {
+            let textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast('Link copied to clipboard!');
+            } catch (err) {
+                showToast('Failed to copy link', 'error');
+            }
+            textArea.remove();
         };
 
         window.switchAuthTab = (tab) => {
@@ -493,7 +533,6 @@
             if (!currentAffiliate) return;
             const myCode = currentAffiliate.affiliateCode;
 
-            // Load Existing Payment Details if any
             const pDetails = currentAffiliate.paymentDetails;
             if(pDetails) {
                 document.getElementById('payMethodSelect').value = pDetails.type || 'UPI';
@@ -542,7 +581,10 @@
                     snapshot.forEach(child => {
                         const p = child.val();
                         let img = p.image || (p.images && p.images.length > 0 ? p.images[0] : '');
-                        prods.push({id: child.key, name: p.name, price: p.price, salePrice: p.salePrice, image: img});
+                        prods.push({
+                            id: child.key, name: p.name, price: p.price, salePrice: p.salePrice, image: img,
+                            description: p.description || '', sizes: p.sizes || [], tags: p.tags || []
+                        });
                     });
                 }
                 State.products = prods;
@@ -567,8 +609,6 @@
                 if(method === 'QR') pDetails.qrUrl = inputValue;
 
                 await update(ref(db, `affiliates/${currentAffiliate.uid}`), { paymentDetails: pDetails });
-                
-                // Update local state
                 currentAffiliate.paymentDetails = pDetails;
                 showToast('Payment Details Saved Successfully!');
             } catch (err) {
@@ -585,7 +625,6 @@
                 showToast("Please save your Payment Details first!", "error");
                 return;
             }
-
             if(finalAvailableBalance < MIN_PAYOUT) {
                 showToast(`Minimum payout is ${formatPrice(MIN_PAYOUT)}`, "error");
                 return;
@@ -608,7 +647,6 @@
 
                 await push(ref(db, 'payouts'), payoutData);
                 showToast("Withdrawal Request sent successfully!");
-                // Note: Real-time listener will auto-update the UI (deducting balance & adding history)
             } catch (err) {
                 showToast('Request failed. Check connection.', 'error');
                 btn.innerHTML = originalText;
@@ -616,7 +654,6 @@
             }
         };
 
-        // Generate Custom Link 
         window.generateCustomLink = () => {
             let input = document.getElementById('customLinkInput').value.trim();
             if(!input) return showToast('Please paste a valid link first', 'error');
@@ -640,7 +677,16 @@
             } catch(e) { showToast('Invalid URL format', 'error'); }
         };
 
-        // Render Product Showcase
+        const processImg = (url) => {
+            if(!url) return '';
+            if(url.includes('drive.google.com')) {
+                const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                if(match && match[1]) return `https://lh3.googleusercontent.com/d/${match[1]}=w500`;
+            }
+            return url;
+        };
+
+        // Bug 2 Fix: Premium Product Grid
         const renderMarketingProducts = () => {
             const grid = document.getElementById('marketingProductsGrid');
             if(!grid) return;
@@ -649,38 +695,77 @@
                 return;
             }
 
-            const processImg = (url) => {
-                if(!url) return '';
-                if(url.includes('drive.google.com')) {
-                    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-                    if(match && match[1]) return `https://lh3.googleusercontent.com/d/${match[1]}=w500`;
-                }
-                return url;
-            };
-
             grid.innerHTML = State.products.map(p => {
                 const activePrice = p.salePrice || p.price;
-                const estComm = activePrice * COMMISSION_RATE;
-                const affUrl = `${DOMAIN}/index.html#product?id=${p.id}&ref=${currentAffiliate.affiliateCode}`;
                 
                 return `
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition">
-                    <img src="${processImg(p.image)}" class="w-full aspect-[4/5] object-cover bg-brand-50">
-                    <div class="p-5 flex-1 flex flex-col">
-                        <h4 class="text-sm font-bold text-brand-900 uppercase tracking-tight line-clamp-2 mb-2">${p.name}</h4>
-                        <div class="flex justify-between items-end mb-4 mt-auto">
-                            <span class="font-display font-bold text-brand-900 text-lg">${formatPrice(activePrice)}</span>
-                            <div class="text-right">
-                                <span class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Est. Comm.</span>
-                                <span class="font-bold text-green-600 text-sm">${formatPrice(estComm)}</span>
-                            </div>
+                <div class="group relative flex flex-col cursor-pointer bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition" onclick="viewProductDetail('${p.id}')">
+                    <div class="relative bg-brand-50 aspect-[4/5] overflow-hidden">
+                        <img src="${processImg(p.image)}" class="w-full h-full object-cover object-center img-hover-zoom">
+                    </div>
+                    <div class="p-4 flex-1 flex flex-col">
+                        <h4 class="text-sm font-bold text-brand-900 uppercase tracking-tight line-clamp-1 mb-1">${p.name}</h4>
+                        <div class="flex items-center gap-2">
+                            <span class="font-display font-bold text-brand-900">${formatPrice(activePrice)}</span>
+                            ${p.salePrice ? `<span class="text-[10px] text-gray-400 line-through">${formatPrice(p.price)}</span>` : ''}
                         </div>
-                        <button onclick="copyToClipboard('${affUrl}')" class="w-full bg-brand-50 hover:bg-brand-900 hover:text-white text-brand-900 py-3 rounded-xl font-bold uppercase tracking-wider text-xs transition border border-gray-200 shadow-sm">
-                            Get Product Link
-                        </button>
                     </div>
                 </div>`;
             }).join('');
+        };
+
+        // Bug 3 Fix: Product Detail View logic
+        window.viewProductDetail = (id) => {
+            const p = State.products.find(x => x.id === id);
+            if(!p) return;
+
+            const activePrice = p.salePrice || p.price;
+            const estComm = activePrice * COMMISSION_RATE;
+            const affUrl = `${DOMAIN}/index.html#product?id=${p.id}&ref=${currentAffiliate.affiliateCode}`;
+
+            const html = `
+                <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
+                    <div class="w-full lg:w-1/2">
+                        <div class="bg-brand-50 rounded-2xl overflow-hidden aspect-[4/5] border border-gray-100">
+                            <img src="${processImg(p.image)}" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                    <div class="w-full lg:w-1/2 flex flex-col justify-center">
+                        <div class="mb-6">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-2 py-1 rounded">Khodal Drops</span>
+                        </div>
+                        <h1 class="font-display text-3xl font-bold text-brand-900 uppercase tracking-tight mb-4">${p.name}</h1>
+                        
+                        <div class="flex items-end gap-3 mb-6">
+                            <span class="font-display font-bold text-3xl text-brand-900">${formatPrice(activePrice)}</span>
+                            ${p.salePrice ? `<span class="text-gray-400 text-lg line-through mb-0.5">${formatPrice(p.price)}</span>` : ''}
+                        </div>
+
+                        <div class="bg-green-50 border border-green-100 p-4 rounded-xl mb-6 flex items-center justify-between">
+                            <span class="text-xs font-bold text-green-700 uppercase tracking-widest">Your Expected Commission (10%)</span>
+                            <span class="font-display font-bold text-xl text-green-600">${formatPrice(estComm)}</span>
+                        </div>
+
+                        <p class="text-sm text-gray-600 font-medium leading-relaxed mb-6 whitespace-pre-line line-clamp-3">${p.description || 'Premium print-on-demand streetwear.'}</p>
+
+                        <div class="mb-8">
+                            <h4 class="text-xs font-bold text-brand-900 uppercase tracking-widest mb-3">Available Sizes</h4>
+                            <div class="flex flex-wrap gap-2">
+                                ${(p.sizes && p.sizes.length > 0 ? p.sizes : ['Free Size']).map(s => `
+                                    <span class="px-4 py-2 border border-gray-200 text-brand-900 text-xs font-bold uppercase tracking-wider rounded-lg">${s}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <button onclick="copyToClipboard('${affUrl}')" class="w-full bg-brand-900 text-white py-4 rounded-xl font-bold uppercase tracking-wider text-sm transition shadow-lg flex items-center justify-center gap-2 hover:bg-gray-800">
+                            <i class="fa-solid fa-link"></i> Copy Affiliate Link
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('affiliatePdpContainer').innerHTML = html;
+            navigate('product-detail');
         };
 
         const updateReportsUI = () => {
@@ -723,7 +808,6 @@
             let totalSales = 0, pendingComm = 0, approvedComm = 0; 
             let totalPaid = 0, totalRequested = 0;
 
-            // Compute Earnings from Orders
             State.orders.forEach(o => {
                 if(o.commissionStatus !== 'REJECTED' && o.status !== 'CANCELLED' && o.status !== 'RETURNED') { 
                     totalSales += Number(o.totalAmount || 0); 
@@ -736,7 +820,6 @@
                 }
             });
 
-            // Compute Deductions from Payouts
             State.payouts.forEach(p => {
                 if(p.status === 'PAID') { totalPaid += Number(p.amount || 0); }
                 else if(p.status === 'REQUESTED') { totalRequested += Number(p.amount || 0); }
@@ -751,7 +834,6 @@
             safeSetText('kpiApprovedComm', formatPrice(finalAvailableBalance));
             safeSetText('kpiPaidComm', formatPrice(totalPaid));
             
-            // Payout Section Updates
             safeSetText('walletAvailableBalance', formatPrice(finalAvailableBalance));
             
             const reqBtn = document.getElementById('btnRequestPayout');
@@ -798,7 +880,6 @@
             }).join('');
         };
 
-        // Render Payouts Table - Including REQUESTED status & Proof logic
         const renderPayoutsTable = (payouts) => {
             const list = document.getElementById('payoutHistoryList');
             if(!list) return;
@@ -809,14 +890,14 @@
             list.innerHTML = payouts.map(p => {
                 const d = new Date(p.createdAt || p.date || Date.now()).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit'});
                 
-                let pStatusColor = 'bg-gray-100 text-gray-600 border-gray-200'; // DEFAULT
+                let pStatusColor = 'bg-gray-100 text-gray-600 border-gray-200';
                 if (p.status === 'REQUESTED') pStatusColor = 'bg-orange-50 text-orange-500 border-orange-100';
                 if (p.status === 'PAID') pStatusColor = 'bg-green-50 text-green-600 border-green-100';
                 if (p.status === 'REJECTED') pStatusColor = 'bg-red-50 text-red-500 border-red-100';
                 
-                let proofText = `<span class="text-orange-400"><i class="fa-solid fa-clock mr-1"></i> Awaiting Transfer</span>`;
+                let proofText = `<span class="text-orange-500 font-bold"><i class="fa-solid fa-clock mr-1"></i> Awaiting Transfer</span>`;
                 if(p.status === 'PAID') proofText = `<span class="text-green-600 font-bold"><i class="fa-solid fa-circle-check mr-1"></i> ${p.transactionReference || 'No Ref ID'}</span>`;
-                if(p.status === 'REJECTED') proofText = `<span class="text-red-500"><i class="fa-solid fa-ban mr-1"></i> Rejected</span>`;
+                if(p.status === 'REJECTED') proofText = `<span class="text-red-500 font-bold"><i class="fa-solid fa-ban mr-1"></i> Rejected</span>`;
 
                 return `
                 <tr class="hover:bg-brand-50 transition border-b border-gray-100">
@@ -830,6 +911,7 @@
 
         // --- AUTH ---
         onAuthStateChanged(auth, async (user) => {
+            const loader = document.getElementById('globalLoader');
             if (user) {
                 try {
                     const dbRef = ref(db);
@@ -839,6 +921,7 @@
                         currentAffiliate.uid = user.uid;
                         
                         document.getElementById('authView').classList.add('hidden');
+                        document.getElementById('authView').classList.remove('flex');
                         document.getElementById('appView').classList.remove('hidden');
                         
                         document.getElementById('sidebarName').innerText = currentAffiliate.name;
@@ -851,6 +934,9 @@
                     } else {
                         await signOut(auth);
                         showToast('Not registered as an Affiliate.', 'error');
+                        document.getElementById('authView').classList.remove('hidden');
+                        document.getElementById('authView').classList.add('flex');
+                        document.getElementById('appView').classList.add('hidden');
                     }
                 } catch (err) {
                     showToast('Failed to load profile.', 'error');
@@ -858,7 +944,14 @@
             } else {
                 currentAffiliate = null;
                 document.getElementById('authView').classList.remove('hidden');
+                document.getElementById('authView').classList.add('flex');
                 document.getElementById('appView').classList.add('hidden');
+            }
+            
+            // Bug 1 Fix: Hide Global Loader Smoothly
+            if(loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.classList.add('hidden'), 300);
             }
         });
 
@@ -909,9 +1002,9 @@
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.className = `nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition text-sm ${btn.dataset.target === target ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`;
             });
-            const titles = { dashboard: 'Overview', marketing: 'Marketing & Links', reports: 'Advanced Reports', orders: 'Order List', payouts: 'Wallet & Payouts' };
+            const titles = { dashboard: 'Overview', marketing: 'Marketing & Links', reports: 'Advanced Reports', orders: 'Order List', payouts: 'Wallet & Payouts', 'product-detail': 'Product Details' };
             const titleEl = document.getElementById('headerTitle');
-            if(titleEl) titleEl.innerText = titles[target];
+            if(titleEl) titleEl.innerText = titles[target] || 'Portal';
             
             document.querySelectorAll('.affiliate-section').forEach(sec => sec.classList.remove('active'));
             const secEl = document.getElementById(`sec-${target}`);
