@@ -39,7 +39,7 @@
         .affiliate-section.active { display: block; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        .toast { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); transform: translateY(150%) scale(0.95); opacity: 0; pointer-events: none; }
+        .toast { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); transform: translateY(150%) scale(0.95); opacity: 0; pointer-events: none; }
         .toast.show { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
 
         .loader { border: 2px solid #e7e7e7; border-top: 2px solid #0a0a0a; border-radius: 50%; width: 24px; height: 24px; animation: spin 0.8s linear infinite; }
@@ -136,7 +136,7 @@
                     <i class="fa-solid fa-bullhorn w-5 text-center"></i> Marketing & Links
                 </button>
                 
-                <div class="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-3 mt-6 mb-2">Performance</div>
+                <div class="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-3 mt-6 mb-2">Performance & Finance</div>
                 <button onclick="navigate('reports')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white font-semibold transition text-sm" data-target="reports">
                     <i class="fa-solid fa-chart-pie w-5 text-center"></i> Advanced Reports
                 </button>
@@ -144,7 +144,7 @@
                     <i class="fa-solid fa-box-open w-5 text-center"></i> Orders List
                 </button>
                 <button onclick="navigate('payouts')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white font-semibold transition text-sm" data-target="payouts">
-                    <i class="fa-solid fa-wallet w-5 text-center"></i> Payout History
+                    <i class="fa-solid fa-wallet w-5 text-center"></i> Wallet & Payouts
                 </button>
             </nav>
 
@@ -177,7 +177,6 @@
                 
                 <!-- ================= DASHBOARD ================= -->
                 <section id="sec-dashboard" class="affiliate-section active max-w-7xl mx-auto">
-                    
                     <!-- Universal Link Card -->
                     <div class="bg-brand-900 rounded-3xl p-8 lg:p-10 text-white mb-8 relative overflow-hidden shadow-xl border border-gray-800">
                         <div class="absolute right-0 top-0 w-64 h-64 bg-accent-red/20 rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
@@ -202,19 +201,16 @@
                             <h3 class="font-display text-3xl font-bold text-brand-900" id="kpiTotalSales">₹0</h3>
                             <p class="text-xs font-bold text-gray-400 mt-3 uppercase tracking-widest"><span id="kpiTotalOrders" class="text-brand-900">0</span> Successful Orders</p>
                         </div>
-                        
                         <div class="bg-white p-6 lg:p-8 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden">
                             <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Pending Commission</p>
                             <h3 class="font-display text-3xl font-bold text-orange-500" id="kpiPendingComm">₹0</h3>
                             <p class="text-xs font-bold text-gray-400 mt-3 uppercase tracking-widest">Awaiting Delivery</p>
                         </div>
-
                         <div class="bg-white p-6 lg:p-8 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden">
                             <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Available to Withdraw</p>
                             <h3 class="font-display text-3xl font-bold text-green-600" id="kpiApprovedComm">₹0</h3>
                             <p class="text-xs font-bold text-gray-400 mt-3 uppercase tracking-widest">Approved for Payout</p>
                         </div>
-
                         <div class="bg-white p-6 lg:p-8 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden">
                             <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Total Paid Out</p>
                             <h3 class="font-display text-3xl font-bold text-brand-900" id="kpiPaidComm">₹0</h3>
@@ -331,26 +327,67 @@
                     </div>
                 </section>
 
-                <!-- ================= PAYOUTS ================= -->
+                <!-- ================= WALLET & PAYOUTS (NEW WORKFLOW) ================= -->
                 <section id="sec-payouts" class="affiliate-section max-w-7xl mx-auto">
-                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
-                        <div class="p-6 border-b border-gray-100 bg-white flex justify-between items-center">
-                            <h3 class="font-display text-xl font-bold text-brand-900 uppercase tracking-tight">Payout History</h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        
+                        <!-- Withdrawal Card & Settings -->
+                        <div class="lg:col-span-1 space-y-6">
+                            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 text-center relative overflow-hidden">
+                                <div class="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center text-2xl mx-auto mb-4 relative z-10"><i class="fa-solid fa-wallet"></i></div>
+                                <h3 class="text-gray-500 font-bold text-xs uppercase tracking-widest mb-1 relative z-10">Available Balance</h3>
+                                <p class="font-display text-4xl lg:text-5xl font-bold text-brand-900 mb-6 relative z-10" id="walletAvailableBalance">₹0</p>
+                                
+                                <button onclick="requestPayout()" id="btnRequestPayout" class="w-full bg-brand-900 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                                    Request Payout
+                                </button>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-4">Minimum payout threshold: ₹500</p>
+                            </div>
+
+                            <!-- Payout Method Settings -->
+                            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 lg:p-8">
+                                <h4 class="font-bold text-brand-900 text-sm uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-gray-100 pb-3"><i class="fa-solid fa-gear"></i> Payment Settings</h4>
+                                <form id="paymentSettingsForm" class="space-y-4">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Select Method</label>
+                                        <select id="payMethodSelect" onchange="togglePaymentInput()" class="w-full bg-brand-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
+                                            <option value="UPI">UPI ID</option>
+                                            <option value="QR">QR Code (G-Drive Link)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label id="payMethodLabel" class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Enter UPI ID</label>
+                                        <input type="text" id="payMethodInput" placeholder="e.g. yourname@upi" required class="w-full bg-brand-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
+                                    </div>
+                                    <button type="submit" id="btnSavePaymentDetails" class="w-full bg-gray-100 hover:bg-gray-200 text-brand-900 py-3 rounded-xl font-bold uppercase tracking-widest text-xs transition border border-gray-200 shadow-sm">
+                                        Save Details
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                        <div class="overflow-x-auto table-container flex-1">
-                            <table class="w-full text-sm text-left whitespace-nowrap">
-                                <thead class="text-[10px] text-gray-400 uppercase tracking-widest bg-brand-50 border-b border-gray-100">
-                                    <tr>
-                                        <th class="px-6 py-5 font-bold">Transfer Date</th>
-                                        <th class="px-6 py-5 font-bold">Payment Mode / Ref</th>
-                                        <th class="px-6 py-5 font-bold">Amount Transferred</th>
-                                        <th class="px-6 py-5 font-bold text-right">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="payoutHistoryList" class="divide-y divide-gray-50 text-gray-600 font-medium">
-                                    <tr><td colspan="4" class="px-6 py-16 text-center">Loading history...</td></tr>
-                                </tbody>
-                            </table>
+                        
+                        <!-- History Table -->
+                        <div class="lg:col-span-2">
+                            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden h-full flex flex-col">
+                                <div class="p-6 border-b border-gray-100 bg-white flex justify-between items-center">
+                                    <h3 class="font-display text-xl font-bold text-brand-900 uppercase tracking-tight">Payout History & Proofs</h3>
+                                </div>
+                                <div class="overflow-x-auto table-container flex-1">
+                                    <table class="w-full text-sm text-left whitespace-nowrap">
+                                        <thead class="text-[10px] text-gray-400 uppercase tracking-widest bg-brand-50 border-b border-gray-100">
+                                            <tr>
+                                                <th class="px-6 py-5 font-bold">Date & Time</th>
+                                                <th class="px-6 py-5 font-bold">Transaction / UTR Proof</th>
+                                                <th class="px-6 py-5 font-bold">Amount</th>
+                                                <th class="px-6 py-5 font-bold text-right">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="payoutHistoryList" class="divide-y divide-gray-50 text-gray-600 font-medium">
+                                            <tr><td colspan="4" class="px-6 py-16 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">No payouts recorded yet.</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -363,8 +400,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getDatabase, ref, get, child, set, onValue, query, orderByChild, equalTo, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+        import { getDatabase, ref, get, child, set, update, push, onValue, query, orderByChild, equalTo, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
+        // TobaKart Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyBHftpk6Z-JtHsK3PV-jbNH-klNvoqODLA",
             authDomain: "khodal-81a54.firebaseapp.com",
@@ -381,8 +419,10 @@
 
         // Globals
         let currentAffiliate = null;
+        let finalAvailableBalance = 0; // Tracks actual withdrawal capability
         const COMMISSION_RATE = 0.10; 
         const DOMAIN = "https://khodal.online"; 
+        const MIN_PAYOUT = 500;
 
         const State = { orders: [], payouts: [], products: [] };
 
@@ -404,7 +444,6 @@
             setTimeout(() => { toast.classList.remove('show'); }, 3000);
         };
 
-        // Advanced Fallback Copy Mechanism 
         window.copyToClipboard = (text) => {
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(text).then(() => showToast('Link copied to clipboard!'));
@@ -426,7 +465,6 @@
             }
         };
 
-        // UI Tabs
         window.switchAuthTab = (tab) => {
             document.getElementById('loginForm').classList.toggle('hidden', tab !== 'login');
             document.getElementById('registerForm').classList.toggle('hidden', tab !== 'register');
@@ -434,12 +472,36 @@
             document.getElementById('tabRegister').className = `flex-1 font-bold pb-2 transition uppercase tracking-wider text-sm ${tab === 'register' ? 'text-brand-900 border-b-2 border-brand-900' : 'text-gray-400 hover:text-gray-600'}`;
         };
 
-        // Core Listeners
+        // UI toggles for Payment settings
+        window.togglePaymentInput = () => {
+            const method = document.getElementById('payMethodSelect').value;
+            const label = document.getElementById('payMethodLabel');
+            const input = document.getElementById('payMethodInput');
+            
+            if(method === 'UPI') {
+                label.innerText = 'Enter UPI ID';
+                input.placeholder = 'e.g. yourname@upi';
+                input.type = 'text';
+            } else {
+                label.innerText = 'QR Code Google Drive Link';
+                input.placeholder = 'Paste viewable drive link...';
+                input.type = 'url';
+            }
+        };
+
         const setupRealtimeListeners = () => {
             if (!currentAffiliate) return;
             const myCode = currentAffiliate.affiliateCode;
 
-            // 1. Orders (FIXED Reference Error & Null Pointer)
+            // Load Existing Payment Details if any
+            const pDetails = currentAffiliate.paymentDetails;
+            if(pDetails) {
+                document.getElementById('payMethodSelect').value = pDetails.type || 'UPI';
+                window.togglePaymentInput();
+                document.getElementById('payMethodInput').value = pDetails.type === 'QR' ? pDetails.qrUrl : pDetails.upiId;
+            }
+
+            // Orders
             onValue(query(ref(db, "orders"), orderByChild("affiliateCode"), equalTo(myCode)), (snapshot) => {
                 const orders = [];
                 if(snapshot.exists()) {
@@ -454,7 +516,7 @@
                         orders.push({
                             id: child.key, ...o,
                             commissionAmount: Number(o.commissionAmount) || (Number(o.totalAmount || 0) * (Number(o.commissionRate) || COMMISSION_RATE)),
-                            commissionStatus: commStatus // Correctly mapped variable
+                            commissionStatus: commStatus
                         });
                     });
                 }
@@ -463,7 +525,7 @@
                 updateReportsUI();
             });
 
-            // 2. Payouts
+            // Payouts
             onValue(query(ref(db, "payouts"), orderByChild("affiliateId"), equalTo(currentAffiliate.uid)), (snapshot) => {
                 const payouts = [];
                 if(snapshot.exists()){
@@ -473,7 +535,7 @@
                 updateDashboardUI();
             });
 
-            // 3. Products
+            // Products
             onValue(ref(db, "products"), (snapshot) => {
                 const prods = [];
                 if(snapshot.exists()){
@@ -488,25 +550,81 @@
             });
         };
 
+        // Handle Payment Details Saving
+        document.getElementById('paymentSettingsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSavePaymentDetails');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<div class="loader border-brand-900 border-t-transparent mx-auto w-4 h-4"></div>`;
+            btn.disabled = true;
+
+            const method = document.getElementById('payMethodSelect').value;
+            const inputValue = document.getElementById('payMethodInput').value.trim();
+
+            try {
+                const pDetails = { type: method };
+                if(method === 'UPI') pDetails.upiId = inputValue;
+                if(method === 'QR') pDetails.qrUrl = inputValue;
+
+                await update(ref(db, `affiliates/${currentAffiliate.uid}`), { paymentDetails: pDetails });
+                
+                // Update local state
+                currentAffiliate.paymentDetails = pDetails;
+                showToast('Payment Details Saved Successfully!');
+            } catch (err) {
+                showToast('Failed to save details', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        // Handle Payout Request
+        window.requestPayout = async () => {
+            if(!currentAffiliate.paymentDetails || !currentAffiliate.paymentDetails.type) {
+                showToast("Please save your Payment Details first!", "error");
+                return;
+            }
+
+            if(finalAvailableBalance < MIN_PAYOUT) {
+                showToast(`Minimum payout is ${formatPrice(MIN_PAYOUT)}`, "error");
+                return;
+            }
+
+            const btn = document.getElementById('btnRequestPayout');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "Processing...";
+            btn.disabled = true;
+
+            try {
+                const payoutData = {
+                    affiliateId: currentAffiliate.uid,
+                    affiliateCode: currentAffiliate.affiliateCode,
+                    amount: finalAvailableBalance,
+                    status: 'REQUESTED',
+                    method: currentAffiliate.paymentDetails.type,
+                    createdAt: serverTimestamp()
+                };
+
+                await push(ref(db, 'payouts'), payoutData);
+                showToast("Withdrawal Request sent successfully!");
+                // Note: Real-time listener will auto-update the UI (deducting balance & adding history)
+            } catch (err) {
+                showToast('Request failed. Check connection.', 'error');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        };
+
         // Generate Custom Link 
         window.generateCustomLink = () => {
             let input = document.getElementById('customLinkInput').value.trim();
-            if(!input) {
-                showToast('Please paste a valid link first', 'error');
-                return;
-            }
-            
-            // Fix missing protocol
-            if(!input.startsWith('http://') && !input.startsWith('https://')) {
-                input = 'https://' + input;
-            }
+            if(!input) return showToast('Please paste a valid link first', 'error');
+            if(!input.startsWith('http://') && !input.startsWith('https://')) input = 'https://' + input;
 
             try {
                 const url = new URL(input);
-                if(!url.hostname.includes('khodal.online')) {
-                    showToast('Please enter a valid khodal.online URL', 'error');
-                    return;
-                }
+                if(!url.hostname.includes('khodal.online')) return showToast('Please enter a valid khodal.online URL', 'error');
                 
                 let hash = url.hash;
                 if(hash) {
@@ -517,14 +635,9 @@
                     url.searchParams.set('ref', currentAffiliate.affiliateCode);
                 }
                 
-                const resultBox = document.getElementById('customLinkResultBox');
-                const resultInput = document.getElementById('customLinkResult');
-                resultInput.value = url.toString();
-                resultBox.classList.remove('hidden');
-                
-            } catch(e) {
-                showToast('Invalid URL format', 'error');
-            }
+                document.getElementById('customLinkResult').value = url.toString();
+                document.getElementById('customLinkResultBox').classList.remove('hidden');
+            } catch(e) { showToast('Invalid URL format', 'error'); }
         };
 
         // Render Product Showcase
@@ -570,7 +683,6 @@
             }).join('');
         };
 
-        // Analytics Logic
         const updateReportsUI = () => {
             let total = State.orders.length;
             let approved = 0, cancelled = 0, pending = 0;
@@ -595,7 +707,6 @@
             safeSetText('repCancelledOrders', cancelled);
             safeSetText('repAvgEarn', formatPrice(avgEarn));
 
-            // Pipeline Bar Logic
             const bar = document.getElementById('pipelineBar');
             if(bar && bar.children.length >= 3) {
                 if(total > 0) {
@@ -603,16 +714,16 @@
                     bar.children[1].style.width = `${(pending/total)*100}%`;
                     bar.children[2].style.width = `${(cancelled/total)*100}%`;
                 } else {
-                    bar.children[0].style.width = '0%'; 
-                    bar.children[1].style.width = '0%'; 
-                    bar.children[2].style.width = '0%';
+                    bar.children[0].style.width = '0%'; bar.children[1].style.width = '0%'; bar.children[2].style.width = '0%';
                 }
             }
         };
 
         const updateDashboardUI = () => {
-            let totalSales = 0, pendingComm = 0, approvedComm = 0, totalPaid = 0;
+            let totalSales = 0, pendingComm = 0, approvedComm = 0; 
+            let totalPaid = 0, totalRequested = 0;
 
+            // Compute Earnings from Orders
             State.orders.forEach(o => {
                 if(o.commissionStatus !== 'REJECTED' && o.status !== 'CANCELLED' && o.status !== 'RETURNED') { 
                     totalSales += Number(o.totalAmount || 0); 
@@ -625,18 +736,34 @@
                 }
             });
 
+            // Compute Deductions from Payouts
             State.payouts.forEach(p => {
                 if(p.status === 'PAID') { totalPaid += Number(p.amount || 0); }
+                else if(p.status === 'REQUESTED') { totalRequested += Number(p.amount || 0); }
             });
 
-            const availableToWithdraw = Math.max(0, approvedComm - totalPaid);
+            finalAvailableBalance = Math.max(0, approvedComm - totalPaid - totalRequested);
             const validOrders = State.orders.filter(o => o.commissionStatus !== 'REJECTED' && o.status !== 'CANCELLED' && o.status !== 'RETURNED').length;
 
             safeSetText('kpiTotalSales', formatPrice(totalSales));
             safeSetText('kpiTotalOrders', validOrders);
             safeSetText('kpiPendingComm', formatPrice(pendingComm));
-            safeSetText('kpiApprovedComm', formatPrice(availableToWithdraw));
+            safeSetText('kpiApprovedComm', formatPrice(finalAvailableBalance));
             safeSetText('kpiPaidComm', formatPrice(totalPaid));
+            
+            // Payout Section Updates
+            safeSetText('walletAvailableBalance', formatPrice(finalAvailableBalance));
+            
+            const reqBtn = document.getElementById('btnRequestPayout');
+            if(reqBtn) {
+                if(finalAvailableBalance >= MIN_PAYOUT) {
+                    reqBtn.disabled = false;
+                    reqBtn.innerText = "Request Payout";
+                } else {
+                    reqBtn.disabled = true;
+                    reqBtn.innerText = `Need ${formatPrice(Math.max(0, MIN_PAYOUT - finalAvailableBalance))} more to request`;
+                }
+            }
 
             renderOrdersTable(State.orders);
             renderPayoutsTable(State.payouts);
@@ -671,6 +798,7 @@
             }).join('');
         };
 
+        // Render Payouts Table - Including REQUESTED status & Proof logic
         const renderPayoutsTable = (payouts) => {
             const list = document.getElementById('payoutHistoryList');
             if(!list) return;
@@ -679,14 +807,21 @@
                 return;
             }
             list.innerHTML = payouts.map(p => {
-                const d = new Date(p.createdAt || p.date || Date.now()).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric'});
-                let pStatusColor = p.status === 'PAID' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-orange-50 text-orange-500 border-orange-100';
-                if(p.status === 'REJECTED') pStatusColor = 'bg-red-50 text-red-500 border-red-100';
+                const d = new Date(p.createdAt || p.date || Date.now()).toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit'});
                 
+                let pStatusColor = 'bg-gray-100 text-gray-600 border-gray-200'; // DEFAULT
+                if (p.status === 'REQUESTED') pStatusColor = 'bg-orange-50 text-orange-500 border-orange-100';
+                if (p.status === 'PAID') pStatusColor = 'bg-green-50 text-green-600 border-green-100';
+                if (p.status === 'REJECTED') pStatusColor = 'bg-red-50 text-red-500 border-red-100';
+                
+                let proofText = `<span class="text-orange-400"><i class="fa-solid fa-clock mr-1"></i> Awaiting Transfer</span>`;
+                if(p.status === 'PAID') proofText = `<span class="text-green-600 font-bold"><i class="fa-solid fa-circle-check mr-1"></i> ${p.transactionReference || 'No Ref ID'}</span>`;
+                if(p.status === 'REJECTED') proofText = `<span class="text-red-500"><i class="fa-solid fa-ban mr-1"></i> Rejected</span>`;
+
                 return `
                 <tr class="hover:bg-brand-50 transition border-b border-gray-100">
                     <td class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">${d}</td>
-                    <td class="px-6 py-4 font-bold text-brand-900"><span class="block">${p.method || 'Bank Transfer'}</span><span class="text-[10px] text-gray-400 uppercase tracking-widest mt-1 block">REF: ${p.transactionReference || p.id || 'N/A'}</span></td>
+                    <td class="px-6 py-4 text-[10px] text-gray-500 uppercase tracking-widest bg-gray-50/50">${proofText}</td>
                     <td class="px-6 py-4 font-display font-bold text-brand-900 text-lg">${formatPrice(p.amount)}</td>
                     <td class="px-6 py-4 text-right"><span class="px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded border ${pStatusColor}">${p.status}</span></td>
                 </tr>`;
@@ -727,7 +862,6 @@
             }
         });
 
-        // Register
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnRegister');
@@ -750,7 +884,6 @@
             finally { btn.innerHTML = originalText; btn.disabled = false; }
         });
 
-        // Login
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnLogin');
@@ -764,7 +897,6 @@
 
         window.logoutAffiliate = async () => { await signOut(auth); setTimeout(() => window.location.reload(), 1000); };
 
-        // Navigation
         window.toggleMobileMenu = () => {
             const sb = document.getElementById('sidebar');
             const bd = document.getElementById('sidebarBackdrop');
@@ -777,7 +909,7 @@
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.className = `nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition text-sm ${btn.dataset.target === target ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`;
             });
-            const titles = { dashboard: 'Overview', marketing: 'Marketing & Links', reports: 'Advanced Reports', orders: 'Order List', payouts: 'Payout History' };
+            const titles = { dashboard: 'Overview', marketing: 'Marketing & Links', reports: 'Advanced Reports', orders: 'Order List', payouts: 'Wallet & Payouts' };
             const titleEl = document.getElementById('headerTitle');
             if(titleEl) titleEl.innerText = titles[target];
             
