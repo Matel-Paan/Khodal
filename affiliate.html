@@ -31,7 +31,6 @@
     </script>
 
     <style>
-        /* Bug 1 Fix: Ensure exact viewport height to prevent bottom cut-offs */
         body { background-color: #f6f6f6; color: #525252; height: 100dvh; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -40,7 +39,6 @@
         .affiliate-section.active { display: block; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Bug 2 Fix: Toast CSS properly targeted */
         .toast { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); transform: translateY(150%) scale(0.95); opacity: 0; pointer-events: none; z-index: 9999; }
         .toast.show { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
 
@@ -57,24 +55,14 @@
 </head>
 <body class="overflow-hidden flex selection:bg-brand-900 selection:text-white font-sans antialiased relative">
 
-    <!-- GLOBAL LOADING SPLASH SCREEN -->
-    <div id="globalLoader" class="fixed inset-0 z-[200] bg-brand-50 flex items-center justify-center transition-opacity duration-300">
-        <div class="text-center">
-            <div class="w-16 h-16 bg-brand-900 text-white rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg">
-                <span class="font-display font-bold">T</span>
-            </div>
-            <div class="loader mx-auto border-gray-300 border-t-brand-900"></div>
-        </div>
-    </div>
-
-    <!-- TOAST NOTIFICATION (Bug 2 Fix: Included 'toast' class) -->
+    <!-- TOAST NOTIFICATION -->
     <div id="toast" class="toast fixed bottom-6 lg:bottom-10 right-6 lg:right-10 bg-brand-900 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center space-x-3 text-sm font-semibold border border-white/10">
         <i id="toastIcon" class="fa-solid fa-circle-check text-green-400 text-lg"></i>
         <span id="toastMessage">Success</span>
     </div>
 
     <!-- 1. AUTHENTICATION VIEW -->
-    <div id="authView" class="fixed inset-0 z-50 bg-brand-50 items-center justify-center p-4 hidden">
+    <div id="authView" class="fixed inset-0 z-50 bg-brand-50 flex items-center justify-center p-4">
         <div class="bg-white p-10 rounded-3xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] max-w-md w-full border border-gray-100">
             <div class="text-center mb-10">
                 <h1 class="font-display text-4xl font-extrabold text-brand-900 tracking-tighter uppercase">TOBAKART<span class="text-accent-red">.</span></h1>
@@ -127,13 +115,13 @@
     </div>
 
     <!-- 2. MAIN APPLICATION VIEW -->
-    <div id="appView" class="hidden flex w-full h-full relative">
+    <div id="appView" class="hidden w-full h-full relative">
         
         <!-- SIDEBAR -->
         <aside class="w-[280px] bg-brand-900 text-gray-300 flex flex-col transition-transform absolute z-40 h-full md:relative md:translate-x-0 -translate-x-full shadow-2xl md:shadow-none" id="sidebar">
             <div class="h-20 flex items-center justify-between px-6 border-b border-white/10 shrink-0">
                 <span class="font-display text-2xl font-bold text-white tracking-tighter uppercase">TOBAKART<span class="text-accent-red">.</span></span>
-                <button class="md:hidden text-gray-400 hover:text-white" onclick="toggleMobileMenu()"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <button class="md:hidden text-gray-400 hover:text-white" onclick="closeMobileMenu()"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
             <div class="p-6 border-b border-white/10 text-center">
@@ -170,7 +158,7 @@
             </div>
         </aside>
 
-        <div id="sidebarBackdrop" class="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm hidden md:hidden transition-opacity" onclick="toggleMobileMenu()"></div>
+        <div id="sidebarBackdrop" class="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm hidden md:hidden transition-opacity" onclick="closeMobileMenu()"></div>
 
         <!-- MAIN CONTENT AREA -->
         <main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-brand-50">
@@ -187,7 +175,7 @@
                 </div>
             </header>
 
-            <!-- Scrollable Content (Bug 1 Fix: Added pb-32 to prevent bottom cut-offs) -->
+            <!-- Scrollable Content -->
             <div class="flex-1 overflow-y-auto p-4 lg:p-10 pb-32 lg:pb-32 hide-scrollbar" id="mainContentArea">
                 
                 <!-- ================= DASHBOARD ================= -->
@@ -461,7 +449,7 @@
             if(el) el.innerText = text;
         };
         
-        // BUG 2 FIX: Robust Moment-Specific Toast System
+        // Robust Moment-Specific Toast System
         window.toastTimer = null;
         window.showToast = (message, type = 'success') => {
             const toast = document.getElementById('toast');
@@ -611,7 +599,7 @@
 
                 await update(ref(db, `affiliates/${currentAffiliate.uid}`), { paymentDetails: pDetails });
                 currentAffiliate.paymentDetails = pDetails;
-                showToast('Payment details saved securely!'); // Specific Toast
+                showToast('Payment details saved securely!'); // Moment Specific Toast
             } catch (err) {
                 showToast('Failed to save details', 'error');
             } finally {
@@ -647,7 +635,7 @@
                 };
 
                 await push(ref(db, 'payouts'), payoutData);
-                showToast("Withdrawal request sent to Admin!"); // Specific Toast
+                showToast("Withdrawal request sent to Admin!"); // Moment Specific Toast
             } catch (err) {
                 showToast('Request failed. Check connection.', 'error');
                 btn.innerHTML = originalText;
@@ -675,7 +663,7 @@
                 
                 document.getElementById('customLinkResult').value = url.toString();
                 document.getElementById('customLinkResultBox').classList.remove('hidden');
-                showToast('Custom link generated successfully!'); // Specific Toast
+                showToast('Custom tracking link generated!'); // Moment Specific Toast
             } catch(e) { showToast('Invalid URL format', 'error'); }
         };
 
@@ -911,7 +899,6 @@
 
         // --- AUTH ---
         onAuthStateChanged(auth, async (user) => {
-            const loader = document.getElementById('globalLoader');
             if (user) {
                 try {
                     const dbRef = ref(db);
@@ -923,6 +910,7 @@
                         document.getElementById('authView').classList.add('hidden');
                         document.getElementById('authView').classList.remove('flex');
                         document.getElementById('appView').classList.remove('hidden');
+                        document.getElementById('appView').classList.add('flex');
                         
                         document.getElementById('sidebarName').innerText = currentAffiliate.name;
                         document.getElementById('sidebarAvatar').innerText = currentAffiliate.name.charAt(0).toUpperCase();
@@ -937,6 +925,7 @@
                         document.getElementById('authView').classList.remove('hidden');
                         document.getElementById('authView').classList.add('flex');
                         document.getElementById('appView').classList.add('hidden');
+                        document.getElementById('appView').classList.remove('flex');
                     }
                 } catch (err) {
                     showToast('Failed to load profile.', 'error');
@@ -946,11 +935,7 @@
                 document.getElementById('authView').classList.remove('hidden');
                 document.getElementById('authView').classList.add('flex');
                 document.getElementById('appView').classList.add('hidden');
-            }
-            
-            if(loader) {
-                loader.style.opacity = '0';
-                setTimeout(() => loader.classList.add('hidden'), 300);
+                document.getElementById('appView').classList.remove('flex');
             }
         });
 
@@ -996,8 +981,16 @@
             bd.classList.toggle('hidden');
         };
 
+        // Bug 1 Fix: Explicitly close menu on navigation instead of toggling
+        window.closeMobileMenu = () => {
+            const sb = document.getElementById('sidebar');
+            const bd = document.getElementById('sidebarBackdrop');
+            sb.classList.add('-translate-x-full');
+            bd.classList.add('hidden');
+        };
+
         window.navigate = (target) => {
-            if(window.innerWidth < 768) toggleMobileMenu();
+            if(window.innerWidth < 768) closeMobileMenu();
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.className = `nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition text-sm ${btn.dataset.target === target ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`;
             });
