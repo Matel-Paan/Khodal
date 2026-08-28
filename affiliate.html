@@ -53,7 +53,18 @@
         .group:hover .img-hover-zoom { transform: scale(1.05); }
     </style>
 </head>
-<body class="overflow-hidden flex selection:bg-brand-900 selection:text-white font-sans antialiased relative">
+<body class="overflow-hidden selection:bg-brand-900 selection:text-white font-sans antialiased relative">
+
+    <!-- GLOBAL LOADING SPLASH SCREEN -->
+    <div id="globalLoader" class="fixed inset-0 z-[200] bg-brand-50 flex items-center justify-center transition-opacity duration-300">
+        <div class="text-center">
+            <div class="w-16 h-16 bg-brand-900 text-white rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg">
+                <span class="font-display font-bold">T</span>
+            </div>
+            <div class="loader mx-auto border-gray-300 border-t-brand-900"></div>
+            <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-4 font-bold">Authenticating...</p>
+        </div>
+    </div>
 
     <!-- TOAST NOTIFICATION -->
     <div id="toast" class="toast fixed bottom-6 lg:bottom-10 right-6 lg:right-10 bg-brand-900 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center space-x-3 text-sm font-semibold border border-white/10">
@@ -61,8 +72,8 @@
         <span id="toastMessage">Success</span>
     </div>
 
-    <!-- 1. AUTHENTICATION VIEW -->
-    <div id="authView" class="fixed inset-0 z-50 bg-brand-50 flex items-center justify-center p-4">
+    <!-- 1. AUTHENTICATION VIEW (Hidden by default to prevent flashing) -->
+    <div id="authView" style="display: none;" class="fixed inset-0 z-50 bg-brand-50 items-center justify-center p-4">
         <div class="bg-white p-10 rounded-3xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] max-w-md w-full border border-gray-100">
             <div class="text-center mb-10">
                 <h1 class="font-display text-4xl font-extrabold text-brand-900 tracking-tighter uppercase">TOBAKART<span class="text-accent-red">.</span></h1>
@@ -114,8 +125,8 @@
         </div>
     </div>
 
-    <!-- 2. MAIN APPLICATION VIEW -->
-    <div id="appView" class="hidden w-full h-full relative">
+    <!-- 2. MAIN APPLICATION VIEW (Hidden by default) -->
+    <div id="appView" style="display: none;" class="w-full h-full relative">
         
         <!-- SIDEBAR -->
         <aside class="w-[280px] bg-brand-900 text-gray-300 flex flex-col transition-transform absolute z-40 h-full md:relative md:translate-x-0 -translate-x-full shadow-2xl md:shadow-none" id="sidebar">
@@ -495,6 +506,18 @@
             textArea.remove();
         };
 
+        const showView = (viewName) => {
+            const authV = document.getElementById('authView');
+            const appV = document.getElementById('appView');
+            if (viewName === 'app') {
+                authV.style.display = 'none';
+                appV.style.display = 'flex';
+            } else {
+                authV.style.display = 'flex';
+                appV.style.display = 'none';
+            }
+        };
+
         window.switchAuthTab = (tab) => {
             document.getElementById('loginForm').classList.toggle('hidden', tab !== 'login');
             document.getElementById('registerForm').classList.toggle('hidden', tab !== 'register');
@@ -599,7 +622,7 @@
 
                 await update(ref(db, `affiliates/${currentAffiliate.uid}`), { paymentDetails: pDetails });
                 currentAffiliate.paymentDetails = pDetails;
-                showToast('Payment details saved securely!'); // Moment Specific Toast
+                showToast('Payment details saved securely!'); 
             } catch (err) {
                 showToast('Failed to save details', 'error');
             } finally {
@@ -635,7 +658,7 @@
                 };
 
                 await push(ref(db, 'payouts'), payoutData);
-                showToast("Withdrawal request sent to Admin!"); // Moment Specific Toast
+                showToast("Withdrawal request sent to Admin!"); 
             } catch (err) {
                 showToast('Request failed. Check connection.', 'error');
                 btn.innerHTML = originalText;
@@ -663,7 +686,7 @@
                 
                 document.getElementById('customLinkResult').value = url.toString();
                 document.getElementById('customLinkResultBox').classList.remove('hidden');
-                showToast('Custom tracking link generated!'); // Moment Specific Toast
+                showToast('Custom tracking link generated!'); 
             } catch(e) { showToast('Invalid URL format', 'error'); }
         };
 
@@ -686,6 +709,8 @@
 
             grid.innerHTML = State.products.map(p => {
                 const activePrice = p.salePrice || p.price;
+                const estComm = activePrice * COMMISSION_RATE;
+                const affUrl = `${DOMAIN}/index.html#product?id=${p.id}&ref=${currentAffiliate.affiliateCode}`;
                 
                 return `
                 <div class="group relative flex flex-col cursor-pointer bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition" onclick="viewProductDetail('${p.id}')">
@@ -693,11 +718,17 @@
                         <img src="${processImg(p.image)}" class="w-full h-full object-cover object-center img-hover-zoom">
                     </div>
                     <div class="p-4 flex-1 flex flex-col">
-                        <h4 class="text-sm font-bold text-brand-900 uppercase tracking-tight line-clamp-1 mb-1">${p.name}</h4>
-                        <div class="flex items-center gap-2">
-                            <span class="font-display font-bold text-brand-900">${formatPrice(activePrice)}</span>
-                            ${p.salePrice ? `<span class="text-[10px] text-gray-400 line-through">${formatPrice(p.price)}</span>` : ''}
+                        <h4 class="text-sm font-bold text-brand-900 uppercase tracking-tight line-clamp-2 mb-2">${p.name}</h4>
+                        <div class="flex justify-between items-end mb-4 mt-auto">
+                            <span class="font-display font-bold text-brand-900 text-lg">${formatPrice(activePrice)}</span>
+                            <div class="text-right">
+                                <span class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Est. Comm.</span>
+                                <span class="font-bold text-green-600 text-sm">${formatPrice(estComm)}</span>
+                            </div>
                         </div>
+                        <button onclick="copyToClipboard('${affUrl}', 'Product link copied to clipboard!'); event.stopPropagation();" class="w-full bg-brand-50 hover:bg-brand-900 hover:text-white text-brand-900 py-3 rounded-xl font-bold uppercase tracking-wider text-xs transition border border-gray-200 shadow-sm">
+                            Get Product Link
+                        </button>
                     </div>
                 </div>`;
             }).join('');
@@ -899,6 +930,7 @@
 
         // --- AUTH ---
         onAuthStateChanged(auth, async (user) => {
+            const loader = document.getElementById('globalLoader');
             if (user) {
                 try {
                     const dbRef = ref(db);
@@ -907,10 +939,7 @@
                         currentAffiliate = snapshot.val();
                         currentAffiliate.uid = user.uid;
                         
-                        document.getElementById('authView').classList.add('hidden');
-                        document.getElementById('authView').classList.remove('flex');
-                        document.getElementById('appView').classList.remove('hidden');
-                        document.getElementById('appView').classList.add('flex');
+                        showView('app');
                         
                         document.getElementById('sidebarName').innerText = currentAffiliate.name;
                         document.getElementById('sidebarAvatar').innerText = currentAffiliate.name.charAt(0).toUpperCase();
@@ -922,20 +951,20 @@
                     } else {
                         await signOut(auth);
                         showToast('Not registered as an Affiliate.', 'error');
-                        document.getElementById('authView').classList.remove('hidden');
-                        document.getElementById('authView').classList.add('flex');
-                        document.getElementById('appView').classList.add('hidden');
-                        document.getElementById('appView').classList.remove('flex');
+                        showView('auth');
                     }
                 } catch (err) {
                     showToast('Failed to load profile.', 'error');
+                    showView('auth');
                 }
             } else {
                 currentAffiliate = null;
-                document.getElementById('authView').classList.remove('hidden');
-                document.getElementById('authView').classList.add('flex');
-                document.getElementById('appView').classList.add('hidden');
-                document.getElementById('appView').classList.remove('flex');
+                showView('auth');
+            }
+            
+            if(loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.classList.add('hidden'), 300);
             }
         });
 
@@ -981,7 +1010,6 @@
             bd.classList.toggle('hidden');
         };
 
-        // Bug 1 Fix: Explicitly close menu on navigation instead of toggling
         window.closeMobileMenu = () => {
             const sb = document.getElementById('sidebar');
             const bd = document.getElementById('sidebarBackdrop');
