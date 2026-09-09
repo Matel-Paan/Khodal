@@ -79,7 +79,7 @@
     </div>
 
     <!-- 0. FINGERPRINT SECURITY OVERLAY -->
-    <div id="fingerprintView" class="fixed inset-0 z-[100] bg-accent-dark flex flex-col items-center justify-center p-4 transition-opacity duration-500">
+    <div id="fingerprintView" class="hidden fixed inset-0 z-[100] bg-accent-dark flex flex-col items-center justify-center p-4 transition-opacity duration-500 opacity-0">
         <div class="text-center mb-12">
             <div class="w-20 h-20 bg-white/10 text-brand-500 rounded-3xl flex items-center justify-center text-3xl mx-auto mb-6 shadow-lg border border-white/10">
                 <i class="fa-solid fa-shield-halved"></i>
@@ -97,7 +97,7 @@
     </div>
 
     <!-- 1. AUTHENTICATION VIEW -->
-    <div id="authView" class="hidden fixed inset-0 z-50 bg-brand-50 flex items-center justify-center p-4">
+    <div id="authView" class="fixed inset-0 z-50 bg-brand-50 flex items-center justify-center p-4">
         <div class="bg-white p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] max-w-md w-full border border-gray-100">
             <div class="text-center mb-10">
                 <div class="w-16 h-16 bg-accent-dark text-white rounded-2xl flex items-center justify-center text-2xl mx-auto mb-6 shadow-lg">
@@ -642,7 +642,6 @@
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Sale Price (₹) <span class="font-normal text-gray-400 ml-1">(Optional)</span></label>
                             <input type="number" id="prodSalePrice" placeholder="999" class="w-full bg-brand-50 border-none rounded-xl px-5 py-4 font-medium focus:ring-2 focus:ring-accent-dark outline-none text-sm transition">
                         </div>
-                        <!-- NEW STOCK/DROP INPUT -->
                         <div>
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Total Stock/Drop</label>
                             <input type="number" id="prodStock" required placeholder="e.g. 50" class="w-full bg-brand-50 border-none rounded-xl px-5 py-4 font-medium focus:ring-2 focus:ring-accent-dark outline-none text-sm transition">
@@ -738,7 +737,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getDatabase, ref, onValue, set, update, remove, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+        // NOTE: Added "get" in the import below to fetch the global key
+        import { getDatabase, ref, onValue, set, update, remove, push, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBHftpk6Z-JtHsK3PV-jbNH-klNvoqODLA",
@@ -757,7 +757,7 @@
         let adminUser = null;
         let currentActiveView = 'dashboard';
         let currentProcessingPayoutId = null; 
-        let fingerprintVerified = false; // NEW FLAG
+        let fingerprintVerified = false;
 
         const State = {
             orders: [],
@@ -793,13 +793,12 @@
             }, 10);
         };
 
-        // NEW: Real Hardware Biometric Validation Flow (WebAuthn)
+        // NEW: Real Hardware Biometric Validation Flow (WebAuthn) tied to Firebase
         window.verifyBiometric = async () => {
             const status = document.getElementById('fingerprintStatus');
             const fpIcon = document.getElementById('fpIcon');
             const scanLine = document.getElementById('scanLine');
             
-            // Check if device supports real biometrics
             if (!window.PublicKeyCredential) {
                 status.innerText = "Biometrics not supported on this browser/device.";
                 status.classList.replace('text-gray-500', 'text-red-500');
@@ -807,26 +806,28 @@
             }
 
             scanLine.style.display = 'block';
-            status.innerText = "Waiting for hardware scanner...";
+            status.innerText = "Checking global security...";
             fpIcon.classList.replace('text-gray-500', 'text-brand-500');
 
             try {
+                // Fetch the globally registered Credential ID from Firebase
+                // This ensures only the device matching this exact ID can unlock it.
+                const dbRef = ref(db, 'settings/admin_fingerprint'); 
+                const snapshot = await get(dbRef);
+                
                 const challenge = new Uint8Array(32);
                 window.crypto.getRandomValues(challenge);
 
-                // Check if fingerprint is already registered in local storage
-                let adminCredId = localStorage.getItem('tbk_admin_fp');
-
-                if (!adminCredId) {
-                    // FIRST TIME SETUP: Register the Fingerprint
-                    status.innerText = "Registering your Fingerprint...";
+                if (!snapshot.exists()) {
+                    // FIRST TIME ONLY: Register the Admin's Fingerprint Globally
+                    status.innerText = "Registering Admin Fingerprint...";
                     const newCredential = await navigator.credentials.create({
                         publicKey: {
                             challenge: challenge,
                             rp: { name: "Khodal Admin", id: window.location.hostname },
                             user: {
-                                id: new Uint8Array(16),
-                                name: "admin@khodal",
+                                id: new Uint8Array(16), 
+                                name: adminUser.email,
                                 displayName: "Super Admin"
                             },
                             pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }],
@@ -835,52 +836,48 @@
                         }
                     });
                     
-                    // Save the credential ID so only this device/fingerprint works next time
                     const credIdArray = Array.from(new Uint8Array(newCredential.rawId));
-                    localStorage.setItem('tbk_admin_fp', JSON.stringify(credIdArray));
-                    adminCredId = JSON.stringify(credIdArray);
+                    await set(dbRef, credIdArray);
+                    
+                    status.innerText = "Global Fingerprint Registered!";
+                } else {
+                    // VERIFICATION: Ask for the SPECIFIC registered Fingerprint from Firebase
+                    status.innerText = "Touch sensor to unlock...";
+                    const credArray = new Uint8Array(snapshot.val());
+                    
+                    const assertion = await navigator.credentials.get({
+                        publicKey: {
+                            challenge: challenge,
+                            rpId: window.location.hostname,
+                            allowCredentials: [{ type: "public-key", id: credArray }],
+                            userVerification: "required"
+                        }
+                    });
+
+                    if (!assertion) throw new Error("Not Verified");
                 }
 
-                // VERIFICATION: Ask for the registered Fingerprint
-                status.innerText = "Touch sensor to unlock...";
-                const credArray = new Uint8Array(JSON.parse(localStorage.getItem('tbk_admin_fp')));
+                // SUCCESS LOGIC
+                scanLine.style.display = 'none';
+                status.innerText = "Identity Verified";
+                status.classList.replace('text-gray-500', 'text-green-400');
+                fpIcon.classList.replace('text-brand-500', 'text-green-400');
                 
-                const assertion = await navigator.credentials.get({
-                    publicKey: {
-                        challenge: challenge,
-                        rpId: window.location.hostname,
-                        allowCredentials: [{ type: "public-key", id: credArray }],
-                        userVerification: "required"
-                    }
-                });
-
-                if (assertion) {
-                    // FINGERPRINT MATCHED SUCCESSFULLY!
-                    scanLine.style.display = 'none';
-                    status.innerText = "Identity Verified";
-                    status.classList.replace('text-gray-500', 'text-green-400');
-                    fpIcon.classList.replace('text-brand-500', 'text-green-400');
-                    
-                    fingerprintVerified = true;
-                    
+                fingerprintVerified = true;
+                
+                setTimeout(() => {
+                    const fpView = document.getElementById('fingerprintView');
+                    fpView.style.opacity = '0';
                     setTimeout(() => {
-                        const fpView = document.getElementById('fingerprintView');
-                        fpView.style.opacity = '0';
-                        setTimeout(() => {
-                            fpView.classList.add('hidden');
-                            if (adminUser) {
-                                document.getElementById('appView').classList.remove('hidden');
-                            } else {
-                                document.getElementById('authView').classList.remove('hidden');
-                            }
-                        }, 500);
-                    }, 1000);
-                }
+                        fpView.classList.add('hidden');
+                        document.getElementById('appView').classList.remove('hidden');
+                    }, 500);
+                }, 1000);
+
             } catch (error) {
-                // IF FINGERPRINT FAILS OR USER CANCELS
                 console.error("Biometric Error:", error);
                 scanLine.style.display = 'none';
-                status.innerText = "Verification Failed or Cancelled.";
+                status.innerText = "Access Denied: Unrecognized Fingerprint.";
                 status.classList.replace('text-gray-500', 'text-red-500');
                 fpIcon.classList.replace('text-brand-500', 'text-red-500');
                 
@@ -888,7 +885,7 @@
                     status.innerText = "Tap to scan fingerprint";
                     status.classList.replace('text-red-500', 'text-gray-500');
                     fpIcon.classList.replace('text-red-500', 'text-gray-500');
-                }, 2500);
+                }, 3000);
             }
         };
 
@@ -1030,22 +1027,32 @@
             if (target === 'products') window.renderProductsTable();
         };
 
+        // NEW FLOW: Auth -> Fingerprint -> App
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 adminUser = user;
                 document.getElementById('adminEmailDisplay').innerText = user.email;
                 setupRealtimeListeners(); 
-                // Only show App if fingerprint verified
-                if(fingerprintVerified) {
-                    document.getElementById('authView').classList.add('hidden');
+                
+                // Hide email login screen
+                document.getElementById('authView').classList.add('hidden');
+                
+                if (!fingerprintVerified) {
+                    // Show fingerprint screen and wait for user interaction
+                    const fpView = document.getElementById('fingerprintView');
+                    fpView.classList.remove('hidden');
+                    setTimeout(() => fpView.style.opacity = '1', 10);
+                } else {
                     document.getElementById('appView').classList.remove('hidden');
                 }
             } else {
                 adminUser = null;
-                if(fingerprintVerified) {
-                    document.getElementById('authView').classList.remove('hidden');
-                    document.getElementById('appView').classList.add('hidden');
-                }
+                fingerprintVerified = false;
+                
+                // Reset views to default login state
+                document.getElementById('fingerprintView').classList.add('hidden');
+                document.getElementById('appView').classList.add('hidden');
+                document.getElementById('authView').classList.remove('hidden');
             }
         });
 
@@ -1685,7 +1692,7 @@
             if(history.length === 0) {
                 tbodyHist.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-gray-500 font-medium">No historical payouts found.</td></tr>`;
             } else {
-                const sortedHistory = [...history].sort((a,b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+                const sortedHistory = [...history].sort((a,b) => new Date(b.createdAt || 0) - new Date(a.createdAt || a.date || 0));
                 tbodyHist.innerHTML = sortedHistory.map(p => {
                     const d = p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-IN') : 'N/A';
                     const affName = State.affiliates.find(a => a.id === p.affiliateId)?.name || 'Unknown';
