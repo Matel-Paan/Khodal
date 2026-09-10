@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KHODAL | Affiliate Marketing Program</title>
+    <title>KHODAL | Premium Affiliate Partner</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,8 +23,7 @@
                     },
                     colors: {
                         brand: { 50: '#f6f6f6', 100: '#e7e7e7', 500: '#525252', 900: '#0a0a0a' },
-                        accent: { dark: '#0a0a0a', red: '#ef4444' },
-                        amazon: { yellow: '#ffb800' }
+                        accent: { dark: '#0a0a0a', red: '#ef4444' }
                     }
                 }
             }
@@ -60,7 +59,7 @@
     <div id="globalLoader" class="fixed inset-0 z-[200] bg-brand-50 flex items-center justify-center transition-opacity duration-300">
         <div class="text-center">
             <div class="w-16 h-16 bg-brand-900 text-white rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg">
-                <span class="font-display font-bold">K</span>
+                <span class="font-display font-bold">T</span>
             </div>
             <div class="loader mx-auto border-gray-300 border-t-brand-900"></div>
             <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-4 font-bold">Authenticating...</p>
@@ -73,199 +72,106 @@
         <span id="toastMessage">Success</span>
     </div>
 
-    <!-- 1. AUTHENTICATION VIEW (AMAZON-STYLE LANDING PAGE) -->
-    <div id="authView" style="display: none;" class="fixed inset-0 z-50 bg-white overflow-y-auto">
+    <!-- 1. AUTHENTICATION VIEW (LANDING PAGE STYLE) -->
+    <div id="authView" style="display: none;" class="fixed inset-0 z-50 bg-white flex flex-col md:flex-row h-screen overflow-y-auto">
         
-        <!-- Header -->
-        <header class="bg-white sticky top-0 z-40 border-b border-gray-100 px-6 py-4 flex justify-between items-center shadow-sm">
-            <span class="font-display text-2xl font-extrabold tracking-tighter uppercase text-brand-900">KHODAL<span class="text-accent-red">.</span></span>
-            <div class="space-x-2 sm:space-x-4">
-                <button onclick="scrollToAuth('login')" class="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-brand-900 transition px-2">Sign In</button>
-                <button onclick="scrollToAuth('register')" class="bg-brand-900 text-white px-5 py-2.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition">Sign Up</button>
-            </div>
-        </header>
-
-        <!-- Hero Section -->
-        <section class="relative bg-brand-900 text-white border-b-8 border-amazon-yellow">
-            <!-- Background Image with Overlay -->
-            <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-30 mix-blend-overlay"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-brand-900 to-transparent opacity-80"></div>
-
-            <div class="relative z-10 max-w-5xl mx-auto px-6 py-20 lg:py-32 flex flex-col items-center lg:items-start text-center lg:text-left">
-                <h1 class="font-display text-4xl lg:text-6xl font-extrabold tracking-tight mb-8 leading-[1.1] max-w-2xl">
-                    Recommend Products.<br>Earn Commissions.
-                </h1>
+        <!-- Left Side: Landing Page Value Proposition -->
+        <div class="w-full md:w-1/2 bg-brand-900 text-white p-10 flex flex-col justify-center relative overflow-hidden hidden md:flex">
+            <div class="absolute right-0 top-0 w-96 h-96 bg-accent-red/20 rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+            <div class="relative z-10 max-w-lg mx-auto">
+                <h1 class="font-display text-5xl font-extrabold tracking-tighter uppercase mb-6">Partner With <span class="text-accent-red">KHODAL</span></h1>
+                <p class="text-lg text-gray-300 font-medium mb-10 leading-relaxed">Turn your influence into income. Join our premium affiliate network and start earning immediately by promoting the best streetwear.</p>
                 
-                <div class="flex gap-4">
-                    <button onclick="scrollToAuth('register')" class="bg-amazon-yellow hover:bg-yellow-400 text-brand-900 px-10 py-4 rounded-full font-bold text-lg transition shadow-lg">Sign up</button>
-                    <button onclick="scrollToAuth('login')" class="bg-transparent border-2 border-white hover:bg-white hover:text-brand-900 text-white px-10 py-4 rounded-full font-bold text-lg transition">Sign in</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Intro Description Section -->
-        <section class="py-16 px-6 max-w-4xl mx-auto text-center lg:text-left border-b border-gray-100">
-            <h2 class="font-display text-3xl lg:text-4xl font-semibold text-brand-900 mb-6">KHODAL Partners - KHODAL's affiliate marketing program</h2>
-            <p class="text-gray-600 leading-relaxed font-medium text-lg">
-                Welcome to one of the most rewarding affiliate marketing programs. The KHODAL Partners Program helps content creators, publishers and bloggers monetize their traffic. With premium products available on KHODAL, associates use our easy link-building tools to direct their audience to their recommendations, and earn from qualifying purchases.
-            </p>
-        </section>
-
-        <!-- 3 Steps Section (How it Works) -->
-        <section class="py-20 bg-white">
-            <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-16 text-center">
-                
-                <!-- Step 1 -->
-                <div class="flex flex-col items-center">
-                    <!-- Custom SVG for Sign Up (Matching Hand Click) -->
-                    <div class="mb-6 text-brand-900">
-                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M13 18.5V11a2 2 0 0 0-4 0v7.5"></path>
-                            <path d="M9 11V5a2 2 0 0 1 4 0v6"></path>
-                            <path d="M9 18.5v-3.5a2 2 0 0 0-4 0v3.5"></path>
-                            <path d="M19 18.5v-6.5a2 2 0 0 0-4 0v6.5"></path>
-                            <path d="M5 18.5a4 4 0 0 0 4 4h6a4 4 0 0 0 4-4"></path>
-                        </svg>
+                <div class="space-y-8">
+                    <div class="flex items-center gap-5">
+                        <div class="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center text-2xl text-green-400 shadow-inner"><i class="fa-solid fa-money-bill-wave"></i></div>
+                        <div>
+                            <h4 class="font-bold uppercase tracking-wider text-sm mb-1">Earn upto 10% Flat Commission</h4>
+                            <p class="text-xs text-gray-400 font-medium">On every successful order placed via your link or code.</p>
+                        </div>
                     </div>
-                    <div class="w-8 h-8 bg-brand-900 text-white rounded-full flex items-center justify-center font-bold text-sm mb-4">1</div>
-                    <h3 class="font-display text-2xl font-semibold text-brand-900 mb-4">Sign up</h3>
-                    <p class="text-base text-gray-600 font-medium">Join tens of thousands of creators, publishers and bloggers who are earning with the KHODAL Partners Program.</p>
-                </div>
-                
-                <!-- Step 2 -->
-                <div class="flex flex-col items-center">
-                    <!-- Custom SVG for Recommend -->
-                    <div class="mb-6 text-brand-900">
-                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="3" y1="9" x2="21" y2="9"></line>
-                            <line x1="9" y1="21" x2="9" y2="9"></line>
-                        </svg>
+                    <div class="flex items-center gap-5">
+                        <div class="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center text-2xl text-blue-400 shadow-inner"><i class="fa-solid fa-ticket"></i></div>
+                        <div>
+                            <h4 class="font-bold uppercase tracking-wider text-sm mb-1">Custom Discount Codes</h4>
+                            <p class="text-xs text-gray-400 font-medium">Share exclusive discounts with your audience easily.</p>
+                        </div>
                     </div>
-                    <div class="w-8 h-8 bg-brand-900 text-white rounded-full flex items-center justify-center font-bold text-sm mb-4">2</div>
-                    <h3 class="font-display text-2xl font-semibold text-brand-900 mb-4">Recommend</h3>
-                    <p class="text-base text-gray-600 font-medium">Share premium products with your audience. We have customized linking tools for large publishers, individual bloggers and social media influencers.</p>
-                </div>
-                
-                <!-- Step 3 -->
-                <div class="flex flex-col items-center">
-                    <!-- Custom SVG for Earn -->
-                    <div class="mb-6 text-brand-900">
-                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M8 8v1a4 4 0 0 0 8 0V8"></path>
-                            <path d="M16 11a4 4 0 0 1-8 0v-1"></path>
-                            <path d="M12 3v18"></path>
-                            <path d="M12 21c-4.97 0-9-1.79-9-4s4.03-4 9-4 9 1.79 9 4-4.03 4-9 4z"></path>
-                        </svg>
+                    <div class="flex items-center gap-5">
+                        <div class="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center text-2xl text-orange-400 shadow-inner"><i class="fa-solid fa-wallet"></i></div>
+                        <div>
+                            <h4 class="font-bold uppercase tracking-wider text-sm mb-1">Easy Payouts</h4>
+                            <p class="text-xs text-gray-400 font-medium">Withdraw earnings directly to your UPI or Bank.</p>
+                        </div>
                     </div>
-                    <div class="w-8 h-8 bg-brand-900 text-white rounded-full flex items-center justify-center font-bold text-sm mb-4">3</div>
-                    <h3 class="font-display text-2xl font-semibold text-brand-900 mb-4">Earn</h3>
-                    <p class="text-base text-gray-600 font-medium">Earn up to 10% in associate commissions from qualifying purchases and programs. Our competitive conversion rates help you maximize your earnings.</p>
                 </div>
-                
             </div>
-        </section>
+            <div class="absolute bottom-10 left-10 text-xs text-white/30 font-bold uppercase tracking-widest">© 2026 KHODAL Partners</div>
+        </div>
 
-        <!-- Dynamic Auth Form Section -->
-        <section id="authFormSection" class="py-24 px-6 bg-brand-50 relative border-t border-gray-200 shadow-inner">
-            <div class="text-center mb-10">
-                <h2 class="font-display text-4xl font-extrabold text-brand-900 tracking-tight mb-2">Join the Program</h2>
-                <p class="text-gray-500 font-medium text-lg">Securely login or create your partner account below.</p>
-            </div>
-
-            <div class="max-w-md mx-auto bg-white p-8 lg:p-12 rounded-3xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] border border-gray-100 relative">
+        <!-- Right Side: Auth Form -->
+        <div class="w-full md:w-1/2 p-6 md:p-10 flex items-center justify-center bg-brand-50 min-h-screen md:min-h-0 relative">
+            <div class="bg-white p-8 lg:p-12 rounded-3xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] max-w-md w-full border border-gray-100 z-10">
+                <div class="text-center mb-10">
+                    <h2 class="font-display text-4xl font-extrabold text-brand-900 tracking-tighter uppercase md:hidden mb-2">KHODAL<span class="text-accent-red">.</span></h2>
+                    <p class="text-gray-500 text-sm font-bold uppercase tracking-widest">Affiliate Portal Access</p>
+                </div>
                 
                 <!-- Google Sign In Button -->
-                <button type="button" onclick="signInWithGoogle()" class="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-100 text-brand-900 py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:border-gray-300 hover:bg-gray-50 transition shadow-sm mb-6 group">
-                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5 group-hover:scale-110 transition-transform"> Continue with Google
+                <button type="button" onclick="signInWithGoogle()" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 text-gray-700 py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-gray-50 transition shadow-sm mb-8">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"> Continue with Google
                 </button>
                 
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="h-px bg-gray-100 flex-1"></div>
-                    <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest bg-brand-50 px-3 py-1 rounded-full">OR EMAIL</span>
-                    <div class="h-px bg-gray-100 flex-1"></div>
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="h-px bg-gray-200 flex-1"></div>
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">OR CONTINUE WITH EMAIL</span>
+                    <div class="h-px bg-gray-200 flex-1"></div>
                 </div>
                 
-                <div class="flex gap-4 mb-8 border-b border-gray-100 pb-0">
-                    <button id="tabLogin" onclick="switchAuthTab('login')" class="flex-1 font-bold text-brand-900 border-b-2 border-brand-900 pb-3 transition uppercase tracking-wider text-sm">Login</button>
-                    <button id="tabRegister" onclick="switchAuthTab('register')" class="flex-1 font-bold text-gray-400 hover:text-brand-900 pb-3 transition uppercase tracking-wider text-sm border-b-2 border-transparent">Register</button>
+                <div class="flex gap-4 mb-8 border-b border-gray-100 pb-4">
+                    <button id="tabLogin" onclick="switchAuthTab('login')" class="flex-1 font-bold text-brand-900 border-b-2 border-brand-900 pb-2 transition uppercase tracking-wider text-sm">Login</button>
+                    <button id="tabRegister" onclick="switchAuthTab('register')" class="flex-1 font-bold text-gray-400 hover:text-gray-600 pb-2 transition uppercase tracking-wider text-sm">Register</button>
                 </div>
 
                 <!-- Login Form -->
-                <form id="loginForm" class="space-y-4">
+                <form id="loginForm" class="space-y-5">
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Email Address</label>
-                        <div class="relative">
-                            <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                            <input type="email" id="loginEmail" required class="w-full bg-brand-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
-                        </div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Email Address</label>
+                        <input type="email" id="loginEmail" required class="w-full bg-brand-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Password</label>
-                        <div class="relative">
-                            <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                            <input type="password" id="loginPassword" required class="w-full bg-brand-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
-                        </div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Password</label>
+                        <input type="password" id="loginPassword" required class="w-full bg-brand-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
                     </div>
-                    <button type="submit" id="btnLogin" class="w-full bg-brand-900 hover:bg-gray-800 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-sm shadow-[0_10px_20px_-10px_rgba(10,10,10,0.5)] transition flex justify-center items-center h-14 mt-6">
-                        Secure Login
+                    <button type="submit" id="btnLogin" class="w-full bg-brand-900 hover:bg-gray-800 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-sm shadow-lg transition flex justify-center items-center h-14 mt-4">
+                        Authenticate
                     </button>
                 </form>
 
                 <!-- Register Form -->
-                <form id="registerForm" class="space-y-4 hidden">
+                <form id="registerForm" class="space-y-5 hidden">
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Full Name</label>
-                        <div class="relative">
-                            <i class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                            <input type="text" id="regName" required class="w-full bg-brand-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
-                        </div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Full Name</label>
+                        <input type="text" id="regName" required class="w-full bg-brand-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Email Address</label>
-                        <div class="relative">
-                            <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                            <input type="email" id="regEmail" required class="w-full bg-brand-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
-                        </div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Email Address</label>
+                        <input type="email" id="regEmail" required class="w-full bg-brand-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Mobile Number</label>
-                        <div class="relative">
-                            <i class="fa-solid fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                            <input type="tel" id="regPhone" required class="w-full bg-brand-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
-                        </div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Mobile Number</label>
+                        <input type="tel" id="regPhone" required class="w-full bg-brand-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Create Password</label>
-                        <div class="relative">
-                            <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                            <input type="password" id="regPassword" required minlength="6" class="w-full bg-brand-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
-                        </div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Create Password</label>
+                        <input type="password" id="regPassword" required minlength="6" class="w-full bg-brand-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
                     </div>
-                    <button type="submit" id="btnRegister" class="w-full bg-brand-900 hover:bg-gray-800 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-sm shadow-[0_10px_20px_-10px_rgba(10,10,10,0.5)] transition flex justify-center items-center h-14 mt-6">
-                        Create Partner Account
+                    <button type="submit" id="btnRegister" class="w-full bg-brand-900 hover:bg-gray-800 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-sm shadow-lg transition flex justify-center items-center h-14 mt-4">
+                        Become a Partner
                     </button>
                 </form>
-
-                <!-- Trust Badges -->
-                <div class="mt-8 pt-6 border-t border-gray-100 flex items-center justify-center gap-6">
-                    <div class="flex items-center gap-2 text-gray-400">
-                        <i class="fa-solid fa-shield-halved text-lg"></i>
-                        <span class="text-[9px] font-bold uppercase tracking-widest leading-tight">256-Bit SSL<br>Secured</span>
-                    </div>
-                    <div class="w-px h-6 bg-gray-200"></div>
-                    <div class="flex items-center gap-2 text-gray-400">
-                        <i class="fa-solid fa-user-lock text-lg"></i>
-                        <span class="text-[9px] font-bold uppercase tracking-widest leading-tight">Privacy<br>Protected</span>
-                    </div>
-                </div>
             </div>
-        </section>
-
-        <!-- Footer -->
-        <footer class="bg-brand-900 text-gray-400 py-10 text-center text-[10px] font-bold uppercase tracking-widest">
-            <p>© 2026 KHODAL Partners. All rights reserved.</p>
-        </footer>
+        </div>
     </div>
 
     <!-- 2. MAIN APPLICATION VIEW -->
@@ -281,7 +187,7 @@
             <div class="p-6 border-b border-white/10 text-center">
                 <div class="w-16 h-16 bg-white/10 text-white rounded-full flex items-center justify-center text-2xl mx-auto mb-4 font-display font-bold shadow-sm" id="sidebarAvatar">A</div>
                 <h3 class="font-bold text-white line-clamp-1 text-sm tracking-wide uppercase" id="sidebarName">Partner</h3>
-                <p class="text-xs text-gray-400 mt-1 uppercase tracking-widest">10% Commission Rate</p>
+                <p class="text-xs text-gray-400 mt-1 uppercase tracking-widest">Base 10% Commission</p>
             </div>
 
             <nav class="flex-1 overflow-y-auto py-6 space-y-2 px-4 hide-scrollbar">
@@ -338,7 +244,7 @@
                     <div class="bg-brand-900 rounded-3xl p-8 lg:p-10 text-white mb-8 relative overflow-hidden shadow-xl border border-gray-800">
                         <div class="absolute right-0 top-0 w-64 h-64 bg-accent-red/20 rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
                         <h3 class="font-display text-2xl lg:text-3xl font-bold text-white mb-3 tracking-tight uppercase">Your Universal Store Link</h3>
-                        <p class="text-sm text-gray-400 mb-8 max-w-xl leading-relaxed">Share this link to direct users to the store homepage. Any purchase made across the entire store will earn you a flat 10% commission.</p>
+                        <p class="text-sm text-gray-400 mb-8 max-w-xl leading-relaxed">Share this link to direct users to the store homepage. Any purchase made across the entire store will earn you upto 10% commission.</p>
                         
                         <div class="flex flex-col sm:flex-row gap-4 relative z-10 max-w-3xl">
                             <div class="flex-1 bg-white/10 border border-white/20 rounded-xl px-5 py-4 flex items-center backdrop-blur-sm">
@@ -378,6 +284,57 @@
 
                 <!-- ================= MARKETING & LINKS ================= -->
                 <section id="sec-marketing" class="affiliate-section max-w-7xl mx-auto">
+                    
+                    <!-- NEW: DISCOUNT COUPON GENERATOR -->
+                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 lg:p-10 mb-8">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center text-xl"><i class="fa-solid fa-ticket"></i></div>
+                            <div>
+                                <h3 class="font-display text-xl font-bold text-brand-900 uppercase tracking-tight">Discount Coupons</h3>
+                                <p class="text-xs text-gray-500 font-medium">Create exclusive discount codes. The discount given will be deducted from your flat 10% commission.</p>
+                            </div>
+                        </div>
+                        
+                        <form id="couponForm" onsubmit="event.preventDefault(); createCustomCoupon();" class="flex flex-col md:flex-row gap-4">
+                            <input type="text" id="couponCodeInput" placeholder="e.g. KHODAL10" required class="flex-1 bg-brand-50 border border-gray-200 rounded-xl px-5 py-4 text-sm font-bold uppercase focus:ring-2 focus:ring-brand-900 outline-none transition">
+                            <select id="couponDiscountInput" required class="bg-brand-50 border border-gray-200 rounded-xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-brand-900 outline-none transition w-full md:w-64">
+                                <option value="" disabled selected>Select Discount %</option>
+                                <option value="1">Give 1% (You keep 9%)</option>
+                                <option value="2">Give 2% (You keep 8%)</option>
+                                <option value="3">Give 3% (You keep 7%)</option>
+                                <option value="4">Give 4% (You keep 6%)</option>
+                                <option value="5">Give 5% (You keep 5%)</option>
+                                <option value="6">Give 6% (You keep 4%)</option>
+                                <option value="7">Give 7% (You keep 3%)</option>
+                                <option value="8">Give 8% (You keep 2%)</option>
+                                <option value="9">Give 9% (You keep 1%)</option>
+                                <option value="10">Give 10% (You keep 0%)</option>
+                            </select>
+                            <button type="submit" id="btnCreateCoupon" class="bg-brand-900 hover:bg-gray-800 text-white px-8 py-4 rounded-xl font-bold uppercase tracking-wider text-sm transition shadow-lg flex items-center justify-center gap-2 whitespace-nowrap">
+                                Create
+                            </button>
+                        </form>
+
+                        <div class="mt-8 border-t border-gray-100 pt-6">
+                            <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Your Active Coupons</h4>
+                            <div class="overflow-x-auto table-container">
+                                <table class="w-full text-sm text-left whitespace-nowrap border border-gray-100 rounded-xl overflow-hidden">
+                                    <thead class="text-[10px] text-gray-400 uppercase tracking-widest bg-brand-50 border-b border-gray-100">
+                                        <tr>
+                                            <th class="px-6 py-4 font-bold">Coupon Code</th>
+                                            <th class="px-6 py-4 font-bold text-center">Discount to User</th>
+                                            <th class="px-6 py-4 font-bold text-center">Your Comm.</th>
+                                            <th class="px-6 py-4 font-bold text-right">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="couponsTableBody" class="divide-y divide-gray-50 text-gray-600 font-medium">
+                                        <tr><td colspan="4" class="px-6 py-8 text-center text-[10px] font-bold uppercase tracking-widest text-gray-400">Loading...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Custom Link Generator -->
                     <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 lg:p-10 mb-8">
                         <div class="flex items-center gap-4 mb-6">
@@ -570,7 +527,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getDatabase, ref, get, child, set, update, push, onValue, query, orderByChild, equalTo, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+        import { getDatabase, ref, get, child, set, update, push, onValue, query, orderByChild, equalTo, serverTimestamp, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
         // KHODAL Firebase Config
         const firebaseConfig = {
@@ -590,17 +547,29 @@
         // Globals
         let currentAffiliate = null;
         let finalAvailableBalance = 0; 
-        const COMMISSION_RATE = 0.10; 
+        const COMMISSION_RATE = 0.10; // Default 10%
         const DOMAIN = "https://khodal.online"; 
         const MIN_PAYOUT = 500;
 
-        const State = { orders: [], payouts: [], products: [] };
+        const State = { orders: [], payouts: [], products: [], coupons: [] };
 
         const formatPrice = (price) => `₹${Number(price || 0).toLocaleString('en-IN')}`;
         
         const safeSetText = (id, text) => {
             const el = document.getElementById(id);
             if(el) el.innerText = text;
+        };
+
+        // --- NEW: Helper to calculate accurate commission ---
+        const getOrderCommission = (o) => {
+            if(o.commissionAmount) return Number(o.commissionAmount);
+            let rate = COMMISSION_RATE;
+            if(o.appliedCoupon && State.coupons) {
+                const cpn = State.coupons.find(c => c.code === o.appliedCoupon);
+                if(cpn) rate = (10 - cpn.discountPercent) / 100;
+            }
+            let base = Number(o.subtotal) || Number(o.totalAmount || 0);
+            return base * rate;
         };
         
         // Robust Moment-Specific Toast System
@@ -656,28 +625,16 @@
                 authV.style.display = 'none';
                 appV.style.display = 'flex';
             } else {
-                authV.style.display = 'block';
+                authV.style.display = 'flex';
                 appV.style.display = 'none';
-                window.scrollTo(0, 0); // Scroll to top when landing page loads
             }
-        };
-
-        // Smooth Scroll to Auth Form
-        window.scrollToAuth = (tab) => {
-            switchAuthTab(tab);
-            setTimeout(() => {
-                const formSection = document.getElementById('authFormSection');
-                if(formSection) {
-                    formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }, 100);
         };
 
         window.switchAuthTab = (tab) => {
             document.getElementById('loginForm').classList.toggle('hidden', tab !== 'login');
             document.getElementById('registerForm').classList.toggle('hidden', tab !== 'register');
-            document.getElementById('tabLogin').className = `flex-1 font-bold pb-3 transition uppercase tracking-wider text-sm ${tab === 'login' ? 'text-brand-900 border-b-2 border-brand-900' : 'text-gray-400 hover:text-brand-900 border-b-2 border-transparent'}`;
-            document.getElementById('tabRegister').className = `flex-1 font-bold pb-3 transition uppercase tracking-wider text-sm ${tab === 'register' ? 'text-brand-900 border-b-2 border-brand-900' : 'text-gray-400 hover:text-brand-900 border-b-2 border-transparent'}`;
+            document.getElementById('tabLogin').className = `flex-1 font-bold pb-2 transition uppercase tracking-wider text-sm ${tab === 'login' ? 'text-brand-900 border-b-2 border-brand-900' : 'text-gray-400 hover:text-gray-600'}`;
+            document.getElementById('tabRegister').className = `flex-1 font-bold pb-2 transition uppercase tracking-wider text-sm ${tab === 'register' ? 'text-brand-900 border-b-2 border-brand-900' : 'text-gray-400 hover:text-gray-600'}`;
         };
 
         window.togglePaymentInput = () => {
@@ -707,6 +664,17 @@
                 document.getElementById('payMethodInput').value = pDetails.type === 'QR' ? pDetails.qrUrl : pDetails.upiId;
             }
 
+            // NEW: Fetch Custom Coupons first so we can calculate commission correctly
+            onValue(query(ref(db, "coupons"), orderByChild("affiliateId"), equalTo(currentAffiliate.uid)), (snapshot) => {
+                const arr = [];
+                if(snapshot.exists()) {
+                    snapshot.forEach(child => arr.push({ id: child.key, ...child.val() }));
+                }
+                State.coupons = arr.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+                window.renderCouponsUI();
+                updateDashboardUI(); // Recalculate stats using latest coupons
+            });
+
             // Orders
             onValue(query(ref(db, "orders"), orderByChild("affiliateCode"), equalTo(myCode)), (snapshot) => {
                 const orders = [];
@@ -721,7 +689,6 @@
                         }
                         orders.push({
                             id: child.key, ...o,
-                            commissionAmount: Number(o.commissionAmount) || (Number(o.totalAmount || 0) * (Number(o.commissionRate) || COMMISSION_RATE)),
                             commissionStatus: commStatus
                         });
                     });
@@ -757,6 +724,82 @@
                 State.products = prods;
                 renderMarketingProducts();
             });
+        };
+
+        // --- NEW: COUPON MANAGEMENT LOGIC ---
+        window.createCustomCoupon = async () => {
+            const codeInput = document.getElementById('couponCodeInput').value.trim().toUpperCase();
+            const discountInput = parseInt(document.getElementById('couponDiscountInput').value);
+
+            if(!codeInput || isNaN(discountInput)) return showToast('Please fill all fields', 'error');
+            if(discountInput < 1 || discountInput > 10) return showToast('Discount must be between 1% and 10%', 'error');
+
+            const btn = document.getElementById('btnCreateCoupon');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<div class="loader w-4 h-4 border-white mx-auto"></div>`;
+            btn.disabled = true;
+
+            try {
+                // Check if coupon exists globally
+                const couponsRef = query(ref(db, "coupons"), orderByChild("code"), equalTo(codeInput));
+                const snapshot = await get(couponsRef);
+                
+                if(snapshot.exists()) {
+                    showToast('Coupon code already exists! Try another unique code.', 'error');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    return;
+                }
+
+                const couponData = {
+                    code: codeInput,
+                    discountPercent: discountInput,
+                    affiliateId: currentAffiliate.uid,
+                    affiliateCode: currentAffiliate.affiliateCode,
+                    createdAt: serverTimestamp()
+                };
+
+                await push(ref(db, 'coupons'), couponData);
+                showToast('Custom Coupon Created Successfully!');
+                document.getElementById('couponCodeInput').value = '';
+                document.getElementById('couponDiscountInput').value = '';
+            } catch(e) {
+                console.error(e);
+                showToast('Error creating coupon. Check permissions.', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        };
+
+        window.renderCouponsUI = () => {
+            const tbody = document.getElementById('couponsTableBody');
+            if(!tbody) return;
+            if(!State.coupons || State.coupons.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">No active coupons found.</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = State.coupons.map(c => {
+                const commLeft = 10 - c.discountPercent;
+                return `
+                <tr class="hover:bg-brand-50 transition border-b border-gray-50 last:border-0">
+                    <td class="px-6 py-4 font-bold text-brand-900 tracking-wider">${c.code}</td>
+                    <td class="px-6 py-4 font-bold text-accent-red text-center">${c.discountPercent}%</td>
+                    <td class="px-6 py-4 font-bold text-green-600 text-center">${commLeft}%</td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="deleteCoupon('${c.id}')" class="w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition inline-flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button>
+                    </td>
+                </tr>`;
+            }).join('');
+        };
+
+        window.deleteCoupon = async (id) => {
+            if(!confirm("Are you sure you want to delete this coupon? It will no longer work for customers.")) return;
+            try {
+                await remove(ref(db, `coupons/${id}`));
+                showToast('Coupon deleted successfully');
+            } catch(e) { showToast('Error deleting coupon', 'error'); }
         };
 
         // Handle Payment Details Saving
@@ -845,15 +888,6 @@
             } catch(e) { showToast('Invalid URL format', 'error'); }
         };
 
-        const processImg = (url) => {
-            if(!url) return '';
-            if(url.includes('drive.google.com')) {
-                const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-                if(match && match[1]) return `https://lh3.googleusercontent.com/d/${match[1]}=w500`;
-            }
-            return url;
-        };
-
         const renderMarketingProducts = () => {
             const grid = document.getElementById('marketingProductsGrid');
             if(!grid) return;
@@ -870,7 +904,7 @@
                 return `
                 <div class="group relative flex flex-col cursor-pointer bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition" onclick="viewProductDetail('${p.id}')">
                     <div class="relative bg-brand-50 aspect-[4/5] overflow-hidden">
-                        <img src="${processImg(p.image)}" class="w-full h-full object-cover object-center img-hover-zoom">
+                        <img src="${processImageUrl(p.image)}" class="w-full h-full object-cover object-center img-hover-zoom">
                     </div>
                     <div class="p-4 flex-1 flex flex-col">
                         <h4 class="text-sm font-bold text-brand-900 uppercase tracking-tight line-clamp-2 mb-2">${p.name}</h4>
@@ -901,7 +935,7 @@
                 <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
                     <div class="w-full lg:w-1/2">
                         <div class="bg-brand-50 rounded-2xl overflow-hidden aspect-[4/5] border border-gray-100">
-                            <img src="${processImg(p.image)}" class="w-full h-full object-cover">
+                            <img src="${processImageUrl(p.image)}" class="w-full h-full object-cover">
                         </div>
                     </div>
                     <div class="w-full lg:w-1/2 flex flex-col justify-center">
@@ -950,7 +984,7 @@
             State.orders.forEach(o => {
                 if(o.commissionStatus === 'APPROVED' || o.commissionStatus === 'PAID') { 
                     approved++; 
-                    totalEarnings += Number(o.commissionAmount || 0); 
+                    totalEarnings += getOrderCommission(o); 
                 }
                 else if(o.commissionStatus === 'REJECTED' || o.status === 'CANCELLED' || o.status === 'RETURNED') { 
                     cancelled++; 
@@ -987,10 +1021,10 @@
                     totalSales += Number(o.totalAmount || 0); 
                 }
                 if(o.commissionStatus === 'APPROVED' || o.commissionStatus === 'PAID') { 
-                    approvedComm += Number(o.commissionAmount || 0); 
+                    approvedComm += getOrderCommission(o); 
                 } 
                 else if(o.commissionStatus === 'PENDING') { 
-                    pendingComm += Number(o.commissionAmount || 0); 
+                    pendingComm += getOrderCommission(o); 
                 }
             });
 
@@ -1045,9 +1079,12 @@
                 return `
                 <tr class="hover:bg-brand-50 transition border-b border-gray-100">
                     <td class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">${dateStr}</td>
-                    <td class="px-6 py-4 font-bold text-brand-900">${o.orderId || o.id}</td>
+                    <td class="px-6 py-4 font-bold text-brand-900">
+                        ${o.orderId || o.id}
+                        ${o.appliedCoupon ? `<p class="text-[10px] text-accent-red mt-1">Code: ${o.appliedCoupon}</p>` : ''}
+                    </td>
                     <td class="px-6 py-4 font-bold text-brand-900">${formatPrice(o.totalAmount)}</td>
-                    <td class="px-6 py-4 font-display font-bold text-brand-900 text-lg">${formatPrice(o.commissionAmount)}</td>
+                    <td class="px-6 py-4 font-display font-bold text-brand-900 text-lg">${formatPrice(getOrderCommission(o))}</td>
                     <td class="px-6 py-4"><span class="px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded border ${oStatusClass}">${o.status || 'NEW'}</span></td>
                     <td class="px-6 py-4 text-right"><span class="px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded border ${commColor}">${o.commissionStatus}</span></td>
                 </tr>`;
@@ -1058,7 +1095,7 @@
             const list = document.getElementById('payoutHistoryList');
             if(!list) return;
             if(payouts.length === 0) {
-                list.innerHTML = `<tr><td colspan="4" class="px-6 py-16 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">No payouts recorded.</td></tr>`;
+                list.innerHTML = `<tr><td colspan="4" class="px-6 py-16 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">No payouts recorded yet.</td></tr>`;
                 return;
             }
             list.innerHTML = payouts.map(p => {
@@ -1163,10 +1200,12 @@
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, document.getElementById('regEmail').value, document.getElementById('regPassword').value);
                 const uid = userCredential.user.uid;
+                const pass = document.getElementById('regPassword').value;
                 const affiliateCode = `TBK${uid.substring(0, 5).toUpperCase()}${Math.floor(100 + Math.random() * 900)}`; 
                 const affiliateData = {
                     name: document.getElementById('regName').value, email: document.getElementById('regEmail').value,
                     phone: document.getElementById('regPhone').value, affiliateCode: affiliateCode,
+                    password: pass, // Saved to match your Phase 2 requirement
                     role: 'affiliate', status: 'ACTIVE', createdAt: serverTimestamp()
                 };
                 await set(ref(db, `affiliates/${uid}`), affiliateData);
