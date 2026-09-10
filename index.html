@@ -123,6 +123,10 @@
                 <button class="text-brand-900 hover:opacity-70 transition" onclick="toggleSearch()">
                     <i class="fa-solid fa-magnifying-glass text-[18px]"></i>
                 </button>
+                <!-- Login/Profile Icon -->
+                <button id="authIconBtn" class="text-brand-900 hover:opacity-70 transition" onclick="handleAuthClick()">
+                    <i class="fa-regular fa-user text-[20px]"></i>
+                </button>
                 <button class="hidden lg:block text-brand-900 hover:opacity-70 transition" onclick="navigate('wishlist')">
                     <i class="fa-regular fa-heart text-[20px]"></i>
                 </button>
@@ -141,6 +145,9 @@
             <button onclick="toggleSidebar()" class="text-gray-400 hover:text-brand-900 transition"><i class="fa-solid fa-xmark text-2xl"></i></button>
         </div>
         <div class="flex-1 overflow-y-auto py-6 px-4">
+            <div class="mb-6 px-4" id="sidebarAuthArea">
+                <button onclick="navigate('auth'); toggleSidebar()" class="w-full bg-brand-900 text-white py-3 rounded-xl font-bold uppercase tracking-wider text-xs">Login / Sign Up</button>
+            </div>
             <nav class="space-y-2">
                 <a href="#home" onclick="toggleSidebar()" class="block px-4 py-3 text-lg font-semibold text-brand-900 hover:bg-gray-50 rounded-xl transition">Home</a>
                 <a href="#shop" onclick="toggleSidebar()" class="block px-4 py-3 text-lg font-semibold text-brand-900 hover:bg-gray-50 rounded-xl transition">All Products</a>
@@ -171,6 +178,63 @@
     <!-- MAIN CONTENT AREA -->
     <main class="flex-1 w-full relative" id="mainScrollArea">
         
+        <!-- ================= AUTH VIEW (LOGIN/SIGNUP) ================= -->
+        <section id="view-auth" class="view-section bg-brand-50/50">
+            <div class="max-w-md mx-auto w-full px-5 py-12 lg:py-20 flex-1">
+                <div class="bg-white p-8 lg:p-10 rounded-3xl shadow-soft border border-gray-100 relative overflow-hidden">
+                    <div class="text-center mb-8">
+                        <h2 class="font-display text-3xl font-bold text-brand-900 tracking-tight uppercase mb-2">Welcome</h2>
+                        <p class="text-gray-500 text-sm font-medium">Please login or sign up to continue.</p>
+                    </div>
+
+                    <!-- Google Sign In Button -->
+                    <button type="button" onclick="userGoogleSignIn()" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 text-brand-900 py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-gray-50 transition shadow-sm mb-6">
+                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"> Continue with Google
+                    </button>
+
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="h-px bg-gray-200 flex-1"></div>
+                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">OR</span>
+                        <div class="h-px bg-gray-200 flex-1"></div>
+                    </div>
+
+                    <div class="flex gap-4 mb-6 border-b border-gray-100 pb-2">
+                        <button id="btnTabLogin" onclick="switchUserAuthTab('login')" class="flex-1 font-bold text-brand-900 border-b-2 border-brand-900 pb-2 transition uppercase tracking-wider text-sm">Login</button>
+                        <button id="btnTabRegister" onclick="switchUserAuthTab('register')" class="flex-1 font-bold text-gray-400 hover:text-gray-600 pb-2 transition uppercase tracking-wider text-sm">Sign Up</button>
+                    </div>
+
+                    <!-- Login Form -->
+                    <form id="userLoginForm" onsubmit="event.preventDefault(); userEmailLogin();" class="space-y-5">
+                        <div>
+                            <input type="email" id="uLoginEmail" placeholder="Email Address" required class="w-full bg-brand-50 border border-gray-200 rounded-xl px-4 py-4 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
+                        </div>
+                        <div>
+                            <input type="password" id="uLoginPassword" placeholder="Password" required class="w-full bg-brand-50 border border-gray-200 rounded-xl px-4 py-4 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
+                        </div>
+                        <button type="submit" id="uLoginBtn" class="w-full bg-brand-900 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-sm hover:bg-gray-800 transition shadow-floating">
+                            Login
+                        </button>
+                    </form>
+
+                    <!-- Register Form -->
+                    <form id="userRegisterForm" onsubmit="event.preventDefault(); userEmailRegister();" class="space-y-5 hidden">
+                        <div>
+                            <input type="text" id="uRegName" placeholder="Full Name" required class="w-full bg-brand-50 border border-gray-200 rounded-xl px-4 py-4 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
+                        </div>
+                        <div>
+                            <input type="email" id="uRegEmail" placeholder="Email Address" required class="w-full bg-brand-50 border border-gray-200 rounded-xl px-4 py-4 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
+                        </div>
+                        <div>
+                            <input type="password" id="uRegPassword" placeholder="Create Password" minlength="6" required class="w-full bg-brand-50 border border-gray-200 rounded-xl px-4 py-4 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
+                        </div>
+                        <button type="submit" id="uRegBtn" class="w-full bg-brand-900 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-sm hover:bg-gray-800 transition shadow-floating">
+                            Create Account
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
         <!-- ================= HOME VIEW ================= -->
         <section id="view-home" class="view-section active">
             
@@ -484,10 +548,24 @@
                             
                             <div class="space-y-4 mb-6" id="chkOrderItems"></div>
 
+                            <!-- DISCOUNT COUPON SECTION -->
+                            <div class="border-t border-b border-white/20 py-6 mb-6">
+                                <label class="block text-xs font-bold text-white/70 uppercase tracking-widest mb-3">Discount Coupon</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="chkCouponCode" placeholder="Enter Code" class="flex-1 bg-white/10 border border-white/20 rounded-xl py-3 px-4 text-sm text-white focus:ring-2 focus:ring-white outline-none transition uppercase">
+                                    <button type="button" onclick="applyCoupon()" class="bg-white text-brand-900 px-6 py-3 rounded-xl font-bold text-sm hover:bg-gray-200 transition">Apply</button>
+                                </div>
+                                <div id="couponMsg" class="text-xs mt-2 hidden font-medium"></div>
+                            </div>
+
                             <div class="space-y-4 border-b border-white/20 pb-6 mb-6 text-sm font-medium">
                                 <div class="flex justify-between text-white/70">
                                     <span>Subtotal</span>
                                     <span id="chkSubtotal">₹0</span>
+                                </div>
+                                <div id="discountRow" class="flex justify-between text-accent-red font-bold hidden">
+                                    <span>Discount applied</span>
+                                    <span id="chkDiscountAmt">-₹0</span>
                                 </div>
                                 <div class="flex justify-between text-white/70">
                                     <span>Shipping</span>
@@ -689,7 +767,8 @@
     <!-- ================= LOGIC & REALTIME DATABASE SYNC ================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getDatabase, ref, push, set, serverTimestamp, onValue, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getDatabase, ref, push, set, update, serverTimestamp, onValue, query, orderByChild, equalTo, get, child } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBHftpk6Z-JtHsK3PV-jbNH-klNvoqODLA",
@@ -701,23 +780,38 @@
             appId: "1:71002380705:web:baf1fbb8fe77ff91e6d3e0"
         };
         
-        let app, db;
+        let app, db, auth;
+
+        // Safe JSON Parse added to stop app crash on bad local storage
+        const getLocalStorageSafe = (key, defaultValue) => {
+            try {
+                const item = localStorage.getItem(key);
+                return item ? JSON.parse(item) : defaultValue;
+            } catch (e) {
+                return defaultValue;
+            }
+        };
         
         window.AppState = {
-            cart: JSON.parse(localStorage.getItem('tbk_cart') || '[]'),
-            wishlist: JSON.parse(localStorage.getItem('tbk_wishlist') || '[]'),
+            currentUser: null,
+            redirectAfterLogin: null,
+            cart: getLocalStorageSafe('tbk_cart', []),
+            wishlist: getLocalStorageSafe('tbk_wishlist', []),
             products: [],
             categories: [], 
             banners: [],
             currentProductView: null,
-            settings: { paymentQR: '' }
+            settings: { paymentQR: '' },
+            appliedCoupon: null 
         };
 
         let currentOrderTrackerUnsubscribe = null;
         let bannerInterval = null;
         let currentBannerIndex = 0;
 
-        window.formatPrice = (price) => `₹${Number(price).toLocaleString('en-IN')}`;
+        // Made formatPrice safe across the entire module scope
+        const formatPrice = (price) => `₹${Number(price).toLocaleString('en-IN')}`;
+        window.formatPrice = formatPrice;
         
         let toastTimer = null;
         window.showToast = (message, type = 'success') => {
@@ -764,7 +858,6 @@
             }
         };
 
-        // --- NEW SELLING STRATEGY COMPONENT ---
         window.getRecommendationsHtml = (context) => {
             if (AppState.products.length === 0) return '';
             
@@ -794,7 +887,6 @@
             </div>`;
         };
 
-        // --- BANNERS SLIDER LOGIC ---
         window.renderBanners = () => {
             const container = document.getElementById('bannerSlidesContainer');
             const indicators = document.getElementById('bannerIndicators');
@@ -882,13 +974,14 @@
         const updateCurrentView = () => {
             let hash = window.location.hash.replace('#', '') || 'home';
             const [path, queryStr] = hash.split('?');
+            
             if(path === 'home') renderHome();
             else if(path === 'shop') renderShop(queryStr);
             else if(path === 'product') renderProduct(queryStr);
             else if(path === 'wishlist') renderWishlist();
+            else if(path === 'checkout') renderCheckout();
         };
 
-        // --- RTDB REAL-TIME LISTENERS ---
         const setupRealtimeDatabase = () => {
             try {
                 document.getElementById('loadingHomeProducts').classList.remove('hidden');
@@ -926,12 +1019,13 @@
                             brand: data.brand || "Khodal",
                             price: Number(data.price),
                             salePrice: data.salePrice ? Number(data.salePrice) : null,
+                            stock: data.stock,
                             rating: data.rating || 4.5,
                             reviews: data.reviewCount || Math.floor(Math.random() * 500) + 10,
                             category: data.category || 'tshirts',
                             tags: data.tags || [],
                             images: processedImages,
-                            image: processedImages.length > 0 ? processedImages[0] : '', // Main thumbnail
+                            image: processedImages.length > 0 ? processedImages[0] : '', 
                             description: data.description !== undefined ? data.description : "",
                             material: data.material !== undefined ? data.material : "",
                             fit: data.fit || "Standard Fit",
@@ -958,9 +1052,138 @@
             }
         };
 
+        window.switchUserAuthTab = (tab) => {
+            document.getElementById('userLoginForm').classList.toggle('hidden', tab !== 'login');
+            document.getElementById('userRegisterForm').classList.toggle('hidden', tab !== 'register');
+            document.getElementById('btnTabLogin').className = `flex-1 font-bold pb-2 transition uppercase tracking-wider text-sm ${tab === 'login' ? 'text-brand-900 border-b-2 border-brand-900' : 'text-gray-400 hover:text-gray-600'}`;
+            document.getElementById('btnTabRegister').className = `flex-1 font-bold pb-2 transition uppercase tracking-wider text-sm ${tab === 'register' ? 'text-brand-900 border-b-2 border-brand-900' : 'text-gray-400 hover:text-gray-600'}`;
+        };
+
+        window.userGoogleSignIn = async () => {
+            const provider = new GoogleAuthProvider();
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                
+                const snapshot = await get(child(ref(db), `users/${user.uid}`));
+                if (!snapshot.exists()) {
+                    await set(ref(db, `users/${user.uid}`), {
+                        name: user.displayName || 'Customer',
+                        email: user.email,
+                        role: 'user',
+                        createdAt: serverTimestamp()
+                    });
+                }
+                showToast('Logged in successfully!');
+                
+                if (AppState.redirectAfterLogin) {
+                    navigate(AppState.redirectAfterLogin);
+                    AppState.redirectAfterLogin = null;
+                } else {
+                    navigate('home');
+                }
+            } catch (error) { showToast(error.message, 'error'); }
+        };
+
+        window.userEmailLogin = async () => {
+            const btn = document.getElementById('uLoginBtn');
+            const originalText = btn.innerText;
+            btn.innerHTML = `<div class="loader mx-auto border-white border-t-transparent w-4 h-4"></div>`;
+            btn.disabled = true;
+            try {
+                await signInWithEmailAndPassword(auth, document.getElementById('uLoginEmail').value, document.getElementById('uLoginPassword').value);
+                showToast('Welcome back!');
+                if (AppState.redirectAfterLogin) {
+                    navigate(AppState.redirectAfterLogin);
+                    AppState.redirectAfterLogin = null;
+                } else {
+                    navigate('home');
+                }
+            } catch (error) { showToast("Invalid email or password", 'error'); }
+            finally { btn.innerText = originalText; btn.disabled = false; }
+        };
+
+        window.userEmailRegister = async () => {
+            const btn = document.getElementById('uRegBtn');
+            const originalText = btn.innerText;
+            btn.innerHTML = `<div class="loader mx-auto border-white border-t-transparent w-4 h-4"></div>`;
+            btn.disabled = true;
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, document.getElementById('uRegEmail').value, document.getElementById('uRegPassword').value);
+                const uid = userCredential.user.uid;
+                await set(ref(db, `users/${uid}`), {
+                    name: document.getElementById('uRegName').value,
+                    email: document.getElementById('uRegEmail').value,
+                    role: 'user',
+                    createdAt: serverTimestamp()
+                });
+                showToast('Account created successfully!');
+                if (AppState.redirectAfterLogin) {
+                    navigate(AppState.redirectAfterLogin);
+                    AppState.redirectAfterLogin = null;
+                } else {
+                    navigate('home');
+                }
+            } catch (error) { showToast(error.message, 'error'); }
+            finally { btn.innerText = originalText; btn.disabled = false; }
+        };
+
+        window.userLogout = async () => {
+            await signOut(auth);
+            showToast('Logged out');
+            navigate('home');
+        };
+
+        window.handleAuthClick = () => {
+            if (AppState.currentUser) {
+                if(confirm("Do you want to logout?")) {
+                    userLogout();
+                }
+            } else {
+                navigate('auth');
+            }
+        };
+
         try {
             app = initializeApp(firebaseConfig);
             db = getDatabase(app);
+            auth = getAuth(app);
+
+            onAuthStateChanged(auth, (user) => {
+                AppState.currentUser = user;
+                
+                const authIcon = document.getElementById('authIconBtn');
+                const sidebarAuthArea = document.getElementById('sidebarAuthArea');
+                
+                if (user) {
+                    authIcon.innerHTML = `<i class="fa-solid fa-user-check text-[20px] text-green-500"></i>`;
+                    sidebarAuthArea.innerHTML = `
+                        <div class="flex items-center gap-3 bg-brand-50 p-4 rounded-xl mb-4">
+                            <div class="w-10 h-10 bg-brand-900 text-white flex items-center justify-center rounded-full font-bold">
+                                ${user.email.charAt(0).toUpperCase()}
+                            </div>
+                            <div class="flex-1 overflow-hidden">
+                                <p class="text-xs font-bold text-brand-900 uppercase tracking-widest truncate">${user.displayName || 'Customer'}</p>
+                                <p class="text-[10px] text-gray-500 truncate">${user.email}</p>
+                            </div>
+                        </div>
+                        <button onclick="userLogout(); toggleSidebar()" class="w-full bg-white border border-gray-200 text-brand-900 py-3 rounded-xl font-bold uppercase tracking-wider text-xs hover:bg-gray-50 transition">Log Out</button>
+                    `;
+
+                    if (window.location.hash.includes('auth')) {
+                        if (AppState.redirectAfterLogin) {
+                            navigate(AppState.redirectAfterLogin);
+                            AppState.redirectAfterLogin = null;
+                        } else {
+                            navigate('home');
+                        }
+                    }
+                } else {
+                    authIcon.innerHTML = `<i class="fa-regular fa-user text-[20px]"></i>`;
+                    sidebarAuthArea.innerHTML = `<button onclick="navigate('auth'); toggleSidebar()" class="w-full bg-brand-900 text-white py-3 rounded-xl font-bold uppercase tracking-wider text-xs hover:bg-gray-800 transition shadow-sm">Login / Sign Up</button>`;
+                }
+            });
+
             checkAffiliateReferral();
             setupRealtimeDatabase();
         } catch(e) {
@@ -999,38 +1222,60 @@
         };
 
         const handleRoute = () => {
-            let hash = window.location.hash.replace('#', '') || 'home';
-            const [path, queryStr] = hash.split('?');
-            
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            try {
+                let hash = window.location.hash.replace('#', '') || 'home';
+                const [path, queryStr] = hash.split('?');
+                
+                const protectedRoutes = ['checkout', 'track', 'wishlist'];
+                if (protectedRoutes.includes(path) && !AppState.currentUser) {
+                    AppState.redirectAfterLogin = hash;
+                    showToast("Please Login to access this page", "error");
+                    window.location.hash = 'auth';
+                    return;
+                }
 
-            const mainHeader = document.getElementById('mainHeader');
-            const pdpBottomBar = document.getElementById('pdpBottomBar');
+                document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            if(path === 'checkout') mainHeader.classList.add('hidden');
-            else mainHeader.classList.remove('hidden');
+                const mainHeader = document.getElementById('mainHeader');
+                const pdpBottomBar = document.getElementById('pdpBottomBar');
 
-            if(path === 'product') pdpBottomBar.classList.replace('hidden', 'flex');
-            else pdpBottomBar.classList.replace('flex', 'hidden');
+                if(mainHeader) {
+                    if(path === 'checkout') mainHeader.classList.add('hidden');
+                    else mainHeader.classList.remove('hidden');
+                }
 
-            const viewElement = document.getElementById(`view-${path}`);
-            if(viewElement) {
-                viewElement.classList.add('active');
-            } else {
-                document.getElementById('view-home').classList.add('active');
-            }
+                // Crash Fix: Removed classList.replace() entirely to support older mobile webviews
+                if(pdpBottomBar) {
+                    if(path === 'product') {
+                        pdpBottomBar.classList.remove('hidden');
+                        pdpBottomBar.classList.add('flex');
+                    } else {
+                        pdpBottomBar.classList.remove('flex');
+                        pdpBottomBar.classList.add('hidden');
+                    }
+                }
 
-            if(path === 'home') renderHome();
-            if(path === 'shop') renderShop(queryStr);
-            if(path === 'product') renderProduct(queryStr);
-            if(path === 'checkout') renderCheckout();
-            if(path === 'wishlist') renderWishlist();
-            
-            if(path !== 'track' && currentOrderTrackerUnsubscribe) {
-                currentOrderTrackerUnsubscribe();
-                currentOrderTrackerUnsubscribe = null;
-                document.getElementById('trackResults').innerHTML = '';
+                const viewElement = document.getElementById(`view-${path}`);
+                if(viewElement) {
+                    viewElement.classList.add('active');
+                } else {
+                    document.getElementById('view-home').classList.add('active');
+                }
+
+                if(path === 'home') renderHome();
+                else if(path === 'shop') renderShop(queryStr);
+                else if(path === 'product') renderProduct(queryStr);
+                else if(path === 'checkout') renderCheckout();
+                else if(path === 'wishlist') renderWishlist();
+                
+                if(path !== 'track' && currentOrderTrackerUnsubscribe) {
+                    currentOrderTrackerUnsubscribe();
+                    currentOrderTrackerUnsubscribe = null;
+                    document.getElementById('trackResults').innerHTML = '';
+                }
+            } catch (err) {
+                console.error("Routing Error:", err);
             }
         };
 
@@ -1103,8 +1348,11 @@
             const size = (p.sizes && p.sizes.length > 0) ? p.sizes[0] : 'Free Size';
             const existing = AppState.cart.find(item => item.id === p.id && item.size === size);
             
-            if(existing) existing.qty += 1;
-            else AppState.cart.push({ id: p.id, name: p.name, price: p.salePrice || p.price, image: p.image, size: size, qty: 1 });
+            if(existing) {
+                existing.qty += 1;
+            } else {
+                AppState.cart.push({ id: p.id, name: p.name, price: p.salePrice || p.price, image: p.image, size: size, qty: 1, maxStock: p.stock });
+            }
             
             saveCart();
             showToast('Added to Cart');
@@ -1187,6 +1435,23 @@
 
             document.getElementById('pdpStickyPrice').innerText = formatPrice(activePrice);
 
+            let stockUI = '';
+            if (product.stock !== undefined && product.stock !== "" && Number(product.stock) >= 0) {
+                stockUI = `
+                <div class="bg-red-50 border border-red-200 text-accent-red px-4 py-3 rounded-xl flex items-center justify-between mb-6 shadow-sm overflow-hidden relative">
+                    <div class="absolute top-0 left-0 h-full bg-red-100/50 w-full animate-pulse z-0"></div>
+                    <div class="flex items-center gap-3 relative z-10">
+                        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
+                            <i class="fa-solid fa-fire text-lg"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-widest text-red-800">Limited Drop Alert</p>
+                            <p class="font-bold text-sm">Only ${product.stock} items left in stock!</p>
+                        </div>
+                    </div>
+                </div>`;
+            }
+
             const html = `
                 <div class="flex flex-col lg:flex-row gap-8 lg:gap-16">
                     <div class="w-full lg:w-[55%]">
@@ -1212,7 +1477,7 @@
                                 
                                 <div id="pdpThumbContainer" class="flex gap-3 overflow-x-auto hide-scrollbar snap-x w-full scroll-smooth py-2 px-1">
                                     ${product.images.map((img, i) => `
-                                        <img src="${img}" onclick="document.getElementById('mainImg-${i}').scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'}); document.querySelectorAll('.pdp-thumb').forEach(el=>el.classList.replace('border-brand-900', 'border-transparent')); this.classList.replace('border-transparent', 'border-brand-900');" class="w-20 h-24 lg:w-24 lg:h-28 object-cover rounded-xl cursor-pointer border-2 ${i===0 ? 'border-brand-900' : 'border-transparent'} hover:border-brand-900 transition-colors snap-start shrink-0 pdp-thumb bg-brand-50 shadow-sm">
+                                        <img src="${img}" onclick="document.getElementById('mainImg-${i}').scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'}); document.querySelectorAll('.pdp-thumb').forEach(el=>{el.classList.remove('border-brand-900'); el.classList.add('border-transparent');}); this.classList.remove('border-transparent'); this.classList.add('border-brand-900');" class="w-20 h-24 lg:w-24 lg:h-28 object-cover rounded-xl cursor-pointer border-2 ${i===0 ? 'border-brand-900' : 'border-transparent'} hover:border-brand-900 transition-colors snap-start shrink-0 pdp-thumb bg-brand-50 shadow-sm">
                                     `).join('')}
                                 </div>
                                 
@@ -1223,6 +1488,9 @@
                     </div>
 
                     <div class="w-full lg:w-[45%] px-5 lg:px-0 py-4 lg:py-10">
+                        
+                        ${stockUI}
+
                         <div class="flex items-center justify-between mb-4">
                             <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Khodal Official</div>
                             <div class="flex items-center gap-1 text-xs font-bold text-brand-900 bg-brand-50 px-2 py-1 rounded">
@@ -1239,6 +1507,23 @@
                                 <span class="text-accent-red font-bold text-xs uppercase tracking-widest bg-red-50 px-2 py-1 rounded mb-1">Save ${discount}%</span>
                             ` : ''}
                         </div>
+
+                        <!-- NEW AFFILIATE ANNOUNCEMENT BAR -->
+                        <a href="affiliate.html" class="flex items-center justify-between bg-gradient-to-r from-brand-900 to-gray-800 text-white p-4 rounded-2xl mb-8 hover:shadow-lg transition-shadow cursor-pointer group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-accent-red group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-handshake"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold uppercase tracking-wider">Join Our Affiliate Program</h4>
+                                    <p class="text-[10px] text-gray-300 uppercase tracking-widest mt-0.5">And Earn 10% Flat Commission</p>
+                                </div>
+                            </div>
+                            <div class="text-white/50 group-hover:text-white group-hover:translate-x-1 transition-all">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </div>
+                        </a>
+                        <!-- END AFFILIATE BAR -->
 
                         <p class="text-sm lg:text-base text-gray-600 font-medium leading-relaxed mb-8 whitespace-pre-line">${product.description || 'No description provided.'}</p>
 
@@ -1355,8 +1640,12 @@
             const size = sizeEl ? sizeEl.innerText : (p.sizes && p.sizes.length > 0 ? p.sizes[0] : 'Free Size');
             
             const existing = AppState.cart.find(item => item.id === p.id && item.size === size);
-            if(existing) existing.qty += 1;
-            else AppState.cart.push({ id: p.id, name: p.name, price: p.salePrice || p.price, image: p.image, size: size, qty: 1 });
+            
+            if(existing) {
+                existing.qty += 1;
+            } else {
+                AppState.cart.push({ id: p.id, name: p.name, price: p.salePrice || p.price, image: p.image, size: size, qty: 1, maxStock: p.stock });
+            }
             
             saveCart();
             showToast('Added to Cart');
@@ -1369,15 +1658,21 @@
             }
         };
 
-        const updateCartQty = (index, delta) => {
-            AppState.cart[index].qty += delta;
-            if(AppState.cart[index].qty <= 0) AppState.cart.splice(index, 1);
+        window.updateCartQty = (index, delta) => {
+            const item = AppState.cart[index];
+            const newQty = item.qty + delta;
+            
+            if(delta > 0 && item.maxStock !== undefined && item.maxStock !== "" && newQty > Number(item.maxStock)) {
+                return showToast(`Only ${item.maxStock} left in stock!`, 'error');
+            }
+            
+            item.qty = newQty;
+            if(item.qty <= 0) AppState.cart.splice(index, 1);
             saveCart();
             renderCartUI();
             
             if(window.location.hash.includes('checkout')) renderCheckout();
         };
-        window.updateCartQty = updateCartQty; 
 
         const saveCart = () => {
             localStorage.setItem('tbk_cart', JSON.stringify(AppState.cart));
@@ -1428,7 +1723,6 @@
                 </div>`;
             }).join('');
             
-            // Add Selling Strategy (Cross-sell) at the end of the cart items
             container.innerHTML = cartItemsHtml + `<div class="border-t border-gray-100 pt-2 mt-4">` + window.getRecommendationsHtml('cart') + `</div>`;
             document.getElementById('cartTotal').innerText = formatPrice(total);
         };
@@ -1449,18 +1743,74 @@
             const utrInput = document.getElementById('chkUtr');
 
             if(method === 'ONLINE') {
-                codLabel.className = "flex items-center p-5 bg-white border-2 border-gray-200 rounded-2xl cursor-pointer transition";
-                onlineLabel.className = "flex items-center p-5 bg-brand-50 border-2 border-brand-900 rounded-2xl cursor-pointer transition";
+                codLabel.classList.remove('bg-brand-50', 'border-brand-900');
+                codLabel.classList.add('bg-white', 'border-gray-200');
+                
+                onlineLabel.classList.remove('bg-white', 'border-gray-200');
+                onlineLabel.classList.add('bg-brand-50', 'border-brand-900');
+                
                 onlineBox.classList.remove('hidden');
                 utrInput.setAttribute('required', 'required');
 
                 const qrImg = document.getElementById('qrCodeImage');
                 if(qrImg && AppState.settings.paymentQR) qrImg.src = AppState.settings.paymentQR;
             } else {
-                codLabel.className = "flex items-center p-5 bg-brand-50 border-2 border-brand-900 rounded-2xl cursor-pointer transition";
-                onlineLabel.className = "flex items-center p-5 bg-white border-2 border-gray-200 rounded-2xl cursor-pointer transition";
+                codLabel.classList.remove('bg-white', 'border-gray-200');
+                codLabel.classList.add('bg-brand-50', 'border-brand-900');
+                
+                onlineLabel.classList.remove('bg-brand-50', 'border-brand-900');
+                onlineLabel.classList.add('bg-white', 'border-gray-200');
+                
                 onlineBox.classList.add('hidden');
                 utrInput.removeAttribute('required');
+            }
+        };
+
+        window.applyCoupon = async () => {
+            const input = document.getElementById('chkCouponCode');
+            const code = input.value.trim().toUpperCase();
+            const msgEl = document.getElementById('couponMsg');
+
+            if(!code) {
+                AppState.appliedCoupon = null;
+                renderCheckout();
+                msgEl.innerText = "";
+                msgEl.classList.add('hidden');
+                return;
+            }
+
+            msgEl.innerText = "Verifying...";
+            msgEl.classList.remove('hidden', 'text-green-400', 'text-red-400');
+            msgEl.classList.add('text-gray-500');
+
+            try {
+                const couponsRef = query(ref(db, "coupons"), orderByChild("code"), equalTo(code));
+                const snapshot = await get(couponsRef);
+                
+                if (snapshot.exists()) {
+                    let couponData;
+                    snapshot.forEach(c => { couponData = c.val(); });
+
+                    AppState.appliedCoupon = {
+                        code: code,
+                        discountPercent: couponData.discountPercent || 0,
+                        affiliateId: couponData.affiliateId
+                    };
+                    msgEl.innerText = `Success! ${couponData.discountPercent}% Discount Applied.`;
+                    msgEl.classList.remove('text-gray-500', 'text-red-400');
+                    msgEl.classList.add('text-green-400');
+                    renderCheckout();
+                } else {
+                    AppState.appliedCoupon = null;
+                    renderCheckout();
+                    msgEl.innerText = "Invalid or expired coupon code.";
+                    msgEl.classList.remove('text-gray-500', 'text-green-400');
+                    msgEl.classList.add('text-red-400');
+                }
+            } catch(e) {
+                msgEl.innerText = "Error applying coupon.";
+                msgEl.classList.remove('text-gray-500', 'text-green-400');
+                msgEl.classList.add('text-red-400');
             }
         };
 
@@ -1470,10 +1820,22 @@
                 return;
             }
 
-            const total = AppState.cart.reduce((s, i) => s + (i.price * i.qty), 0);
-            document.getElementById('chkSubtotal').innerText = formatPrice(total);
-            document.getElementById('chkTotal').innerText = formatPrice(total);
-            document.getElementById('qrAmount').innerText = formatPrice(total);
+            let subtotal = AppState.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+            let discountAmount = 0;
+
+            if (AppState.appliedCoupon) {
+                discountAmount = (subtotal * AppState.appliedCoupon.discountPercent) / 100;
+                document.getElementById('chkDiscountAmt').innerText = `- ${formatPrice(discountAmount)}`;
+                document.getElementById('discountRow').classList.remove('hidden');
+            } else {
+                document.getElementById('discountRow').classList.add('hidden');
+            }
+
+            let finalTotal = subtotal - discountAmount;
+
+            document.getElementById('chkSubtotal').innerText = formatPrice(subtotal);
+            document.getElementById('chkTotal').innerText = formatPrice(finalTotal);
+            document.getElementById('qrAmount').innerText = formatPrice(finalTotal);
 
             window.selectPaymentMethod('COD');
 
@@ -1494,7 +1856,6 @@
             `).join('');
             document.getElementById('chkOrderItems').innerHTML = itemsHtml;
 
-            // Render Selling Strategy in Checkout
             document.getElementById('checkoutRecommendations').innerHTML = window.getRecommendationsHtml('checkout');
         };
 
@@ -1507,15 +1868,20 @@
             btn.innerHTML = `<div class="loader border-brand-900 border-t-transparent mx-auto"></div>`;
             btn.disabled = true;
             
-            const orderTotal = AppState.cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+            const subtotal = AppState.cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+            let discount = 0;
+            if (AppState.appliedCoupon) {
+                discount = (subtotal * AppState.appliedCoupon.discountPercent) / 100;
+            }
+            const orderTotal = subtotal - discount;
             
-            const prefix = "KHO"; // Khodal Prefix
+            const prefix = "KHO"; 
             const year = new Date().getFullYear();
             const randomCode = Math.floor(100000 + Math.random() * 900000);
             const orderId = `${prefix}-${year}-${randomCode}`;
             
             const mobile = document.getElementById('chkMobile').value;
-            const affiliateCode = localStorage.getItem('pod_affiliate_ref');
+            const affiliateCode = AppState.appliedCoupon ? AppState.appliedCoupon.affiliateId : localStorage.getItem('pod_affiliate_ref');
 
             const selectedPaymentMethod = document.getElementById('payONLINE').checked ? 'ONLINE' : 'COD';
             const utrNumber = selectedPaymentMethod === 'ONLINE' ? document.getElementById('chkUtr').value.trim() : null;
@@ -1545,9 +1911,10 @@
                 state: state,
                 address: [addressLine1, addressLine2, city, state, pincode].filter(Boolean).join(', '),
                 products: AppState.cart,
-                subtotal: orderTotal,
+                subtotal: subtotal,
                 shippingCharge: 0,
-                discount: 0,
+                discount: discount,
+                appliedCoupon: AppState.appliedCoupon ? AppState.appliedCoupon.code : null,
                 totalAmount: orderTotal,
                 paymentMethod: selectedPaymentMethod,
                 utrNumber: utrNumber,
@@ -1566,9 +1933,17 @@
                         createdAt: serverTimestamp(),
                         updatedAt: serverTimestamp()
                     });
+
+                    for (let item of AppState.cart) {
+                        if (item.maxStock !== undefined && item.maxStock !== "") {
+                            let newStock = Number(item.maxStock) - item.qty;
+                            await update(ref(db, `products/${item.id}`), { stock: newStock > 0 ? newStock : 0 });
+                        }
+                    }
                 }
                 
                 AppState.cart = [];
+                AppState.appliedCoupon = null;
                 saveCart();
                 btn.innerHTML = originalText;
                 btn.disabled = false;
@@ -1583,6 +1958,9 @@
                 document.getElementById('chkCity').value = '';
                 document.getElementById('chkState').value = '';
                 document.getElementById('chkUtr').value = '';
+                document.getElementById('chkCouponCode').value = '';
+                document.getElementById('couponMsg').classList.add('hidden');
+                
                 window.selectPaymentMethod('COD');
                 
                 navigate('home');
