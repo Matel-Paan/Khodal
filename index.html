@@ -46,7 +46,11 @@
     </script>
 
     <style>
-        body { -webkit-tap-highlight-color: transparent; }
+        html, body { 
+            -webkit-tap-highlight-color: transparent; 
+            overflow-x: hidden; 
+            width: 100%;
+        }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
@@ -87,6 +91,13 @@
         .policy-content p { color: #525252; margin-bottom: 1rem; line-height: 1.6; }
         .policy-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; color: #525252; }
         .policy-content li { margin-bottom: 0.5rem; }
+
+        /* Timer Pulse Animation */
+        @keyframes pulse-red {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .timer-pulse { animation: pulse-red 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
     </style>
 </head>
 <body class="bg-white text-brand-900 font-sans antialiased flex flex-col min-h-screen selection:bg-brand-900 selection:text-white">
@@ -135,17 +146,31 @@
     </header>
 
     <!-- MOBILE SIDEBAR -->
-    <div id="sidebarMenu" class="fixed inset-y-0 left-0 w-[300px] bg-white z-[80] transform -translate-x-full transition-transform duration-400 ease-in-out shadow-2xl flex flex-col lg:hidden">
-        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white">
+    <div id="sidebarMenu" class="fixed inset-y-0 left-0 w-[300px] bg-white z-[80] transform -translate-x-full transition-transform duration-400 ease-in-out shadow-2xl flex flex-col overflow-hidden lg:hidden">
+        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-white shrink-0">
             <div class="font-display font-bold text-xl tracking-tighter">KHODAL<span class="text-accent-red">.</span></div>
             <button onclick="toggleSidebar()" class="text-gray-400 hover:text-brand-900 transition"><i class="fa-solid fa-xmark text-2xl"></i></button>
         </div>
-        <div class="flex-1 overflow-y-auto py-6 px-4">
-            <nav class="space-y-2">
+        <div class="flex-1 overflow-y-auto hide-scrollbar">
+            <nav class="space-y-1 p-4">
                 <a href="#home" onclick="toggleSidebar()" class="block px-4 py-3 text-lg font-semibold text-brand-900 hover:bg-gray-50 rounded-xl transition">Home</a>
                 <a href="#shop" onclick="toggleSidebar()" class="block px-4 py-3 text-lg font-semibold text-brand-900 hover:bg-gray-50 rounded-xl transition">All Products</a>
                 <a href="#about" onclick="toggleSidebar()" class="block px-4 py-3 text-lg font-semibold text-brand-900 hover:bg-gray-50 rounded-xl transition">About Us</a>
+                
+                <!-- Authentication Links styled like main menu -->
+                <div id="sidebarAuthGuest">
+                    <a href="#auth" onclick="toggleSidebar()" class="block px-4 py-3 text-lg font-semibold text-brand-900 hover:bg-gray-50 rounded-xl transition">Sign In / Register</a>
+                </div>
+                <div id="sidebarAuthUser" class="hidden">
+                    <a href="#profile" onclick="toggleSidebar()" class="block px-4 py-3 text-lg font-semibold text-brand-900 hover:bg-gray-50 rounded-xl transition">My Profile</a>
+                    <a href="#rewards" onclick="toggleSidebar()" class="flex items-center justify-between px-4 py-3 text-lg font-semibold text-brand-900 hover:bg-gray-50 rounded-xl transition">
+                        <span>Khodal Missions</span>
+                        <span class="bg-accent-red text-white py-0.5 px-2 rounded text-[10px] font-bold uppercase tracking-widest"><i class="fa-solid fa-gift"></i> Rewards</span>
+                    </a>
+                </div>
+                
                 <div class="h-px bg-gray-100 my-4 mx-4"></div>
+
                 <a href="#wishlist" onclick="toggleSidebar()" class="flex items-center justify-between px-4 py-3 text-base font-medium text-gray-600 hover:bg-gray-50 rounded-xl transition">
                     <span>Wishlist</span>
                     <span id="sidebarWishlistCount" class="bg-gray-100 text-brand-900 py-0.5 px-2.5 rounded-full text-xs font-bold hidden">0</span>
@@ -157,10 +182,10 @@
                     <span>Contact Support</span>
                 </a>
             </nav>
-            <!-- SELLING STRATEGY: SIDEBAR RECOMMENDATIONS -->
-            <div id="sidebarRecommendations" class="px-4 pb-2 border-t border-gray-100 pt-4 mt-4"></div>
+
+            <div id="sidebarRecommendations" class="px-4 pb-4 mt-2"></div>
         </div>
-        <div class="p-6 bg-gray-50">
+        <div class="p-6 bg-white border-t border-gray-100 shrink-0">
             <a href="#track" onclick="toggleSidebar()" class="w-full bg-brand-900 text-white text-center py-3.5 rounded-xl font-bold flex justify-center items-center gap-2 shadow-soft">
                 <i class="fa-solid fa-truck-fast"></i> Track My Order
             </a>
@@ -173,17 +198,14 @@
         
         <!-- ================= HOME VIEW ================= -->
         <section id="view-home" class="view-section active">
-            
             <!-- DYNAMIC BANNERS CAROUSEL -->
             <div id="homeBannerSlider" class="relative w-full h-[50vh] md:h-[60vh] lg:h-[80vh] bg-brand-900 overflow-hidden group">
                 <div id="bannerSlidesContainer" class="flex transition-transform duration-500 ease-in-out h-full w-full">
-                    <!-- Loading State -->
                     <div class="w-full flex-shrink-0 h-full flex items-center justify-center text-white/50 bg-gray-100">
                         <div class="loader border-gray-300 border-t-brand-900"></div>
                     </div>
                 </div>
                 
-                <!-- Slider Controls -->
                 <button onclick="prevBanner()" class="absolute left-2 lg:left-8 top-1/2 -translate-y-1/2 w-10 h-10 lg:w-14 lg:h-14 bg-white/40 hover:bg-white/70 backdrop-blur-md text-brand-900 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20">
                     <i class="fa-solid fa-chevron-left lg:text-xl"></i>
                 </button>
@@ -191,7 +213,6 @@
                     <i class="fa-solid fa-chevron-right lg:text-xl"></i>
                 </button>
                 
-                <!-- Indicators -->
                 <div id="bannerIndicators" class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20"></div>
             </div>
 
@@ -286,6 +307,250 @@
                     </div>
                 </div>
             </footer>
+        </section>
+
+        <!-- ================= AUTH VIEW ================= -->
+        <section id="view-auth" class="view-section bg-brand-50/50">
+            <div class="max-w-md mx-auto w-full px-5 py-12 lg:py-20 flex-1 flex flex-col justify-center">
+                <div class="bg-white p-8 rounded-3xl shadow-soft border border-gray-100 text-center">
+                    <h1 class="font-display text-3xl font-bold text-brand-900 uppercase tracking-tight mb-2">Welcome</h1>
+                    <p class="text-gray-500 mb-8 font-medium text-sm">Sign in or register to continue</p>
+
+                    <button onclick="signInWithGoogle()" class="w-full bg-white border border-gray-200 text-brand-900 py-3.5 rounded-xl font-bold text-sm tracking-wider shadow-sm hover:bg-gray-50 transition flex justify-center items-center gap-3 mb-6">
+                        <svg viewBox="0 0 24 24" class="w-5 h-5">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Continue with Google
+                    </button>
+
+                    <div class="relative flex py-2 items-center mb-6">
+                        <div class="flex-grow border-t border-gray-200"></div>
+                        <span class="flex-shrink-0 mx-4 text-gray-400 text-[10px] font-bold uppercase tracking-widest">Or email</span>
+                        <div class="flex-grow border-t border-gray-200"></div>
+                    </div>
+
+                    <form id="authForm" onsubmit="event.preventDefault(); handleEmailAuth();" class="space-y-4 text-left">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Email Address</label>
+                            <input type="email" id="authEmail" required placeholder="you@example.com" class="w-full bg-brand-50 border border-gray-200 rounded-xl py-3.5 px-4 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Password</label>
+                            <input type="password" id="authPassword" required placeholder="••••••••" class="w-full bg-brand-50 border border-gray-200 rounded-xl py-3.5 px-4 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
+                        </div>
+                        <button type="submit" id="btnEmailAuth" class="w-full bg-brand-900 text-white py-4 rounded-xl font-bold text-sm tracking-wider uppercase shadow-floating hover:bg-gray-800 transition">
+                            Sign In / Sign Up
+                        </button>
+                        <p class="text-xs text-gray-400 text-center mt-4">If you don't have an account, one will be created automatically.</p>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PROFILE VIEW ================= -->
+        <section id="view-profile" class="view-section bg-brand-50/50">
+            <div class="max-w-2xl mx-auto w-full px-5 py-8 lg:py-16 flex-1">
+                <div class="flex items-center gap-4 mb-10">
+                    <button onclick="history.back()" class="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-brand-900 hover:bg-gray-50 transition">
+                        <i class="fa-solid fa-arrow-left text-sm"></i>
+                    </button>
+                    <h1 class="font-display text-3xl font-bold text-brand-900 uppercase tracking-tight">My Profile</h1>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <button onclick="navigate('profile')" class="bg-brand-900 text-white py-4 rounded-xl font-bold text-sm uppercase tracking-wider shadow-sm transition">Profile</button>
+                    <button onclick="navigate('rewards')" class="bg-white text-brand-900 border border-gray-200 py-4 rounded-xl font-bold text-sm uppercase tracking-wider hover:bg-gray-50 transition">Missions & Rewards</button>
+                </div>
+
+                <div class="bg-white p-8 lg:p-10 rounded-3xl shadow-soft border border-gray-100 mb-8">
+                    <form id="profilePageForm" class="space-y-6" onsubmit="event.preventDefault(); saveUserProfile();">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Full Name</label>
+                            <input type="text" id="profPageName" placeholder="Your Name" class="w-full bg-brand-50 border border-gray-200 rounded-xl py-4 px-5 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Mobile Number</label>
+                            <input type="tel" id="profPagePhone" placeholder="10-digit number" class="w-full bg-brand-50 border border-gray-200 rounded-xl py-4 px-5 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Shipping Address</label>
+                            <textarea id="profPageAddress" placeholder="Complete Address" rows="3" class="w-full bg-brand-50 border border-gray-200 rounded-xl py-4 px-5 text-sm font-medium focus:ring-2 focus:ring-brand-900 outline-none transition resize-none"></textarea>
+                        </div>
+                        <button type="submit" id="btnSaveProfilePage" class="w-full bg-brand-900 text-white py-4 rounded-xl font-bold text-sm tracking-wider uppercase shadow-floating hover:bg-gray-800 transition flex justify-center items-center gap-2 h-14">
+                            Save Details
+                        </button>
+                    </form>
+                </div>
+
+                <button onclick="requestLogout()" class="w-full bg-white border border-red-200 text-accent-red py-4 rounded-xl font-bold text-sm tracking-wider uppercase hover:bg-red-50 transition flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-power-off"></i> Log Out
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= REWARDS & MISSIONS VIEW (NEW) ================= -->
+        <section id="view-rewards" class="view-section bg-brand-50/50">
+            <div class="max-w-3xl mx-auto w-full px-5 py-8 lg:py-16 flex-1">
+                <div class="flex items-center gap-4 mb-8">
+                    <button onclick="history.back()" class="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-brand-900 hover:bg-gray-50 transition">
+                        <i class="fa-solid fa-arrow-left text-sm"></i>
+                    </button>
+                    <h1 class="font-display text-3xl font-bold text-brand-900 uppercase tracking-tight">Khodal Rewards</h1>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-10">
+                    <button onclick="navigate('profile')" class="bg-white text-brand-900 border border-gray-200 py-4 rounded-xl font-bold text-sm uppercase tracking-wider hover:bg-gray-50 transition">Profile</button>
+                    <button onclick="navigate('rewards')" class="bg-brand-900 text-white py-4 rounded-xl font-bold text-sm uppercase tracking-wider shadow-sm transition">Missions & Rewards</button>
+                </div>
+
+                <!-- Wallet Card -->
+                <div class="bg-gradient-to-br from-brand-900 to-gray-800 text-white rounded-3xl p-8 mb-10 shadow-floating relative overflow-hidden">
+                    <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                        <div>
+                            <p class="text-xs font-bold text-white/70 uppercase tracking-widest mb-2">Available Wallet Balance</p>
+                            <h2 class="font-display text-5xl font-bold tracking-tight" id="walletBalanceDisplay">₹0</h2>
+                            <p class="text-[10px] text-white/50 uppercase tracking-widest mt-2">Usable on eligible orders. Valid for 30 days.</p>
+                        </div>
+                        <div class="text-left md:text-right">
+                            <p class="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-2">Total Earned Potential</p>
+                            <p class="text-xl font-bold text-green-400">₹175</p>
+                        </div>
+                    </div>
+                    <div class="absolute -right-6 -bottom-6 opacity-10 text-9xl">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+                </div>
+
+                <!-- Missions List -->
+                <h3 class="font-display text-xl font-bold text-brand-900 uppercase tracking-tight mb-6">Missions (Earn Wallet Credit)</h3>
+                <div class="space-y-4 mb-12">
+                    
+                    <!-- Mission 1 -->
+                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-soft flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                        <div class="w-16 h-16 shrink-0 bg-brand-50 text-brand-900 rounded-2xl flex items-center justify-center text-2xl">
+                            <i class="fa-brands fa-instagram"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="font-bold text-brand-900 uppercase tracking-tight">Mission 01: Follow Khodal</h4>
+                                <span class="bg-green-50 text-green-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-widest">+₹25</span>
+                            </div>
+                            <p class="text-xs text-gray-500 font-medium mb-3">Follow us on Instagram and unlock ₹25 Wallet Credit.</p>
+                            <div id="mission1ActionArea">
+                                <button onclick="submitMissionClaim('FOLLOW', 'mission1ActionArea')" class="bg-brand-900 text-white px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition">
+                                    I Followed (Submit)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mission 2 -->
+                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-soft flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                        <div class="w-16 h-16 shrink-0 bg-brand-50 text-brand-900 rounded-2xl flex items-center justify-center text-2xl">
+                            <i class="fa-solid fa-camera"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="font-bold text-brand-900 uppercase tracking-tight">Mission 02: Wear & Share</h4>
+                                <span class="bg-green-50 text-green-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-widest">+₹50</span>
+                            </div>
+                            <p class="text-xs text-gray-500 font-medium mb-3">Post your Khodal look on Instagram & tag us. Submit URL below.</p>
+                            <div id="mission2ActionArea" class="flex flex-col sm:flex-row gap-3 w-full">
+                                <input type="url" id="ugcUrlInput" placeholder="Instagram Post URL" class="flex-1 bg-brand-50 border border-gray-200 rounded-lg px-4 py-2.5 text-xs outline-none focus:ring-1 focus:ring-brand-900">
+                                <button onclick="submitUgcClaim()" class="bg-brand-900 text-white px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition whitespace-nowrap">
+                                    Submit Link
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mission 3 -->
+                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-soft flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                        <div class="w-16 h-16 shrink-0 bg-brand-50 text-brand-900 rounded-2xl flex items-center justify-center text-2xl">
+                            <i class="fa-solid fa-box-open"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="font-bold text-brand-900 uppercase tracking-tight">Mission 03: First Order</h4>
+                                <span class="bg-green-50 text-green-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-widest">+₹100</span>
+                            </div>
+                            <p class="text-xs text-gray-500 font-medium mb-1">Place your first successful order to receive ₹100 Wallet Credit.</p>
+                            <div id="mission3ActionArea">
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest"><i class="fa-solid fa-clock mr-1"></i> Awaiting First Order</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Wallet Ledger -->
+                <h3 class="font-display text-xl font-bold text-brand-900 uppercase tracking-tight mb-4">Active Wallet Rewards</h3>
+                <div id="activeRewardsList" class="space-y-3 mb-10">
+                    <div class="text-center py-6 text-gray-500 text-sm font-medium bg-gray-50 rounded-2xl border border-gray-100">No active rewards found.</div>
+                </div>
+
+                <!-- Reward History (Expired / Used) -->
+                <h3 class="font-display text-xl font-bold text-brand-900 uppercase tracking-tight mb-4">Reward History</h3>
+                <div id="historyRewardsList" class="space-y-3">
+                    <div class="text-center py-6 text-gray-500 text-sm font-medium bg-gray-50 rounded-2xl border border-gray-100">No past rewards found.</div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= GIFT CARD REWARD REVEAL VIEW (NEW) ================= -->
+        <section id="view-gift-reward" class="view-section bg-brand-50/50">
+            <div class="max-w-md mx-auto w-full px-5 py-20 flex-1 flex flex-col justify-center text-center">
+                <div id="giftCardContainer" class="bg-white p-10 rounded-3xl shadow-floating border border-gray-100 relative overflow-hidden transition-all duration-500 transform">
+                    
+                    <div id="giftRevealState">
+                        <div class="w-20 h-20 bg-brand-900 text-white rounded-full flex items-center justify-center text-3xl mx-auto mb-6 shadow-lg animate-bounce">
+                            <i class="fa-solid fa-gift"></i>
+                        </div>
+                        <h2 class="font-display text-3xl font-bold text-brand-900 uppercase tracking-tight mb-3">You've Got a Gift!</h2>
+                        <p class="text-sm text-gray-500 font-medium mb-8">Thanks for your order. We have a surprise waiting for you.</p>
+                        
+                        <button onclick="revealGiftCard()" id="btnRevealGift" class="w-full bg-brand-900 text-white py-4 rounded-xl font-bold text-sm tracking-wider uppercase shadow-floating hover:bg-gray-800 transition flex justify-center items-center gap-2">
+                            Reveal My Reward
+                        </button>
+                    </div>
+
+                    <div id="giftSuccessState" class="hidden">
+                        <div class="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-6">
+                            <i class="fa-solid fa-face-smile-wink"></i>
+                        </div>
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">🎉 You Unlocked</p>
+                        <h2 class="font-display text-5xl font-bold text-brand-900 tracking-tight mb-2" id="giftRewardAmount">₹0</h2>
+                        <p class="text-sm text-brand-900 font-bold uppercase mb-8">Wallet Credit</p>
+                        
+                        <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-6 text-left">
+                            <ul class="text-xs text-gray-500 font-medium space-y-2">
+                                <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Valid for next 30 days</li>
+                                <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Added directly to Khodal Wallet</li>
+                                <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Usable on eligible orders</li>
+                            </ul>
+                        </div>
+
+                        <button onclick="navigate('rewards')" class="w-full bg-brand-900 text-white py-4 rounded-xl font-bold text-sm tracking-wider uppercase shadow-floating hover:bg-gray-800 transition">
+                            View My Wallet
+                        </button>
+                    </div>
+
+                    <div id="giftErrorState" class="hidden">
+                        <div class="w-20 h-20 bg-red-50 text-accent-red rounded-full flex items-center justify-center text-4xl mx-auto mb-6">
+                            <i class="fa-regular fa-face-frown"></i>
+                        </div>
+                        <h2 class="font-display text-2xl font-bold text-brand-900 uppercase tracking-tight mb-3">Invalid or Redeemed</h2>
+                        <p class="text-sm text-gray-500 font-medium mb-8">This gift card code is no longer valid or has already been used.</p>
+                        <button onclick="navigate('home')" class="w-full bg-white border border-gray-200 text-brand-900 py-4 rounded-xl font-bold text-sm tracking-wider uppercase shadow-sm hover:bg-gray-50 transition">
+                            Back to Home
+                        </button>
+                    </div>
+
+                </div>
+            </div>
         </section>
 
         <!-- ================= SHOP VIEW ================= -->
@@ -442,6 +707,23 @@
                             </div>
                         </div>
 
+                        <!-- KHODAL WALLET INTEGRATION -->
+                        <div class="bg-white p-6 lg:p-8 rounded-3xl border border-brand-900 shadow-soft" id="checkoutWalletBox">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-display text-xl font-bold text-brand-900 uppercase tracking-tight flex items-center gap-2">
+                                    <i class="fa-solid fa-wallet text-brand-900"></i> Khodal Wallet
+                                </h3>
+                                <span class="bg-green-50 text-green-600 text-xs font-bold px-2 py-1 rounded uppercase tracking-widest" id="chkWalletAvailable">₹0 Available</span>
+                            </div>
+                            <label class="flex items-center p-4 bg-gray-50 border border-gray-200 rounded-2xl cursor-pointer transition hover:bg-gray-100" id="walletApplyLabel">
+                                <input type="checkbox" id="chkUseWallet" class="w-5 h-5 accent-brand-900" onchange="calculateCheckoutTotals()">
+                                <div class="ml-4 flex-1 flex justify-between items-center">
+                                    <span class="block font-bold text-brand-900 text-sm uppercase tracking-wider">Apply Wallet Balance</span>
+                                    <span class="block text-sm font-bold text-accent-red" id="chkWalletAppliedAmount">-₹0</span>
+                                </div>
+                            </label>
+                        </div>
+
                         <div class="bg-white p-6 lg:p-8 rounded-3xl border border-gray-100 shadow-soft">
                             <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
                                 <h3 class="font-display text-xl font-bold text-brand-900 uppercase tracking-tight">Payment Method</h3>
@@ -474,7 +756,6 @@
                             </div>
                         </div>
                         
-                        <!-- SELLING STRATEGY: CHECKOUT RECOMMENDATIONS -->
                         <div id="checkoutRecommendations" class="mt-8"></div>
                     </div>
 
@@ -484,10 +765,14 @@
                             
                             <div class="space-y-4 mb-6" id="chkOrderItems"></div>
 
-                            <div class="space-y-4 border-b border-white/20 pb-6 mb-6 text-sm font-medium">
+                            <div class="space-y-3 border-b border-white/20 pb-6 mb-6 text-sm font-medium">
                                 <div class="flex justify-between text-white/70">
                                     <span>Subtotal</span>
                                     <span id="chkSubtotal">₹0</span>
+                                </div>
+                                <div class="flex justify-between text-accent-red font-bold hidden" id="chkWalletDiscountRow">
+                                    <span>Wallet Applied</span>
+                                    <span id="chkWalletDiscountDisplay">-₹0</span>
                                 </div>
                                 <div class="flex justify-between text-white/70">
                                     <span>Shipping</span>
@@ -495,7 +780,7 @@
                                 </div>
                             </div>
                             <div class="flex justify-between items-end mb-8">
-                                <span class="font-bold text-white/70 text-sm uppercase tracking-wider">Total</span>
+                                <span class="font-bold text-white/70 text-sm uppercase tracking-wider">Payable</span>
                                 <span id="chkTotal" class="text-3xl font-display font-bold">₹0</span>
                             </div>
 
@@ -680,6 +965,19 @@
     </div>
     <div id="cartBackdrop" class="fixed inset-0 z-[90] bg-black/40 hidden backdrop-blur-sm transition-opacity" onclick="toggleCart()"></div>
 
+    <!-- CUSTOM LOGOUT MODAL -->
+    <div id="customLogoutModal" class="fixed inset-0 z-[120] bg-black/50 hidden items-center justify-center backdrop-blur-sm transition-opacity opacity-0">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full mx-4 text-center shadow-2xl transform scale-95 transition-transform duration-300" id="logoutModalContent">
+            <div class="w-16 h-16 bg-red-50 text-accent-red rounded-full flex items-center justify-center mx-auto mb-4 text-2xl"><i class="fa-solid fa-power-off"></i></div>
+            <h3 class="font-display text-2xl font-bold text-brand-900 mb-2 uppercase tracking-tight">Log Out?</h3>
+            <p class="text-sm text-gray-500 mb-6 font-medium">Are you sure you want to sign out of your account?</p>
+            <div class="flex gap-3">
+                <button onclick="closeLogoutModal()" class="flex-1 py-3.5 bg-gray-100 text-brand-900 rounded-xl font-bold text-sm uppercase tracking-wider hover:bg-gray-200 transition">Cancel</button>
+                <button onclick="confirmLogout()" class="flex-1 py-3.5 bg-accent-red text-white rounded-xl font-bold text-sm uppercase tracking-wider hover:bg-red-600 transition shadow-lg">Log Out</button>
+            </div>
+        </div>
+    </div>
+
     <!-- TOAST NOTIFICATION -->
     <div id="toast" class="toast fixed bottom-6 lg:bottom-10 right-6 lg:right-10 bg-brand-900 text-white px-6 py-4 rounded-xl shadow-floating z-[110] flex items-center space-x-3 text-sm font-semibold border border-white/10">
         <i id="toastIcon" class="fa-solid fa-circle-check text-green-400 text-lg"></i>
@@ -689,7 +987,8 @@
     <!-- ================= LOGIC & REALTIME DATABASE SYNC ================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getDatabase, ref, push, set, serverTimestamp, onValue, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+        import { getDatabase, ref, push, set, get, update, serverTimestamp, onValue, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBHftpk6Z-JtHsK3PV-jbNH-klNvoqODLA",
@@ -701,7 +1000,9 @@
             appId: "1:71002380705:web:baf1fbb8fe77ff91e6d3e0"
         };
         
-        let app, db;
+        let app, db, auth, provider;
+        window.currentUser = null;
+        let isAuthInitialized = false;
         
         window.AppState = {
             cart: JSON.parse(localStorage.getItem('tbk_cart') || '[]'),
@@ -709,11 +1010,17 @@
             products: [],
             categories: [], 
             banners: [],
+            walletRewards: [],
+            rewardClaims: [],
+            hasOrders: false,
             currentProductView: null,
             settings: { paymentQR: '' }
         };
 
         let currentOrderTrackerUnsubscribe = null;
+        let userWalletUnsubscribe = null;
+        let userClaimsUnsubscribe = null;
+        let userOrdersUnsubscribe = null;
         let bannerInterval = null;
         let currentBannerIndex = 0;
 
@@ -764,7 +1071,6 @@
             }
         };
 
-        // --- NEW SELLING STRATEGY COMPONENT ---
         window.getRecommendationsHtml = (context) => {
             if (AppState.products.length === 0) return '';
             
@@ -794,7 +1100,6 @@
             </div>`;
         };
 
-        // --- BANNERS SLIDER LOGIC ---
         window.renderBanners = () => {
             const container = document.getElementById('bannerSlidesContainer');
             const indicators = document.getElementById('bannerIndicators');
@@ -886,9 +1191,10 @@
             else if(path === 'shop') renderShop(queryStr);
             else if(path === 'product') renderProduct(queryStr);
             else if(path === 'wishlist') renderWishlist();
+            else if(path === 'rewards') renderRewards();
+            else if(path === 'gift-reward') renderGiftReward(queryStr);
         };
 
-        // --- RTDB REAL-TIME LISTENERS ---
         const setupRealtimeDatabase = () => {
             try {
                 document.getElementById('loadingHomeProducts').classList.remove('hidden');
@@ -931,11 +1237,12 @@
                             category: data.category || 'tshirts',
                             tags: data.tags || [],
                             images: processedImages,
-                            image: processedImages.length > 0 ? processedImages[0] : '', // Main thumbnail
+                            image: processedImages.length > 0 ? processedImages[0] : '', 
                             description: data.description !== undefined ? data.description : "",
                             material: data.material !== undefined ? data.material : "",
                             fit: data.fit || "Standard Fit",
-                            sizes: data.sizes && data.sizes.length > 0 ? data.sizes : ['S', 'M', 'L', 'XL']
+                            sizes: data.sizes && data.sizes.length > 0 ? data.sizes : ['S', 'M', 'L', 'XL'],
+                            offerEndTime: data.offerEndTime || null 
                         });
                     });
                     
@@ -958,13 +1265,193 @@
             }
         };
 
+        const setupUserRealtimeListeners = (uid) => {
+            if(userWalletUnsubscribe) userWalletUnsubscribe();
+            if(userClaimsUnsubscribe) userClaimsUnsubscribe();
+            if(userOrdersUnsubscribe) userOrdersUnsubscribe();
+
+            // Listen to User's Wallet Rewards
+            userWalletUnsubscribe = onValue(ref(db, `users/${uid}/walletRewards`), (snapshot) => {
+                const rewards = [];
+                snapshot.forEach(child => rewards.push({ id: child.key, ...child.val() }));
+                AppState.walletRewards = rewards;
+                if(window.location.hash.includes('rewards')) renderRewards();
+                if(window.location.hash.includes('checkout')) renderCheckout();
+            });
+
+            // Listen to User's Claims
+            const claimsQuery = query(ref(db, 'rewardClaims'), orderByChild('uid'), equalTo(uid));
+            userClaimsUnsubscribe = onValue(claimsQuery, (snapshot) => {
+                const claims = [];
+                snapshot.forEach(child => claims.push({ id: child.key, ...child.val() }));
+                AppState.rewardClaims = claims;
+                if(window.location.hash.includes('rewards')) renderRewards();
+            });
+
+            // Listen to check if user has placed first order
+            const ordersQuery = query(ref(db, 'orders'), orderByChild('userId'), equalTo(uid));
+            userOrdersUnsubscribe = onValue(ordersQuery, (snapshot) => {
+                AppState.hasOrders = snapshot.exists();
+                if(window.location.hash.includes('rewards')) renderRewards();
+            });
+        };
+
         try {
             app = initializeApp(firebaseConfig);
             db = getDatabase(app);
+            auth = getAuth(app);
+            provider = new GoogleAuthProvider();
             checkAffiliateReferral();
             setupRealtimeDatabase();
+
+            onAuthStateChanged(auth, (user) => {
+                window.currentUser = user;
+                if(user) {
+                    setupUserRealtimeListeners(user.uid);
+                } else {
+                    if(userWalletUnsubscribe) { userWalletUnsubscribe(); userWalletUnsubscribe = null; }
+                    if(userClaimsUnsubscribe) { userClaimsUnsubscribe(); userClaimsUnsubscribe = null; }
+                    if(userOrdersUnsubscribe) { userOrdersUnsubscribe(); userOrdersUnsubscribe = null; }
+                    AppState.walletRewards = [];
+                    AppState.rewardClaims = [];
+                    AppState.hasOrders = false;
+                }
+
+                if (!isAuthInitialized) {
+                    isAuthInitialized = true;
+                    handleRoute(); 
+                }
+                updateAuthUI();
+            });
+
         } catch(e) {
             console.error("Firebase init failed", e);
+        }
+
+        window.signInWithGoogle = async () => {
+            try {
+                await signInWithPopup(auth, provider);
+                showToast("Logged in successfully!");
+                redirectAfterAuth();
+            } catch(e) {
+                showToast(e.message, 'error');
+            }
+        };
+
+        window.handleEmailAuth = async () => {
+            const email = document.getElementById('authEmail').value;
+            const pass = document.getElementById('authPassword').value;
+            const btn = document.getElementById('btnEmailAuth');
+            btn.innerHTML = `<div class="loader border-white border-t-transparent mx-auto w-5 h-5"></div>`;
+            
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                showToast("Logged in successfully!");
+                redirectAfterAuth();
+            } catch (error) {
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
+                    try {
+                        await createUserWithEmailAndPassword(auth, email, pass);
+                        showToast("Account created and logged in!");
+                        redirectAfterAuth();
+                    } catch(e) {
+                        showToast(e.message, 'error');
+                    }
+                } else {
+                    showToast(error.message, 'error');
+                }
+            } finally {
+                btn.innerHTML = `Sign In / Sign Up`;
+            }
+        };
+
+        const redirectAfterAuth = () => {
+            let redirectParams = new URLSearchParams(window.location.hash.split('?')[1]);
+            let target = redirectParams.get('redirect') || 'home';
+            navigate(target);
+        }
+
+        const updateAuthUI = () => {
+            const guestSection = document.getElementById('sidebarAuthGuest');
+            const userSection = document.getElementById('sidebarAuthUser');
+            
+            if(window.currentUser) {
+                guestSection.classList.add('hidden');
+                userSection.classList.remove('hidden');
+                
+                // Fetch existing details for the profile page view
+                get(ref(db, `users/${window.currentUser.uid}`)).then(snap => {
+                    if(snap.exists()) {
+                        const d = snap.val();
+                        if(document.getElementById('profPageName')) document.getElementById('profPageName').value = d.name || '';
+                        if(document.getElementById('profPagePhone')) document.getElementById('profPagePhone').value = d.phone || '';
+                        if(document.getElementById('profPageAddress')) document.getElementById('profPageAddress').value = d.address || '';
+                    }
+                });
+            } else {
+                guestSection.classList.remove('hidden');
+                userSection.classList.add('hidden');
+                
+                if(document.getElementById('profPageName')) document.getElementById('profPageName').value = '';
+                if(document.getElementById('profPagePhone')) document.getElementById('profPagePhone').value = '';
+                if(document.getElementById('profPageAddress')) document.getElementById('profPageAddress').value = '';
+            }
+        }
+
+        window.saveUserProfile = async () => {
+            if(!window.currentUser) return;
+            const btn = document.getElementById('btnSaveProfilePage');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<div class="loader border-white border-t-transparent mx-auto w-4 h-4"></div>`;
+            btn.disabled = true;
+
+            const name = document.getElementById('profPageName').value;
+            const phone = document.getElementById('profPagePhone').value;
+            const address = document.getElementById('profPageAddress').value;
+            
+            try {
+                await update(ref(db, `users/${window.currentUser.uid}`), { name, phone, address });
+                showToast("Profile Saved Successfully!");
+            } catch(e) {
+                showToast("Error updating profile", "error");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Custom Logout Modal Logic
+        window.requestLogout = () => {
+            if (window.innerWidth < 1024) toggleSidebar(); 
+            const modal = document.getElementById('customLogoutModal');
+            const content = document.getElementById('logoutModalContent');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        }
+
+        window.closeLogoutModal = () => {
+            const modal = document.getElementById('customLogoutModal');
+            const content = document.getElementById('logoutModalContent');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300);
+        }
+
+        window.confirmLogout = () => {
+            closeLogoutModal();
+            signOut(auth).then(() => {
+                showToast("Logged out successfully");
+                navigate('home');
+            });
         }
 
         window.toggleSidebar = () => {
@@ -999,9 +1486,17 @@
         };
 
         const handleRoute = () => {
+            if (!isAuthInitialized) return; 
+
             let hash = window.location.hash.replace('#', '') || 'home';
             const [path, queryStr] = hash.split('?');
             
+            const protectedRoutes = ['track', 'checkout', 'wishlist', 'orders', 'profile', 'rewards'];
+            if (protectedRoutes.includes(path) && !window.currentUser) {
+                navigate(`auth?redirect=${path}`);
+                return;
+            }
+
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -1026,6 +1521,8 @@
             if(path === 'product') renderProduct(queryStr);
             if(path === 'checkout') renderCheckout();
             if(path === 'wishlist') renderWishlist();
+            if(path === 'rewards') renderRewards();
+            if(path === 'gift-reward') renderGiftReward(queryStr);
             
             if(path !== 'track' && currentOrderTrackerUnsubscribe) {
                 currentOrderTrackerUnsubscribe();
@@ -1070,6 +1567,15 @@
             if (p.tags && p.tags.includes('new')) badge = `<div class="absolute top-3 left-3 bg-white text-brand-900 text-[10px] font-bold px-2 py-1 uppercase tracking-widest z-10 shadow-sm">New Drop</div>`;
             else if (discount > 0) badge = `<div class="absolute top-3 left-3 bg-accent-red text-white text-[10px] font-bold px-2 py-1 uppercase tracking-widest z-10 shadow-sm">Save ${discount}%</div>`;
 
+            let timerHtml = '';
+            if(p.offerEndTime && !isNaN(parseInt(p.offerEndTime))) {
+                timerHtml = `
+                    <div class="text-accent-red text-[9px] font-bold mt-1.5 flex items-center gap-1.5 offer-timer timer-pulse bg-red-50 w-fit px-1.5 py-1 rounded border border-red-100" data-endtime="${p.offerEndTime}">
+                        <i class="fa-solid fa-clock"></i> <span class="timer-text tracking-widest">Loading...</span>
+                    </div>
+                `;
+            }
+
             return `
             <div class="group relative flex flex-col cursor-pointer" onclick="navigate('product?id=${p.id}')">
                 <div class="relative bg-brand-50 aspect-[4/5] mb-4 overflow-hidden">
@@ -1086,8 +1592,9 @@
                 </div>
                 
                 <div class="flex-1 flex flex-col">
-                    <h4 class="text-sm lg:text-base font-bold text-brand-900 leading-tight mb-2 uppercase tracking-tight">${p.name}</h4>
-                    <div class="mt-auto flex items-baseline gap-2">
+                    <h4 class="text-sm lg:text-base font-bold text-brand-900 leading-tight uppercase tracking-tight">${p.name}</h4>
+                    ${timerHtml}
+                    <div class="mt-auto pt-2 flex items-baseline gap-2">
                         <span class="font-display font-bold text-brand-900 text-base">${formatPrice(activePrice)}</span>
                         ${discount > 0 ? `<span class="text-gray-400 text-xs line-through">${formatPrice(p.price)}</span>` : ''}
                     </div>
@@ -1187,17 +1694,25 @@
 
             document.getElementById('pdpStickyPrice').innerText = formatPrice(activePrice);
 
+            let timerHtml = '';
+            if(product.offerEndTime && !isNaN(parseInt(product.offerEndTime))) {
+                timerHtml = `
+                <div class="bg-red-50 text-accent-red border border-red-100 rounded-xl p-4 mt-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between offer-timer timer-pulse" data-endtime="${product.offerEndTime}">
+                    <div class="flex items-center gap-2 font-bold mb-2 sm:mb-0"><i class="fa-solid fa-bolt text-lg"></i> Limited Time Offer!</div>
+                    <div class="font-display font-bold text-xl tracking-widest timer-text bg-white px-4 py-1.5 rounded-lg border border-red-100 shadow-sm text-center">00:00:00</div>
+                </div>`;
+            }
+
             const html = `
-                <div class="flex flex-col lg:flex-row gap-8 lg:gap-16">
+                <div class="flex flex-col lg:flex-row gap-8 lg:gap-16 relative">
                     <div class="w-full lg:w-[55%]">
                         <div class="sticky top-24 flex flex-col gap-4">
-                            <div class="absolute top-4 left-4 flex gap-2 z-10 lg:hidden">
+                            <div class="absolute top-4 left-4 flex gap-2 z-30 lg:hidden">
                                 <button onclick="history.back()" class="w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-brand-900 shadow-sm">
                                     <i class="fa-solid fa-arrow-left text-sm"></i>
                                 </button>
                             </div>
                             
-                            <!-- SWIPEABLE IMAGE SLIDER ADDED HERE -->
                             <div class="bg-brand-50 w-full aspect-[4/5] lg:aspect-auto lg:h-[65vh] overflow-hidden rounded-3xl relative border border-gray-100 shadow-sm">
                                 <div id="pdpMainSlider" class="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar w-full h-full scroll-smooth">
                                     ${product.images && product.images.length > 0 ? product.images.map((img, index) => `
@@ -1222,7 +1737,8 @@
                         </div>
                     </div>
 
-                    <div class="w-full lg:w-[45%] px-5 lg:px-0 py-4 lg:py-10">
+                    <!-- PDP Right Column - Added pb-28 for Mobile Bottom Bar overlap fix -->
+                    <div class="w-full lg:w-[45%] px-5 lg:px-0 py-4 lg:py-10 pb-28 lg:pb-10">
                         <div class="flex items-center justify-between mb-4">
                             <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Khodal Official</div>
                             <div class="flex items-center gap-1 text-xs font-bold text-brand-900 bg-brand-50 px-2 py-1 rounded">
@@ -1232,6 +1748,8 @@
 
                         <h1 class="font-display text-2xl lg:text-4xl font-bold text-brand-900 uppercase tracking-tight mb-4 leading-[1.1]">${product.name}</h1>
                         
+                        ${timerHtml}
+
                         <div class="flex items-end gap-3 mb-8">
                             <span class="font-display font-bold text-3xl text-brand-900">${formatPrice(activePrice)}</span>
                             ${discount > 0 ? `
@@ -1428,7 +1946,6 @@
                 </div>`;
             }).join('');
             
-            // Add Selling Strategy (Cross-sell) at the end of the cart items
             container.innerHTML = cartItemsHtml + `<div class="border-t border-gray-100 pt-2 mt-4">` + window.getRecommendationsHtml('cart') + `</div>`;
             document.getElementById('cartTotal').innerText = formatPrice(total);
         };
@@ -1464,18 +1981,172 @@
             }
         };
 
+        // --- KHODAL WALLET LOGIC ---
+
+        const getValidWalletBalance = () => {
+            let balance = 0;
+            const now = Date.now();
+            AppState.walletRewards.forEach(r => {
+                if(r.status === 'ACTIVE' && r.expiresAt > now) {
+                    balance += (Number(r.amount) - Number(r.usedAmount || 0));
+                }
+            });
+            return balance;
+        };
+
+        const renderRewards = () => {
+            if(!window.currentUser) return;
+            const now = Date.now();
+            let activeBalance = getValidWalletBalance();
+            
+            document.getElementById('walletBalanceDisplay').innerText = formatPrice(activeBalance);
+
+            // Mission 1: Follow Status
+            const followClaim = AppState.rewardClaims.find(c => c.type === 'FOLLOW');
+            const m1Area = document.getElementById('mission1ActionArea');
+            if(followClaim) {
+                if(followClaim.status === 'PENDING') m1Area.innerHTML = `<span class="text-[10px] font-bold text-orange-500 uppercase tracking-widest"><i class="fa-solid fa-clock mr-1"></i> Verification Pending</span>`;
+                else if(followClaim.status === 'APPROVED') m1Area.innerHTML = `<span class="text-[10px] font-bold text-green-500 uppercase tracking-widest"><i class="fa-solid fa-check mr-1"></i> Reward Claimed</span>`;
+                else m1Area.innerHTML = `<span class="text-[10px] font-bold text-red-500 uppercase tracking-widest"><i class="fa-solid fa-xmark mr-1"></i> Rejected</span>`;
+            } else {
+                m1Area.innerHTML = `<button onclick="submitMissionClaim('FOLLOW', 'mission1ActionArea')" class="bg-brand-900 text-white px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition">I Followed (Submit)</button>`;
+            }
+
+            // Mission 2: UGC Status
+            const ugcClaim = AppState.rewardClaims.find(c => c.type === 'UGC_SHARE');
+            const m2Area = document.getElementById('mission2ActionArea');
+            if(ugcClaim) {
+                if(ugcClaim.status === 'PENDING') m2Area.innerHTML = `<span class="text-[10px] font-bold text-orange-500 uppercase tracking-widest"><i class="fa-solid fa-clock mr-1"></i> Link Submitted. Review Pending.</span>`;
+                else if(ugcClaim.status === 'APPROVED') m2Area.innerHTML = `<span class="text-[10px] font-bold text-green-500 uppercase tracking-widest"><i class="fa-solid fa-check mr-1"></i> Reward Claimed</span>`;
+                else m2Area.innerHTML = `<span class="text-[10px] font-bold text-red-500 uppercase tracking-widest"><i class="fa-solid fa-xmark mr-1"></i> Rejected. Try again.</span>`;
+            } else {
+                m2Area.innerHTML = `
+                    <input type="url" id="ugcUrlInput" placeholder="Instagram Post URL" class="flex-1 bg-brand-50 border border-gray-200 rounded-lg px-4 py-2.5 text-xs outline-none focus:ring-1 focus:ring-brand-900">
+                    <button onclick="submitUgcClaim()" class="bg-brand-900 text-white px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition whitespace-nowrap">Submit Link</button>
+                `;
+            }
+
+            // Mission 3: First Order Status
+            const m3Area = document.getElementById('mission3ActionArea');
+            if(AppState.hasOrders) {
+                m3Area.innerHTML = `<span class="text-[10px] font-bold text-green-500 uppercase tracking-widest"><i class="fa-solid fa-check mr-1"></i> Mission Accomplished</span>`;
+            }
+
+            // Ledger Lists
+            let activeHtml = '';
+            let historyHtml = '';
+
+            // Sort to show soonest expiring first
+            const sortedRewards = [...AppState.walletRewards].sort((a,b) => a.expiresAt - b.expiresAt);
+
+            sortedRewards.forEach(r => {
+                const remaining = Number(r.amount) - Number(r.usedAmount || 0);
+                const isExpired = r.expiresAt <= now;
+                const d = new Date(r.createdAt || r.expiresAt - (30*24*60*60*1000)).toLocaleDateString('en-IN');
+                
+                let title = r.type === 'FOLLOW' ? 'Mission 01: Follow Reward' : 
+                            r.type === 'UGC_SHARE' ? 'Mission 02: Wear & Share Reward' : 
+                            r.type === 'FIRST_ORDER' ? 'Mission 03: First Order Reward' : 
+                            'Gift Card Reward';
+
+                if(r.status === 'ACTIVE' && !isExpired && remaining > 0) {
+                    const daysLeft = Math.ceil((r.expiresAt - now)/(1000*60*60*24));
+                    activeHtml += `
+                    <div class="flex justify-between items-center bg-white border border-gray-100 p-4 rounded-2xl shadow-sm">
+                        <div>
+                            <p class="font-bold text-brand-900 text-sm tracking-tight mb-1">${title}</p>
+                            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Expires in ${daysLeft} days</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-display font-bold text-lg text-green-500">${formatPrice(remaining)}</span>
+                            ${r.usedAmount > 0 ? `<p class="text-[9px] text-gray-400 font-bold uppercase mt-1">Partially Used</p>` : ''}
+                        </div>
+                    </div>`;
+                } else {
+                    let statusLabel = r.status === 'USED' ? '<span class="text-gray-500">Fully Used</span>' : 
+                                      isExpired ? '<span class="text-red-500">Expired</span>' : 
+                                      `<span class="text-gray-500">${r.status}</span>`;
+                    
+                    historyHtml += `
+                    <div class="flex justify-between items-center bg-gray-50 border border-gray-100 p-4 rounded-2xl">
+                        <div>
+                            <p class="font-bold text-gray-700 text-sm tracking-tight mb-1">${title}</p>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">${d}</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-display font-bold text-gray-500">${formatPrice(r.amount)}</span>
+                            <p class="text-[9px] font-bold uppercase mt-1">${statusLabel}</p>
+                        </div>
+                    </div>`;
+                }
+            });
+
+            document.getElementById('activeRewardsList').innerHTML = activeHtml || `<div class="text-center py-6 text-gray-500 text-sm font-medium bg-gray-50 rounded-2xl border border-gray-100">No active rewards found.</div>`;
+            document.getElementById('historyRewardsList').innerHTML = historyHtml || `<div class="text-center py-6 text-gray-500 text-sm font-medium bg-gray-50 rounded-2xl border border-gray-100">No past rewards found.</div>`;
+        };
+
+        window.submitMissionClaim = async (type, btnId) => {
+            if(!window.currentUser) return navigate('auth');
+            const uid = window.currentUser.uid;
+            
+            const btnContainer = document.getElementById(btnId);
+            const originalHTML = btnContainer.innerHTML;
+            btnContainer.innerHTML = `<div class="loader w-4 h-4 border-brand-900 border-t-transparent inline-block"></div>`;
+
+            try {
+                const claimId = push(ref(db, 'rewardClaims')).key;
+                await set(ref(db, `rewardClaims/${claimId}`), {
+                    uid,
+                    type,
+                    status: 'PENDING',
+                    submittedAt: serverTimestamp()
+                });
+                showToast('Claim Submitted for Verification!');
+            } catch(e) {
+                console.error(e);
+                showToast('Failed to submit claim.', 'error');
+                btnContainer.innerHTML = originalHTML;
+            }
+        };
+
+        window.submitUgcClaim = async () => {
+            if(!window.currentUser) return navigate('auth');
+            const urlInput = document.getElementById('ugcUrlInput');
+            const url = urlInput.value.trim();
+            if(!url || !url.includes('instagram.com')) return showToast('Please enter a valid Instagram URL', 'error');
+
+            const uid = window.currentUser.uid;
+            const btnContainer = document.getElementById('mission2ActionArea');
+            const originalHTML = btnContainer.innerHTML;
+            btnContainer.innerHTML = `<div class="loader w-4 h-4 border-brand-900 border-t-transparent inline-block"></div>`;
+
+            try {
+                const claimId = push(ref(db, 'rewardClaims')).key;
+                // Escape user input basic sanitation
+                const sanitizedUrl = url.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                await set(ref(db, `rewardClaims/${claimId}`), {
+                    uid,
+                    type: 'UGC_SHARE',
+                    url: sanitizedUrl,
+                    status: 'PENDING',
+                    submittedAt: serverTimestamp()
+                });
+                showToast('UGC Link Submitted for Review!');
+            } catch(e) {
+                console.error(e);
+                showToast('Failed to submit claim.', 'error');
+                btnContainer.innerHTML = originalHTML;
+            }
+        };
+
         const renderCheckout = () => {
             if(AppState.cart.length === 0) {
                 navigate('shop');
                 return;
             }
 
-            const total = AppState.cart.reduce((s, i) => s + (i.price * i.qty), 0);
-            document.getElementById('chkSubtotal').innerText = formatPrice(total);
-            document.getElementById('chkTotal').innerText = formatPrice(total);
-            document.getElementById('qrAmount').innerText = formatPrice(total);
-
-            window.selectPaymentMethod('COD');
+            document.getElementById('chkUseWallet').checked = false;
+            calculateCheckoutTotals();
 
             const itemsHtml = AppState.cart.map(item => `
                 <div class="flex justify-between items-center gap-4">
@@ -1494,8 +2165,55 @@
             `).join('');
             document.getElementById('chkOrderItems').innerHTML = itemsHtml;
 
-            // Render Selling Strategy in Checkout
             document.getElementById('checkoutRecommendations').innerHTML = window.getRecommendationsHtml('checkout');
+            
+            // Auto-fill user details if logged in
+            if(window.currentUser) {
+                document.getElementById('chkEmail').value = window.currentUser.email || '';
+                get(ref(db, `users/${window.currentUser.uid}`)).then(snap => {
+                    if(snap.exists()) {
+                        const d = snap.val();
+                        if(d.name) document.getElementById('chkName').value = d.name;
+                        if(d.phone) document.getElementById('chkMobile').value = d.phone;
+                    }
+                });
+            }
+        };
+
+        window.calculateCheckoutTotals = () => {
+            const subtotal = AppState.cart.reduce((s, i) => s + (i.price * i.qty), 0);
+            document.getElementById('chkSubtotal').innerText = formatPrice(subtotal);
+
+            let payable = subtotal;
+            let walletDiscount = 0;
+
+            const walletBox = document.getElementById('checkoutWalletBox');
+            if(window.currentUser) {
+                walletBox.classList.remove('hidden');
+                const available = getValidWalletBalance();
+                document.getElementById('chkWalletAvailable').innerText = `₹${available} Available`;
+                
+                if(document.getElementById('chkUseWallet').checked && available > 0) {
+                    walletDiscount = Math.min(available, subtotal); 
+                    payable = subtotal - walletDiscount;
+                    document.getElementById('chkWalletAppliedAmount').innerText = `-₹${walletDiscount}`;
+                    document.getElementById('chkWalletDiscountRow').classList.remove('hidden');
+                    document.getElementById('chkWalletDiscountDisplay').innerText = `-₹${walletDiscount}`;
+                } else {
+                    document.getElementById('chkWalletAppliedAmount').innerText = `-₹0`;
+                    document.getElementById('chkWalletDiscountRow').classList.add('hidden');
+                }
+            } else {
+                walletBox.classList.add('hidden');
+                document.getElementById('chkWalletDiscountRow').classList.add('hidden');
+            }
+
+            document.getElementById('chkTotal').innerText = formatPrice(payable);
+            document.getElementById('qrAmount').innerText = formatPrice(payable);
+
+            if(!document.getElementById('payONLINE').checked && !document.getElementById('payCOD').checked) {
+                window.selectPaymentMethod('COD');
+            }
         };
 
         window.placeOrder = async () => {
@@ -1507,9 +2225,9 @@
             btn.innerHTML = `<div class="loader border-brand-900 border-t-transparent mx-auto"></div>`;
             btn.disabled = true;
             
-            const orderTotal = AppState.cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+            const subtotal = AppState.cart.reduce((sum, item) => sum + item.price * item.qty, 0);
             
-            const prefix = "KHO"; // Khodal Prefix
+            const prefix = "KHODAL"; 
             const year = new Date().getFullYear();
             const randomCode = Math.floor(100000 + Math.random() * 900000);
             const orderId = `${prefix}-${year}-${randomCode}`;
@@ -1525,6 +2243,40 @@
                 btn.innerHTML = originalText;
                 btn.disabled = false;
                 return;
+            }
+
+            let walletDiscount = 0;
+            let finalPayable = subtotal;
+            let rewardsUsed = [];
+
+            if(window.currentUser && document.getElementById('chkUseWallet').checked) {
+                const available = getValidWalletBalance();
+                if(available > 0) {
+                    walletDiscount = Math.min(available, subtotal);
+                    finalPayable = subtotal - walletDiscount;
+                    
+                    // Deduct from rewards (FIFO)
+                    let remainingToDeduct = walletDiscount;
+                    const now = Date.now();
+                    const activeRewards = AppState.walletRewards
+                        .filter(r => r.status === 'ACTIVE' && r.expiresAt > now)
+                        .sort((a,b) => a.expiresAt - b.expiresAt); // Sort by expiry ascending
+
+                    for(let r of activeRewards) {
+                        if(remainingToDeduct <= 0) break;
+                        let rRem = Number(r.amount) - Number(r.usedAmount || 0);
+                        if(rRem > 0) {
+                            let deduct = Math.min(rRem, remainingToDeduct);
+                            rewardsUsed.push({
+                                id: r.id,
+                                amountDeducted: deduct,
+                                newUsedAmount: Number(r.usedAmount || 0) + deduct,
+                                fullyUsed: (Number(r.usedAmount || 0) + deduct) >= Number(r.amount)
+                            });
+                            remainingToDeduct -= deduct;
+                        }
+                    }
+                }
             }
 
             const addressLine1 = document.getElementById('chkAddress1').value;
@@ -1545,27 +2297,56 @@
                 state: state,
                 address: [addressLine1, addressLine2, city, state, pincode].filter(Boolean).join(', '),
                 products: AppState.cart,
-                subtotal: orderTotal,
+                subtotal: subtotal,
                 shippingCharge: 0,
-                discount: 0,
-                totalAmount: orderTotal,
+                walletDiscount: walletDiscount,
+                rewardsUsedLog: rewardsUsed.length > 0 ? rewardsUsed.map(r => ({id: r.id, amount: r.amountDeducted})) : null,
+                totalAmount: finalPayable,
                 paymentMethod: selectedPaymentMethod,
                 utrNumber: utrNumber,
                 paymentStatus: selectedPaymentMethod === 'ONLINE' ? 'UTR_SUBMITTED' : 'PENDING',
                 status: 'NEW',
                 affiliateCode: affiliateCode || null,
+                userId: window.currentUser ? window.currentUser.uid : 'guest',
                 date: new Date().toISOString() 
             };
 
             try {
                 if(db) {
-                    const ordersRef = ref(db, "orders");
-                    const newOrderRef = push(ordersRef);
-                    await set(newOrderRef, {
-                        ...orderData,
-                        createdAt: serverTimestamp(),
-                        updatedAt: serverTimestamp()
-                    });
+                    const updates = {};
+                    const newOrderKey = push(ref(db, 'orders')).key;
+                    
+                    orderData.createdAt = serverTimestamp();
+                    orderData.updatedAt = serverTimestamp();
+                    updates[`orders/${newOrderKey}`] = orderData;
+
+                    // Apply wallet deductions
+                    if(window.currentUser && rewardsUsed.length > 0) {
+                        rewardsUsed.forEach(r => {
+                            updates[`users/${window.currentUser.uid}/walletRewards/${r.id}/usedAmount`] = r.newUsedAmount;
+                            if(r.fullyUsed) {
+                                updates[`users/${window.currentUser.uid}/walletRewards/${r.id}/status`] = 'USED';
+                            }
+                        });
+                    }
+
+                    // Grant First Order Reward if eligible
+                    if(window.currentUser && !AppState.hasOrders) {
+                        const newRewardKey = push(ref(db)).key; // Generate key without specific ref
+                        const expiry = Date.now() + (30 * 24 * 60 * 60 * 1000); // 30 days
+                        updates[`users/${window.currentUser.uid}/walletRewards/${newRewardKey}`] = {
+                            amount: 100,
+                            type: 'FIRST_ORDER',
+                            source: 'khodal_mission',
+                            status: 'ACTIVE',
+                            usedAmount: 0,
+                            createdAt: serverTimestamp(),
+                            expiresAt: expiry
+                        };
+                    }
+
+                    // Atomic update
+                    await update(ref(db), updates);
                 }
                 
                 AppState.cart = [];
@@ -1588,9 +2369,137 @@
                 navigate('home');
             } catch(e) {
                 console.error("Order error", e);
-                showToast('Permission Denied: Ensure Database Rules are true', 'error');
+                showToast('Transaction Failed: Ensure Database Rules are true', 'error');
             } finally {
                 btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        };
+
+        // --- GIFT CARD REWARD LOGIC ---
+
+        let currentGiftCode = null;
+        let currentGiftConfig = null;
+
+        const renderGiftReward = async (queryStr) => {
+            const code = new URLSearchParams(queryStr).get('code');
+            const stateReveal = document.getElementById('giftRevealState');
+            const stateSuccess = document.getElementById('giftSuccessState');
+            const stateError = document.getElementById('giftErrorState');
+            
+            stateReveal.classList.add('hidden');
+            stateSuccess.classList.add('hidden');
+            stateError.classList.add('hidden');
+
+            if(!code) {
+                stateError.classList.remove('hidden');
+                return;
+            }
+
+            if(!window.currentUser) {
+                // Must be logged in to redeem
+                navigate(`auth?redirect=gift-reward?code=${code}`);
+                return;
+            }
+
+            try {
+                const snap = await get(ref(db, `giftCards/${code}`));
+                if(!snap.exists()) {
+                    stateError.classList.remove('hidden');
+                    return;
+                }
+
+                const data = snap.val();
+                if(data.status !== 'ACTIVE' || (data.expiresAt && data.expiresAt < Date.now()) || (data.maxRedemptions && (data.redemptionCount || 0) >= data.maxRedemptions)) {
+                    stateError.classList.remove('hidden');
+                    return;
+                }
+
+                // Check if this specific user already redeemed it
+                const redemptionQuery = query(ref(db, 'giftCardRedemptions'), orderByChild('uid'), equalTo(window.currentUser.uid));
+                const userRedemptionsSnap = await get(redemptionQuery);
+                let alreadyRedeemed = false;
+                if(userRedemptionsSnap.exists()) {
+                    userRedemptionsSnap.forEach(child => {
+                        if(child.val().code === code) alreadyRedeemed = true;
+                    });
+                }
+
+                if(alreadyRedeemed) {
+                    stateError.classList.remove('hidden');
+                    return;
+                }
+
+                currentGiftCode = code;
+                currentGiftConfig = data;
+                stateReveal.classList.remove('hidden');
+
+            } catch(e) {
+                console.error(e);
+                stateError.classList.remove('hidden');
+            }
+        };
+
+        window.revealGiftCard = async () => {
+            if(!currentGiftCode || !currentGiftConfig || !window.currentUser) return;
+
+            const btn = document.getElementById('btnRevealGift');
+            btn.innerHTML = `<div class="loader border-white border-t-transparent mx-auto"></div>`;
+            btn.disabled = true;
+
+            try {
+                // Determine reward amount (If weighted config exists, else default to fixed amount)
+                let rewardAmount = currentGiftConfig.rewardAmount || 50; 
+                
+                const updates = {};
+                const now = Date.now();
+                const expiry = now + (30 * 24 * 60 * 60 * 1000); // 30 days expiry
+                
+                const newRewardKey = push(ref(db)).key;
+                const newRedemptionKey = push(ref(db)).key;
+
+                const newRedemptionCount = (currentGiftConfig.redemptionCount || 0) + 1;
+                let newStatus = currentGiftConfig.status;
+                if(currentGiftConfig.maxRedemptions && newRedemptionCount >= currentGiftConfig.maxRedemptions) {
+                    newStatus = 'REDEEMED';
+                }
+
+                // 1. Update Gift Card Record
+                updates[`giftCards/${currentGiftCode}/redemptionCount`] = newRedemptionCount;
+                updates[`giftCards/${currentGiftCode}/status`] = newStatus;
+
+                // 2. Create Redemption Log
+                updates[`giftCardRedemptions/${newRedemptionKey}`] = {
+                    code: currentGiftCode,
+                    uid: window.currentUser.uid,
+                    rewardId: newRewardKey,
+                    amount: rewardAmount,
+                    redeemedAt: serverTimestamp()
+                };
+
+                // 3. Add to User Wallet
+                updates[`users/${window.currentUser.uid}/walletRewards/${newRewardKey}`] = {
+                    amount: rewardAmount,
+                    type: 'GIFT_CARD',
+                    source: currentGiftCode,
+                    status: 'ACTIVE',
+                    usedAmount: 0,
+                    createdAt: serverTimestamp(),
+                    expiresAt: expiry
+                };
+
+                await update(ref(db), updates);
+
+                document.getElementById('giftRevealState').classList.add('hidden');
+                document.getElementById('giftRewardAmount').innerText = `₹${rewardAmount}`;
+                document.getElementById('giftSuccessState').classList.remove('hidden');
+                
+                showToast('Reward added to your wallet!');
+
+            } catch(e) {
+                console.error(e);
+                showToast('Error redeeming gift card.', 'error');
+                btn.innerHTML = `Reveal My Reward`;
                 btn.disabled = false;
             }
         };
@@ -1718,11 +2627,39 @@
             }
         });
 
+        // Global Timer Tick Function for Limited Time Offers
+        setInterval(() => {
+            document.querySelectorAll('.offer-timer').forEach(el => {
+                const endTime = parseInt(el.dataset.endtime); 
+                if(isNaN(endTime)) return;
+                
+                const now = Date.now();
+                const diff = endTime - now;
+                const textEl = el.querySelector('.timer-text');
+                
+                if(diff <= 0) {
+                    if(textEl) textEl.innerHTML = "Offer Expired";
+                    el.classList.add('opacity-50');
+                    el.classList.remove('timer-pulse');
+                } else {
+                    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                    const m = Math.floor((diff / 1000 / 60) % 60);
+                    const s = Math.floor((diff / 1000) % 60);
+                    
+                    let str = "";
+                    if(d > 0) str += `${d}d `;
+                    str += `${h.toString().padStart(2,'0')}h ${m.toString().padStart(2,'0')}m ${s.toString().padStart(2,'0')}s`;
+                    
+                    if(textEl) textEl.innerHTML = str;
+                }
+            });
+        }, 1000);
+
         const initApp = () => {
             saveCart();
             updateSidebarBadges();
             window.addEventListener('hashchange', handleRoute);
-            handleRoute();
         };
 
         window.onload = initApp;
