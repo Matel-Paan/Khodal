@@ -1,0 +1,52 @@
+html, body { 
+    -webkit-tap-highlight-color: transparent; 
+    overflow-x: hidden; 
+    width: 100%;
+}
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+.view-section { display: none; min-height: 100vh; flex-direction: column; } 
+.view-section.active { display: flex; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* TOAST ANIMATION */
+.toast { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); transform: translateY(150%) scale(0.95); opacity: 0; pointer-events: none; }
+.toast.show { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
+
+.loader {
+    border: 2px solid #e7e7e7;
+    border-radius: 50%;
+    border-top: 2px solid #0a0a0a;
+    width: 24px;
+    height: 24px;
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+.drawer-open { transform: translateX(0) !important; }
+.drawer-closed { transform: translateX(100%) !important; }
+
+@media (max-width: 768px) {
+    .drawer-closed { transform: translateY(100%) !important; }
+}
+
+.img-hover-zoom { transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+.group:hover .img-hover-zoom { transform: scale(1.05); }
+
+.policy-content h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; color: #0a0a0a; text-transform: uppercase; }
+.policy-content p { color: #525252; margin-bottom: 1rem; line-height: 1.6; }
+.policy-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; color: #525252; }
+.policy-content li { margin-bottom: 0.5rem; }
+
+/* Timer Pulse Animation */
+@keyframes pulse-red {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+.timer-pulse { animation: pulse-red 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
