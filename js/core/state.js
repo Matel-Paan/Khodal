@@ -1,4 +1,4 @@
-window.AppState = {
+herewindow.AppState = {
     cart: JSON.parse(localStorage.getItem('tbk_cart') || '[]'),
     wishlist: JSON.parse(localStorage.getItem('tbk_wishlist') || '[]'),
     products: [],
