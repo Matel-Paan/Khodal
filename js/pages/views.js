@@ -4,6 +4,8 @@
 
 window.renderCategoriesUI = () => {
     const homeCatGrid = document.getElementById('homeCategoriesGrid');
+    if(!homeCatGrid) return;
+    
     if(window.AppState.categories.length === 0) {
         homeCatGrid.innerHTML = `<div class="col-span-full text-center py-6 text-gray-500 font-medium border-b border-r border-gray-200">Categories will appear here once added by Admin.</div>`;
     } else {
@@ -49,6 +51,7 @@ window.setTrendingTab = (catName) => {
 window.renderBanners = () => {
     const container = document.getElementById('bannerSlidesContainer');
     const indicators = document.getElementById('bannerIndicators');
+    if(!container || !indicators) return;
     
     if(window.AppState.banners.length === 0) {
         container.innerHTML = `
@@ -141,11 +144,13 @@ window.nextPrimaryBanner = () => {
 
 window.updateBannerPosition = () => {
     const container = document.getElementById('bannerSlidesContainer');
-    const indicators = document.getElementById('bannerIndicators').children;
+    const indicators = document.getElementById('bannerIndicators');
+    if(!container || !indicators) return;
     if(window.AppState.banners.length === 0) return;
+    
     container.style.transform = `translateX(-${window.currentBannerIndex * 100}%)`;
     
-    Array.from(indicators).forEach((ind, i) => {
+    Array.from(indicators.children).forEach((ind, i) => {
         if(i === window.currentBannerIndex) {
             ind.className = "w-6 h-2.5 rounded-full transition-all bg-white shadow-sm";
         } else {
@@ -182,12 +187,16 @@ window.startBannerAutoPlay = () => {
 };
 
 // ==========================================
-// VIEWS RENDERING
+// VIEWS RENDERING (HOME, SHOP, PDP)
 // ==========================================
 
 window.renderHome = () => {
     const grid = document.getElementById('homeProductGrid');
     const empty = document.getElementById('emptyHomeProducts');
+    const loader = document.getElementById('loadingHomeProducts');
+    
+    if(!grid || !empty) return;
+    if(loader) loader.classList.add('hidden');
     
     if(window.AppState.products.length === 0) {
         grid.innerHTML = '';
@@ -221,11 +230,17 @@ window.renderShop = (queryStr) => {
     let filtered = cat ? window.AppState.products.filter(p => p.category.toLowerCase() === cat.toLowerCase() || (p.tags && p.tags.join(' ').toLowerCase().includes(cat.toLowerCase()))) : window.AppState.products;
     
     let title = cat ? cat : 'All Collection';
-    document.getElementById('shopTitle').innerText = title;
-    document.getElementById('shopBreadcrumb').innerText = title;
+    const shopTitle = document.getElementById('shopTitle');
+    const shopBreadcrumb = document.getElementById('shopBreadcrumb');
+    if(shopTitle) shopTitle.innerText = title;
+    if(shopBreadcrumb) shopBreadcrumb.innerText = title;
     
     const grid = document.getElementById('shopGrid');
     const empty = document.getElementById('emptyShopProducts');
+    const loader = document.getElementById('loadingShopProducts');
+    
+    if(!grid || !empty) return;
+    if(loader) loader.classList.add('hidden');
     
     if (filtered.length === 0 && window.AppState.products.length > 0) {
         grid.innerHTML = '';
@@ -243,82 +258,90 @@ window.renderShop = (queryStr) => {
         pillsHtml += `<button onclick="navigate('shop?category=${cNameLower}')" class="px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-colors border ${isActive ? 'bg-brand-900 text-white border-brand-900' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-400'}">${c.name}</button>`;
     });
 
-    document.getElementById('shopCategoriesList').innerHTML = pillsHtml;
+    const list = document.getElementById('shopCategoriesList');
+    if(list) list.innerHTML = pillsHtml;
 };
 
 window.renderProduct = (queryStr) => {
     const id = new URLSearchParams(queryStr).get('id');
     const product = window.AppState.products.find(p => p.id === id);
     
-    if(!product && window.AppState.products.length > 0) return window.navigate('home');
-    if(!product) return; 
+    if(!product) return window.navigate('home');
     
     window.AppState.currentProductView = product;
     const isWishlisted = window.AppState.wishlist.includes(id);
     const activePrice = product.salePrice || product.price;
     let discount = 0;
+    
     if(product.salePrice && product.price > product.salePrice) {
         discount = Math.round(((product.price - product.salePrice) / product.price) * 100);
     }
 
-    document.getElementById('pdpStickyPrice').innerText = window.formatPrice(activePrice);
+    const pdpStickyPrice = document.getElementById('pdpStickyPrice');
+    if(pdpStickyPrice) pdpStickyPrice.innerText = window.formatPrice(activePrice);
 
-    let timerHtml = '';
-    if(product.offerEndTime && !isNaN(parseInt(product.offerEndTime))) {
-        timerHtml = `
-        <div class="bg-red-50 text-accent-red border border-red-100 rounded-xl p-4 mt-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between offer-timer timer-pulse" data-endtime="${product.offerEndTime}">
-            <div class="flex items-center gap-2 font-bold mb-2 sm:mb-0"><i class="fa-solid fa-bolt text-lg"></i> Limited Time Offer!</div>
-            <div class="font-display font-bold text-xl tracking-widest timer-text bg-white px-4 py-1.5 rounded-lg border border-red-100 shadow-sm text-center">00:00:00</div>
-        </div>`;
+    let sliderHtml = '';
+    let thumbHtml = '';
+    const imagesArray = product.images && product.images.length > 0 ? product.images : (product.image ? [product.image] : []);
+    imagesArray.forEach((img, i) => {
+        let imgId = `mainImg-${i}`;
+        sliderHtml += `<img id="${imgId}" src="${img}" class="w-full h-full object-cover object-center snap-center snap-always shrink-0" alt="${product.name}">`;
+        let borderClass = (i === 0) ? 'border-brand-900' : 'border-transparent';
+        thumbHtml += `<img src="${img}" onclick="document.getElementById('${imgId}').scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'});" class="w-16 h-20 object-cover rounded cursor-pointer border-2 ${borderClass} snap-start shrink-0">`;
+    });
+
+    const allProducts = window.AppState.products || [];
+    let relatedProducts = allProducts.filter(p => p.id !== product.id).slice(0, 4);
+    let relatedHtml = relatedProducts.map(window.createProductCard).join('');
+
+    // === MULTI-COUPON CAROUSEL DESIGN ===
+    let couponHtml = '';
+    const productCoupons = window.AppState.coupons ? window.AppState.coupons.filter(c => c.productId === product.id) : [];
+    
+    if (productCoupons.length > 0) {
+        const couponsCards = productCoupons.map(c => `
+            <div class="snap-start shrink-0 w-[80%] md:w-[250px] p-3 rounded-lg flex flex-col items-start gap-1 shadow-sm" style="background-color: #FDF6F6; border: 1px solid #F5E6E6;">
+                <div onclick="copyCouponCode('${c.code}')" class="flex items-center gap-2 px-2.5 py-1 rounded cursor-pointer transition active:scale-95" style="background-color: #FCA595;">
+                    <span class="font-bold text-black tracking-wider text-xs uppercase">${c.code}</span>
+                    <i class="fa-regular fa-copy text-black text-[10px] ml-1"></i>
+                </div>
+                <p class="text-gray-800 text-xs font-medium mt-1 line-clamp-2">${c.description}</p>
+            </div>
+        `).join('');
+
+        couponHtml = `
+            <div class="mt-4 mb-6">
+                <div class="flex gap-3 overflow-x-auto hide-scrollbar snap-x w-full pb-1">
+                    ${couponsCards}
+                </div>
+            </div>
+        `;
     }
 
     const html = `
-        <div class="flex flex-col lg:flex-row gap-8 lg:gap-16 relative">
-            <div class="w-full lg:w-[55%]">
-                <div class="sticky top-24 flex flex-col gap-4">
-                    <div class="absolute top-4 left-4 flex gap-2 z-30 lg:hidden">
-                        <button onclick="history.back()" class="w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-brand-900 shadow-sm">
-                            <i class="fa-solid fa-arrow-left text-sm"></i>
-                        </button>
+        <div class="flex flex-col lg:flex-row gap-8 lg:gap-16 relative p-5 lg:p-0">
+            <div class="w-full lg:w-[55%] flex flex-col items-center">
+                <div class="relative w-full max-w-[691px] aspect-[691/1050] bg-gray-50 overflow-hidden rounded-xl border border-gray-100 shadow-sm">
+                    <div id="pdpMainSlider" class="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar w-full h-full scroll-smooth">
+                        ${sliderHtml}
                     </div>
-                    
-                    <div class="bg-brand-50 w-full aspect-[4/5] lg:aspect-auto lg:h-[65vh] overflow-hidden rounded-3xl relative border border-gray-100 shadow-sm">
-                        <div id="pdpMainSlider" class="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar w-full h-full scroll-smooth">
-                            ${product.images && product.images.length > 0 ? product.images.map((img, index) => `
-                                <img id="mainImg-${index}" src="${img}" class="w-full h-full object-cover object-center snap-center snap-always shrink-0" alt="${product.name}">
-                            `).join('') : `<img src="${product.image}" class="w-full h-full object-cover object-center snap-center snap-always shrink-0" alt="${product.name}">`}
-                        </div>
-                    </div>
-                    
-                    ${product.images && product.images.length > 1 ? `
-                    <div class="relative flex items-center group px-1">
-                        <button onclick="scrollPdpThumbs(-1)" class="absolute left-0 z-10 w-8 h-8 bg-white shadow-md text-brand-900 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition disabled:opacity-0 -translate-x-1/2 hover:scale-110"><i class="fa-solid fa-chevron-left text-xs"></i></button>
-                        
-                        <div id="pdpThumbContainer" class="flex gap-3 overflow-x-auto hide-scrollbar snap-x w-full scroll-smooth py-2 px-1">
-                            ${product.images.map((img, i) => `
-                                <img src="${img}" onclick="document.getElementById('mainImg-${i}').scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'}); document.querySelectorAll('.pdp-thumb').forEach(el=>el.classList.replace('border-brand-900', 'border-transparent')); this.classList.replace('border-transparent', 'border-brand-900');" class="w-20 h-24 lg:w-24 lg:h-28 object-cover rounded-xl cursor-pointer border-2 ${i===0 ? 'border-brand-900' : 'border-transparent'} hover:border-brand-900 transition-colors snap-start shrink-0 pdp-thumb bg-brand-50 shadow-sm">
-                            `).join('')}
-                        </div>
-                        
-                        <button onclick="scrollPdpThumbs(1)" class="absolute right-0 z-10 w-8 h-8 bg-white shadow-md text-brand-900 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition disabled:opacity-0 translate-x-1/2 hover:scale-110"><i class="fa-solid fa-chevron-right text-xs"></i></button>
-                    </div>
-                    ` : ''}
                 </div>
+                ${imagesArray.length > 1 ? `
+                    <div class="flex gap-2 mt-4 overflow-x-auto hide-scrollbar snap-x max-w-[691px] w-full">
+                        ${thumbHtml}
+                    </div>
+                ` : ''}
             </div>
 
-            <div class="w-full lg:w-[45%] px-5 lg:px-0 py-4 lg:py-10 pb-28 lg:pb-10">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Khodal Official</div>
-                    <div class="flex items-center gap-1 text-xs font-bold text-brand-900 bg-brand-50 px-2 py-1 rounded">
-                        <i class="fa-solid fa-star text-accent-red text-[10px]"></i> ${product.rating} <span class="text-gray-400 ml-1">(${product.reviews})</span>
-                    </div>
+            <div class="w-full lg:w-[45%] py-4 pb-28 lg:pb-10">
+                <h1 class="font-display text-2xl lg:text-4xl font-bold text-brand-900 uppercase tracking-tight mb-2 leading-[1.1]">${product.name}</h1>
+                
+                <div class="flex items-center gap-1 text-xs font-bold text-brand-900 bg-brand-50 px-2 py-1 rounded w-fit mb-4">
+                    <i class="fa-solid fa-star text-accent-red text-[10px]"></i> ${product.rating || '4.8'} 
+                    <span class="text-gray-400 ml-1">(${product.reviews || '10+'} reviews)</span>
                 </div>
 
-                <h1 class="font-display text-2xl lg:text-4xl font-bold text-brand-900 uppercase tracking-tight mb-4 leading-[1.1]">${product.name}</h1>
-                
-                ${timerHtml}
-
-                <div class="flex items-end gap-3 mb-8">
+                <div class="flex items-end gap-3 mb-2">
                     <span class="font-display font-bold text-3xl text-brand-900">${window.formatPrice(activePrice)}</span>
                     ${discount > 0 ? `
                         <span class="text-gray-400 text-lg line-through mb-0.5">${window.formatPrice(product.price)}</span>
@@ -326,9 +349,9 @@ window.renderProduct = (queryStr) => {
                     ` : ''}
                 </div>
 
-                <p class="text-sm lg:text-base text-gray-600 font-medium leading-relaxed mb-8 whitespace-pre-line">${product.description || 'No description provided.'}</p>
+                ${couponHtml}
 
-                <div class="mb-10">
+                <div class="mt-8 mb-8">
                     <div class="flex justify-between items-end mb-4">
                         <h4 class="text-xs font-bold text-brand-900 uppercase tracking-widest">Select Size</h4>
                         <button onclick="navigate('sizes')" class="text-xs font-bold text-gray-500 uppercase tracking-widest border-b border-gray-400 hover:text-brand-900 transition">Size Guide</button>
@@ -340,31 +363,90 @@ window.renderProduct = (queryStr) => {
                     </div>
                 </div>
 
-                <div class="hidden lg:flex gap-4 mb-12">
-                    <button onclick="pdpAddToCart()" class="flex-1 bg-brand-900 text-white py-4.5 font-bold text-sm uppercase tracking-wider shadow-floating hover:bg-gray-800 transition">
+                <div class="flex gap-4 mb-12">
+                    <button onclick="pdpAddToCart()" class="flex-1 bg-brand-900 text-white py-4.5 font-bold text-sm uppercase tracking-wider shadow-floating hover:bg-gray-800 transition rounded-xl">
                         Add to Cart
                     </button>
-                    <button onclick="toggleWishlist('${product.id}')" class="w-14 h-14 border border-gray-200 flex items-center justify-center text-brand-900 hover:border-brand-900 transition" id="pdpWishlistBtnDesktop">
+                    <button onclick="toggleWishlist('${product.id}')" class="w-14 h-14 border border-gray-200 flex items-center justify-center text-brand-900 hover:border-brand-900 transition rounded-xl" id="pdpWishlistBtnDesktop">
                         <i class="fa-${isWishlisted ? 'solid text-accent-red' : 'regular'} fa-heart text-lg"></i>
                     </button>
                 </div>
 
-                <div class="border-t border-gray-100 divide-y divide-gray-100">
-                    <div class="py-5">
-                        <h5 class="text-sm font-bold text-brand-900 uppercase tracking-wider mb-2">Details & Fit</h5>
-                        <ul class="text-sm text-gray-600 font-medium space-y-2 list-disc list-inside">
-                            ${product.material ? `<li>${product.material}</li>` : ''}
-                            ${product.fit ? `<li>${product.fit}</li>` : ''}
-                            <li>Machine wash cold, lay flat to dry</li>
-                        </ul>
+                <div class="w-full border-t border-gray-100 pt-4" id="product-accordion">
+                    
+                    <div class="accordion-item border-b border-gray-200">
+                        <button class="accordion-header w-full py-5 flex justify-between items-center text-left focus:outline-none group" onclick="window.toggleAccordion(this)">
+                            <span class="text-sm font-bold text-brand-900 tracking-widest uppercase">Delivery</span>
+                            <span class="accordion-icon text-gray-400 text-2xl font-light transition-transform duration-300 group-hover:text-brand-900">+</span>
+                        </button>
+                        <div class="accordion-content max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                            <div class="pb-6 text-sm text-gray-600 font-medium">
+                                <div class="flex gap-2">
+                                    <input type="text" id="pincode-input" class="border border-gray-200 p-3 rounded-lg w-full focus:ring-2 focus:ring-brand-900 outline-none" placeholder="Enter Pincode" maxlength="6">
+                                    <button onclick="window.checkDelivery()" class="bg-black text-white px-6 py-3 rounded-lg font-bold uppercase tracking-wider hover:bg-gray-800 transition">Check</button>
+                                </div>
+                                <p id="delivery-msg" class="text-green-600 font-bold mt-3 hidden">Yes, we can deliver to your doorstep! We also provide all-India delivery.</p>
+                                <p id="delivery-error-msg" class="text-accent-red font-bold mt-3 hidden">Please enter a valid 6-digit Pincode.</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="py-5">
-                        <h5 class="text-sm font-bold text-brand-900 uppercase tracking-wider mb-2">Shipping & Returns</h5>
-                        <p class="text-sm text-gray-600 font-medium">Delivered in 5-7 days. Easy replacements for damaged items. <a href="#returns" class="underline">View policy</a>.</p>
+
+                    <div class="accordion-item border-b border-gray-200">
+                        <button class="accordion-header w-full py-5 flex justify-between items-center text-left focus:outline-none group" onclick="window.toggleAccordion(this)">
+                            <span class="text-sm font-bold text-brand-900 tracking-widest uppercase">Description & Fit</span>
+                            <span class="accordion-icon text-gray-400 text-2xl font-light transition-transform duration-300 group-hover:text-brand-900">+</span>
+                        </button>
+                        <div class="accordion-content max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                            <div class="pb-6 text-sm text-gray-600 font-medium leading-relaxed whitespace-pre-line">
+                                ${product.description || 'No description provided.'}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item border-b border-gray-200">
+                        <button class="accordion-header w-full py-5 flex justify-between items-center text-left focus:outline-none group" onclick="window.toggleAccordion(this)">
+                            <span class="text-sm font-bold text-brand-900 tracking-widest uppercase">Reviews (4.8/5)</span>
+                            <span class="accordion-icon text-gray-400 text-2xl font-light transition-transform duration-300 group-hover:text-brand-900">+</span>
+                        </button>
+                        <div class="accordion-content max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                            <div class="pb-6 space-y-4">
+                                <div class="bg-gray-50 p-4 rounded-xl">
+                                    <div class="flex text-yellow-400 text-xs mb-1"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+                                    <p class="font-bold text-brand-900 text-sm">Rahul S.</p>
+                                    <p class="text-xs text-gray-600 mt-1">Awesome quality and perfect fit! Delivery was also fast.</p>
+                                </div>
+                                <div class="bg-gray-50 p-4 rounded-xl">
+                                    <div class="flex text-yellow-400 text-xs mb-1"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+                                    <p class="font-bold text-brand-900 text-sm">Priya M.</p>
+                                    <p class="text-xs text-gray-600 mt-1">The print is exactly as shown in the picture. Will buy again.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item border-b border-gray-200">
+                        <button class="accordion-header w-full py-5 flex justify-between items-center text-left focus:outline-none group" onclick="window.toggleAccordion(this)">
+                            <span class="text-sm font-bold text-brand-900 tracking-widest uppercase">Return Policy</span>
+                            <span class="accordion-icon text-gray-400 text-2xl font-light transition-transform duration-300 group-hover:text-brand-900">+</span>
+                        </button>
+                        <div class="accordion-content max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                            <div class="pb-6 text-sm text-gray-600 font-medium leading-relaxed">
+                                At <b>Khodal</b>, all our products are custom printed on-demand just for you in partnership with <b>Qikink</b>. We do not accept returns or exchanges for size or color preference issues. Returns or replacements are only accepted if you receive a damaged or misprinted item. Please report any defects within 7 days of delivery with an unboxing video.
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div class="w-full mt-10 pt-10 border-t border-gray-100 pb-10 px-5 lg:px-0">
+            <h2 class="font-display text-2xl lg:text-3xl font-bold text-brand-900 uppercase tracking-tight mb-8 text-center">May You Also Like</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-8">
+                ${relatedHtml || '<p class="text-center col-span-full text-gray-500">More products coming soon.</p>'}
+            </div>
+        </div>
     `;
-    document.getElementById('productDetailContainer').innerHTML = html;
+
+    const container = document.getElementById('productDetailContainer');
+    if(container) container.innerHTML = html;
 };
