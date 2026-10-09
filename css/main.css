@@ -1,7 +1,19 @@
 html, body { 
     -webkit-tap-highlight-color: transparent; 
-    overflow-x: hidden; 
     width: 100%;
+}
+
+/* FIX: overflow-x:hidden on <body> makes it a scroll container and breaks position:sticky.
+   Only <html> is clipped; <body> uses overflow-x:clip (no scroll container) so header stays sticky. */
+html { overflow-x: hidden; }
+body { overflow-x: clip; }
+
+/* STICKY HEADER (always pinned to top while scrolling) */
+#mainHeader {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 40;
 }
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -29,12 +41,23 @@ html, body {
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-.drawer-open { transform: translateX(0) !important; }
-.drawer-closed { transform: translateX(100%) !important; }
+.drawer-open { transform: translateX(0) !important; visibility: visible !important; }
+/* FIX: closed drawer must be fully hidden (visibility + no shadow), otherwise on mobile
+   when the browser address bar hides/shows while scrolling, the white drawer peeks from the bottom. */
+.drawer-closed {
+    transform: translateX(100%) !important;
+    visibility: hidden !important;
+    box-shadow: none !important;
+    pointer-events: none;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0.4s;
+}
 
 @media (max-width: 768px) {
     .drawer-closed { transform: translateY(100%) !important; }
 }
+
+/* Same protection for the mobile sidebar menu */
+#sidebarMenu.-translate-x-full { visibility: hidden; box-shadow: none; transition: transform 0.4s ease-in-out, visibility 0s linear 0.4s; }
 
 .img-hover-zoom { transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
 .group:hover .img-hover-zoom { transform: scale(1.05); }
