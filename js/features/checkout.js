@@ -1,5 +1,6 @@
-import { db } from '../firebase/firebase-config.js';
-import { ref, push, update, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+import { db, app } from '../firebase/firebase-config.js';
+import { ref, get } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-functions.js";
 
 window.appliedCoupon = null;
 
@@ -212,13 +213,6 @@ window.placeOrder = async () => {
     btn.innerHTML = `<div class="loader border-brand-900 border-t-transparent mx-auto"></div>`;
     btn.disabled = true;
     
-    const subtotal = window.AppState.cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-    
-    const prefix = "KHODAL"; 
-    const year = new Date().getFullYear();
-    const randomCode = Math.floor(100000 + Math.random() * 900000);
-    const orderId = `${prefix}-${year}-${randomCode}`;
-    
     const mobile = document.getElementById('chkMobile').value;
     const affiliateCode = localStorage.getItem('pod_affiliate_ref');
 
@@ -234,133 +228,60 @@ window.placeOrder = async () => {
         return;
     }
 
-    let couponDiscountAmount = 0;
-    if (window.appliedCoupon && subtotal >= window.appliedCoupon.minOrder) {
-        couponDiscountAmount = Math.round(subtotal * (window.appliedCoupon.discount / 100));
-    }
-
-    let postCouponTotal = subtotal - couponDiscountAmount;
-    let walletDiscount = 0;
-    let finalPayable = postCouponTotal;
-    let rewardsUsed = [];
-
     const chkUseWallet = document.getElementById('chkUseWallet');
-    if(window.currentUser && chkUseWallet && chkUseWallet.checked) {
-        const available = window.getValidWalletBalance ? window.getValidWalletBalance() : 0;
-        if(available > 0) {
-            walletDiscount = Math.min(available, postCouponTotal);
-            finalPayable = postCouponTotal - walletDiscount;
-            
-            let remainingToDeduct = walletDiscount;
-            const now = Date.now();
-            const activeRewards = (window.AppState.walletRewards || [])
-                .filter(r => r.status === 'ACTIVE' && r.expiresAt > now)
-                .sort((a,b) => a.expiresAt - b.expiresAt);
+    const useWallet = window.currentUser && chkUseWallet && chkUseWallet.checked;
 
-            for(let r of activeRewards) {
-                if(remainingToDeduct <= 0) break;
-                let rRem = Number(r.amount) - Number(r.usedAmount || 0);
-                if(rRem > 0) {
-                    let deduct = Math.min(rRem, remainingToDeduct);
-                    rewardsUsed.push({
-                        id: r.id,
-                        amountDeducted: deduct,
-                        newUsedAmount: Number(r.usedAmount || 0) + deduct,
-                        fullyUsed: (Number(r.usedAmount || 0) + deduct) >= Number(r.amount)
-                    });
-                    remainingToDeduct -= deduct;
-                }
-            }
-        }
-    }
-
-    const addressLine1 = document.getElementById('chkAddress1').value;
-    const addressLine2 = document.getElementById('chkAddress2').value;
-    const pincode = document.getElementById('chkPincode').value;
-    const city = document.getElementById('chkCity').value;
-    const state = document.getElementById('chkState').value;
-
-    const orderData = {
-        orderId: orderId,
-        customerName: document.getElementById('chkName').value,
+    const shippingAddress = {
+        name: document.getElementById('chkName').value,
         email: document.getElementById('chkEmail').value,
         mobile: mobile,
-        addressLine1: addressLine1,
-        addressLine2: addressLine2 || '',
-        pincode: pincode,
-        city: city,
-        state: state,
-        address: [addressLine1, addressLine2, city, state, pincode].filter(Boolean).join(', '),
-        products: window.AppState.cart,
-        subtotal: subtotal,
-        couponCode: window.appliedCoupon ? window.appliedCoupon.code : null,
-        couponDiscount: couponDiscountAmount,
-        walletDiscount: walletDiscount,
-        shippingCharge: 0,
-        rewardsUsedLog: rewardsUsed.length > 0 ? rewardsUsed.map(r => ({id: r.id, amount: r.amountDeducted})) : null,
-        totalAmount: finalPayable,
-        paymentMethod: selectedPaymentMethod,
-        utrNumber: utrNumber,
-        paymentStatus: selectedPaymentMethod === 'ONLINE' ? 'UTR_SUBMITTED' : 'PENDING',
-        status: 'NEW',
-        affiliateCode: affiliateCode || null,
-        userId: window.currentUser ? window.currentUser.uid : 'guest',
-        date: new Date().toISOString() 
+        addressLine1: document.getElementById('chkAddress1').value,
+        addressLine2: document.getElementById('chkAddress2').value || '',
+        pincode: document.getElementById('chkPincode').value,
+        city: document.getElementById('chkCity').value,
+        state: document.getElementById('chkState').value
     };
 
     try {
-        if(db) {
-            const updates = {};
-            const newOrderKey = push(ref(db, 'orders')).key;
-            
-            orderData.createdAt = serverTimestamp();
-            orderData.updatedAt = serverTimestamp();
-            updates[`orders/${newOrderKey}`] = orderData;
-
-            if(window.currentUser && rewardsUsed.length > 0) {
-                rewardsUsed.forEach(r => {
-                    updates[`users/${window.currentUser.uid}/walletRewards/${r.id}/usedAmount`] = r.newUsedAmount;
-                    if(r.fullyUsed) {
-                        updates[`users/${window.currentUser.uid}/walletRewards/${r.id}/status`] = 'USED';
-                    }
-                });
-            }
-
-            if(window.currentUser && !window.AppState.hasOrders) {
-                const newRewardKey = push(ref(db)).key;
-                const expiry = Date.now() + (30 * 24 * 60 * 60 * 1000); 
-                updates[`users/${window.currentUser.uid}/walletRewards/${newRewardKey}`] = {
-                    amount: 100,
-                    type: 'FIRST_ORDER',
-                    source: 'khodal_mission',
-                    status: 'ACTIVE',
-                    usedAmount: 0,
-                    createdAt: serverTimestamp(),
-                    expiresAt: expiry
-                };
-            }
-
-            await update(ref(db), updates);
-        }
+        const functions = getFunctions(app);
+        const secureCheckout = httpsCallable(functions, 'secureCheckout');
         
-        window.AppState.cart = [];
-        window.appliedCoupon = null;
-        if (window.saveCart) window.saveCart();
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-        window.showToast(`Order ${orderId} Confirmed!`);
-        
-        const idsToReset = ['chkName', 'chkEmail', 'chkMobile', 'chkAddress1', 'chkAddress2', 'chkPincode', 'chkCity', 'chkState', 'chkUtr'];
-        idsToReset.forEach(id => {
-            const el = document.getElementById(id);
-            if(el) el.value = '';
+        // Passing safe payload: Let backend do the math and deduct wallets
+        const cartPayload = window.AppState.cart.map(item => ({
+            productId: item.id || item.productId,
+            quantity: item.qty,
+            size: item.size
+        }));
+
+        const result = await secureCheckout({
+            cartItems: cartPayload,
+            shippingAddress: shippingAddress,
+            paymentMethod: selectedPaymentMethod,
+            utrNumber: utrNumber,
+            couponCode: window.appliedCoupon ? window.appliedCoupon.code : null,
+            useWallet: useWallet,
+            affiliateCode: affiliateCode
         });
-        
-        window.selectPaymentMethod('COD');
-        window.navigate('home');
+
+        if (result.data.success) {
+            window.AppState.cart = [];
+            window.appliedCoupon = null;
+            if (window.saveCart) window.saveCart();
+            
+            window.showToast(`Order Confirmed Successfully!`);
+            
+            const idsToReset = ['chkName', 'chkEmail', 'chkMobile', 'chkAddress1', 'chkAddress2', 'chkPincode', 'chkCity', 'chkState', 'chkUtr'];
+            idsToReset.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.value = '';
+            });
+            
+            window.selectPaymentMethod('COD');
+            window.navigate('home');
+        }
     } catch(e) {
         console.error("Order error", e);
-        window.showToast('Transaction Failed', 'error');
+        window.showToast('Transaction Failed: ' + (e.message || 'Unknown error'), 'error');
     } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
