@@ -1,5 +1,6 @@
-import { db } from '../firebase/firebase-config.js';
-import { ref, push, set, serverTimestamp, get, update, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+import { db, app } from '../firebase/firebase-config.js';
+import { ref, push, set, serverTimestamp, get, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-functions.js";
 
 window.getValidWalletBalance = () => {
     let balance = 0;
@@ -216,53 +217,22 @@ window.revealGiftCard = async () => {
     btn.disabled = true;
 
     try {
-        let rewardAmount = window.currentGiftConfig.rewardAmount || 50; 
+        const functions = getFunctions(app);
+        const secureRewardRedemption = httpsCallable(functions, 'secureRewardRedemption');
         
-        const updates = {};
-        const now = Date.now();
-        const expiry = now + (30 * 24 * 60 * 60 * 1000);
-        
-        const newRewardKey = push(ref(db)).key;
-        const newRedemptionKey = push(ref(db)).key;
+        // Let the backend process the redemption securely
+        const result = await secureRewardRedemption({ rewardId: window.currentGiftCode });
 
-        const newRedemptionCount = (window.currentGiftConfig.redemptionCount || 0) + 1;
-        let newStatus = window.currentGiftConfig.status;
-        if(window.currentGiftConfig.maxRedemptions && newRedemptionCount >= window.currentGiftConfig.maxRedemptions) {
-            newStatus = 'REDEEMED';
+        if(result.data.success) {
+            document.getElementById('giftRevealState').classList.add('hidden');
+            document.getElementById('giftRewardAmount').innerText = `₹${result.data.rewardAmount || window.currentGiftConfig.rewardAmount || 50}`;
+            document.getElementById('giftSuccessState').classList.remove('hidden');
+            
+            window.showToast('Reward added to your wallet!');
         }
-
-        updates[`giftCards/${window.currentGiftCode}/redemptionCount`] = newRedemptionCount;
-        updates[`giftCards/${window.currentGiftCode}/status`] = newStatus;
-
-        updates[`giftCardRedemptions/${newRedemptionKey}`] = {
-            code: window.currentGiftCode,
-            uid: window.currentUser.uid,
-            rewardId: newRewardKey,
-            amount: rewardAmount,
-            redeemedAt: serverTimestamp()
-        };
-
-        updates[`users/${window.currentUser.uid}/walletRewards/${newRewardKey}`] = {
-            amount: rewardAmount,
-            type: 'GIFT_CARD',
-            source: window.currentGiftCode,
-            status: 'ACTIVE',
-            usedAmount: 0,
-            createdAt: serverTimestamp(),
-            expiresAt: expiry
-        };
-
-        await update(ref(db), updates);
-
-        document.getElementById('giftRevealState').classList.add('hidden');
-        document.getElementById('giftRewardAmount').innerText = `₹${rewardAmount}`;
-        document.getElementById('giftSuccessState').classList.remove('hidden');
-        
-        window.showToast('Reward added to your wallet!');
-
     } catch(e) {
         console.error(e);
-        window.showToast('Error redeeming gift card.', 'error');
+        window.showToast('Error redeeming gift card. It might be invalid or already used.', 'error');
         btn.innerHTML = `Reveal My Reward`;
         btn.disabled = false;
     }
