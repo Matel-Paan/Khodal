@@ -9,10 +9,18 @@ window.renderCategoriesUI = () => {
     if(window.AppState.categories.length === 0) {
         homeCatGrid.innerHTML = `<div class="col-span-full text-center py-6 text-gray-500 font-medium border-b border-r border-gray-200">Categories will appear here once added by Admin.</div>`;
     } else {
+        // OPTIMIZED: Added skeleton loader (animate-pulse) and lazy loading for categories
         homeCatGrid.innerHTML = window.AppState.categories.map(c => `
             <div onclick="navigate('shop?category=${c.name.toLowerCase()}')" class="group flex flex-col items-center bg-white border-b border-r border-gray-200 p-3 lg:p-4 cursor-pointer hover:shadow-md transition">
                 <h3 class="text-brand-900 font-sans font-bold text-xs lg:text-sm uppercase tracking-wider mb-2 lg:mb-3 text-left w-full">${c.name}</h3>
-                <img src="${c.image}" class="w-full h-auto object-contain img-hover-zoom aspect-square">
+                <div class="w-full bg-gray-100 animate-pulse aspect-square overflow-hidden flex items-center justify-center">
+                    <img src="${c.image}" 
+                         class="w-full h-auto object-contain img-hover-zoom opacity-0 transition-opacity duration-300" 
+                         loading="lazy" 
+                         decoding="async" 
+                         onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('animate-pulse', 'bg-gray-100');"
+                         onerror="this.src='assets/fallback.png'; this.classList.remove('opacity-0'); this.parentElement.classList.remove('animate-pulse', 'bg-gray-100');">
+                </div>
             </div>
         `).join('');
     }
@@ -56,7 +64,7 @@ window.renderBanners = () => {
     if(window.AppState.banners.length === 0) {
         container.innerHTML = `
         <div class="w-full flex-shrink-0 h-full relative">
-            <img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1600&auto=format" class="absolute inset-0 w-full h-full object-cover object-center">
+            <img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1600&auto=format" class="absolute inset-0 w-full h-full object-cover object-center" fetchpriority="high">
             <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/50 to-transparent pointer-events-none"></div>
             <div class="relative z-10 h-full max-w-[1400px] mx-auto px-5 lg:px-10 flex flex-col justify-end pb-12 lg:pb-24">
                 <span class="text-xs lg:text-sm font-bold tracking-[0.2em] text-white/90 uppercase mb-4 shadow-sm">The New Drop is Here</span>
@@ -73,9 +81,13 @@ window.renderBanners = () => {
         return;
     }
 
-    container.innerHTML = window.AppState.banners.map(b => `
+    // OPTIMIZED: First banner gets fetchpriority="high", others lazy load
+    container.innerHTML = window.AppState.banners.map((b, i) => `
         <div class="w-full flex-shrink-0 h-full relative cursor-pointer bg-brand-50" onclick="navigate('${b.targetLink || 'shop'}')">
-            <img src="${window.processImageUrl(b.imageUrl)}" class="absolute inset-0 w-full h-full object-cover object-center">
+            <img src="${window.processImageUrl(b.imageUrl)}" 
+                 class="absolute inset-0 w-full h-full object-cover object-center ${i === 0 ? '' : 'opacity-0 transition-opacity duration-500'}" 
+                 ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy" decoding="async" onload="this.classList.remove(\'opacity-0\')"'} 
+                 alt="Promotional Banner">
             <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
         </div>
     `).join('');
@@ -94,7 +106,7 @@ window.renderSmallBanners = () => {
     if(!container) return;
     if(window.AppState.smallBanners && window.AppState.smallBanners.length > 0) {
         const b = window.AppState.smallBanners[0];
-        container.innerHTML = `<img src="${window.processImageUrl(b.imageUrl)}" class="w-full h-full object-cover cursor-pointer" onclick="navigate('${b.targetLink || 'shop'}')">`;
+        container.innerHTML = `<img src="${window.processImageUrl(b.imageUrl)}" class="w-full h-full object-cover cursor-pointer" loading="lazy" decoding="async" onclick="navigate('${b.targetLink || 'shop'}')">`;
     } else {
         container.innerHTML = `<div class="w-full h-full flex items-center justify-center text-gray-400 font-bold uppercase tracking-widest text-xs">Small Banner [1200x400]</div>`;
     }
@@ -104,10 +116,11 @@ window.renderPrimaryBanners = () => {
     const container = document.getElementById('primaryBannerContainer');
     if(!container) return;
     if(window.AppState.primaryBanners && window.AppState.primaryBanners.length > 0) {
+        // OPTIMIZED: Added lazy loading to carousel images
         container.innerHTML = `
             <div id="primaryBannerScroll" class="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar w-full h-full scroll-smooth">
                 ${window.AppState.primaryBanners.map(b => `
-                    <img src="${window.processImageUrl(b.imageUrl)}" class="w-full h-full object-cover shrink-0 snap-center cursor-pointer" onclick="navigate('${b.targetLink || 'shop'}')">
+                    <img src="${window.processImageUrl(b.imageUrl)}" class="w-full h-full object-cover shrink-0 snap-center cursor-pointer" loading="lazy" decoding="async" onclick="navigate('${b.targetLink || 'shop'}')">
                 `).join('')}
             </div>
         `;
@@ -283,18 +296,21 @@ window.renderProduct = (queryStr) => {
     let sliderHtml = '';
     let thumbHtml = '';
     const imagesArray = product.images && product.images.length > 0 ? product.images : (product.image ? [product.image] : []);
+    
+    // OPTIMIZED: First image high priority, rest lazy loaded
     imagesArray.forEach((img, i) => {
         let imgId = `mainImg-${i}`;
-        sliderHtml += `<img id="${imgId}" src="${img}" class="w-full h-full object-cover object-center snap-center snap-always shrink-0" alt="${product.name}">`;
+        let loadType = (i === 0) ? 'fetchpriority="high"' : 'loading="lazy" decoding="async"';
+        sliderHtml += `<img id="${imgId}" src="${img}" class="w-full h-full object-cover object-center snap-center snap-always shrink-0" alt="${product.name}" ${loadType}>`;
+        
         let borderClass = (i === 0) ? 'border-brand-900' : 'border-transparent';
-        thumbHtml += `<img src="${img}" onclick="document.getElementById('${imgId}').scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'});" class="w-16 h-20 object-cover rounded cursor-pointer border-2 ${borderClass} snap-start shrink-0">`;
+        thumbHtml += `<img src="${img}" onclick="document.getElementById('${imgId}').scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'});" class="w-16 h-20 object-cover rounded cursor-pointer border-2 ${borderClass} snap-start shrink-0" loading="lazy">`;
     });
 
     const allProducts = window.AppState.products || [];
     let relatedProducts = allProducts.filter(p => p.id !== product.id).slice(0, 4);
     let relatedHtml = relatedProducts.map(window.createProductCard).join('');
 
-    // === MULTI-COUPON CAROUSEL DESIGN ===
     let couponHtml = '';
     const productCoupons = window.AppState.coupons ? window.AppState.coupons.filter(c => c.productId === product.id) : [];
     
@@ -373,7 +389,6 @@ window.renderProduct = (queryStr) => {
                 </div>
 
                 <div class="w-full border-t border-gray-100 pt-4" id="product-accordion">
-                    
                     <div class="accordion-item border-b border-gray-200">
                         <button class="accordion-header w-full py-5 flex justify-between items-center text-left focus:outline-none group" onclick="window.toggleAccordion(this)">
                             <span class="text-sm font-bold text-brand-900 tracking-widest uppercase">Delivery</span>
