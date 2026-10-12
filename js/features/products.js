@@ -6,10 +6,17 @@ window.createProductCard = (p) => {
         discount = Math.round(((p.price - p.salePrice) / p.price) * 100);
     }
     
+    // ADVANCED IMAGE LOADING: Added lazy loading, async decoding, and skeleton animation
     return `
     <div class="group flex flex-col cursor-pointer bg-white" onclick="navigate('product?id=${p.id}')">
-        <div class="relative bg-gray-100 aspect-[3/4] mb-3 overflow-hidden">
-            <img src="${p.image}" class="w-full h-full object-cover object-center img-hover-zoom" alt="${p.name}" loading="lazy">
+        <div class="relative bg-gray-200 aspect-[3/4] mb-3 overflow-hidden animate-pulse">
+            <img src="${p.image}" 
+                 class="w-full h-full object-cover object-center img-hover-zoom opacity-0 transition-opacity duration-300" 
+                 alt="${p.name}" 
+                 loading="lazy" 
+                 decoding="async" 
+                 onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('animate-pulse', 'bg-gray-200');"
+                 onerror="this.src='assets/fallback.png'; this.classList.remove('opacity-0'); this.parentElement.classList.remove('animate-pulse', 'bg-gray-200');">
             <button onclick="toggleWishlist('${p.id}', event)" class="absolute top-2 right-2 w-8 h-8 flex items-center justify-center z-10 hover:scale-110 transition">
                 <i class="fa-${isWishlisted ? 'solid text-accent-red' : 'regular text-gray-500'} fa-heart text-xl"></i>
             </button>
